@@ -1,0 +1,456 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BiteFinder Restaurante</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand-dark: #0a2f4c;
+      --brand: #005e8a;
+      --brand-soft: #1a8dbd;
+      --brand-alt: #7f3ff5;
+      --bg: #f3f4f6;
+      --surface: #ffffff;
+      --surface-strong: #0f2a4b;
+      --text: #112b45;
+      --text-soft: #6b7280;
+      --radius: 15px;
+      --shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
+      font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: linear-gradient(135deg, #022540, #071326 75%); color: var(--text); display: flex; justify-content: center; align-items: center; padding: 12px; }
+
+    .app { width: min(100%, 1180px); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.16); background: linear-gradient(180deg, #0a1f39 0%, #081830 70%); }
+
+    .header { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .logo { width: 48px; height: 48px; border-radius: 12px; }
+    .header h1 { margin: 0; font-size: clamp(1.2rem, 2.2vw, 1.8rem); color: #edf6ff; }
+    .header p { margin: 2px 0 0; color: #b4c8e5; font-size: 0.92rem; }
+
+    .tabs { display: flex; gap: 9px; padding: 14px 20px; align-items: stretch; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .tabs button { flex: 1; border: none; border-radius: 12px; background: rgba(255,255,255,0.08); color: #dbe7ff; font-weight: 600; cursor: pointer; transition: all .2s ease; }
+    .tabs button.active { background: linear-gradient(135deg, var(--brand), var(--brand-alt)); color: #fff; box-shadow: 0 9px 22px rgba(0, 117, 212, 0.4); }
+    .tabs button.hidden { display: none; }
+    .tabs button.disabled { opacity: .5; cursor: not-allowed; }
+
+    .content { padding: 20px; display: grid; gap: 16px; }
+    .panel { display: none; animation: fade 0.2s ease; }
+    .panel.active { display: grid; }
+
+    .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 18px; backdrop-filter: blur(4px); }
+
+    .login-card {
+      max-width: 460px;
+      margin: 0 auto;
+      background: rgba(7, 20, 41, 0.92);
+      border: 1px solid rgba(109, 173, 255, 0.28);
+      border-radius: 18px;
+      padding: 30px 25px;
+      box-shadow: 0 22px 45px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(8px);
+      position: relative;
+    }
+
+    .login-card h2 {
+      margin: 0 0 10px;
+      color: #f3f9ff;
+      font-size: 1.5rem;
+      letter-spacing: 0.7px;
+    }
+
+    .login-card p {
+      margin: 0 0 16px;
+      color: #afc9f7;
+      font-size: 0.92rem;
+    }
+
+    .login-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .login-footer .link { color: #8cc1ff; font-size: 0.86rem; text-decoration: underline; cursor: pointer; border: none; background: transparent; padding: 0; }
+
+    .field-error { color: #ff8f9e; font-size: 0.82rem; min-height: 1.2rem; }
+
+    .form-row { display: grid; gap: 6px; margin-bottom: 12px; }
+    .form-row label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: #bfd3f7; }
+    .form-row input, .form-row textarea { border: 1px solid rgba(255,255,255,0.23); border-radius: 10px; background: rgba(0, 30, 55, 0.6); color: #ecf4ff; padding: 11px 12px; outline: none; transition: ring .25s ease, border .2s ease; }
+    .form-row input::placeholder, .form-row textarea::placeholder { color: #9ab8df; }
+    .form-row input:focus, .form-row textarea:focus { border-color: var(--brand); box-shadow: 0 0 0 3px rgba(0, 112, 180, 0.2); }
+    .form-row textarea { min-height: 74px; resize: vertical; }
+
+    .button-cta { width: 100%; border: none; border-radius: 11px; padding: 12px 14px; font-weight: 700; letter-spacing: 0.14px; color: #fff; background: linear-gradient(135deg, var(--brand), var(--brand-alt)); cursor: pointer; transition: transform .18s ease, box-shadow .18s ease; }
+    .button-cta:hover { transform: translateY(-1px); box-shadow: 0 10px 18px rgba(0, 115, 215, 0.5); }
+
+    .status { margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(2, 24, 49, 0.7); color: #d6e8ff; border-radius: 10px; padding: 10px 12px; font-size: 0.88rem; }
+
+    .grid-menu { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); }
+    .menu-card { border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; background: rgba(1,17,36,0.68); padding: 12px 10px; }
+    .menu-card h4 { margin: 0 0 5px; color: #edf6ff; }
+    .menu-card small { color: #9ac3f8; }
+    .menu-card p { margin: 6px 0 0; color: #c3d3ef; }
+
+    .toast { position: fixed; right: 16px; bottom: 16px; z-index: 9999; background: rgba(17, 37, 64, 0.95); color: #fff; padding: 11px 14px; border-radius: 10px; box-shadow: 0 14px 30px rgba(0,0,0,0.4); opacity: 0; transform: translateY(8px); transition: 0.28s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .placeholder { color: #9bafdd; border: 1px dashed rgba(255,255,255,0.2); border-radius: 10px; padding: 12px; text-align: center; }
+    /* modo minimal para tela de login inicial */
+    body.minimal .logo { display: none; }
+    body.minimal .header p { display: none; }
+    body.minimal .app { width: min(760px, 96%); }
+    body.minimal .tabs { justify-content: center; }
+    body.minimal .login-card { margin-left: auto; margin-right: auto; }
+
+    @keyframes fade { from { opacity: 0.05; transform: translateY(6px);} to { opacity: 1; transform: translateY(0); }}
+
+    @media (max-width: 880px) { .header { flex-direction: column; align-items: flex-start; } .tabs { flex-wrap: wrap; } }
+  </style>
+</head>
+<body>
+  <article class="app">
+    <header class="header">
+      <img class="logo" src="https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png" alt="Logo BiteFinder" />
+      <div>
+        <h1>BiteFinder Restaurante</h1>
+        <p>Faça login com email e gerencie seu restaurante com segurança</p>
+      <div class="tabs" style="justify-content:center;">
+        <button id="tabLogin" class="active" type="button">Login</button>
+        <button id="tabRegister" type="button">Cadastro</button>
+        <button id="tabMenu" class="hidden" type="button">Cardápio</button>
+        <button id="tabSales" class="hidden" type="button">Vendas</button>
+      </div>
+
+    <main class="content">
+      <section id="panelLogin" class="panel active" aria-labelledby="tabLogin">
+        <div class="login-card">
+          <h2>Login de Restaurante</h2>
+          <p>Insira seu email e senha para acessar o painel de gestão.</p>
+          <form id="formLogin" autocomplete="off" novalidate>
+            <div class="form-row"><label>Email</label><input id="loginEmail" type="email" name="email" required placeholder="seu@email.com" /></div>
+            <div class="field-error" id="loginEmailError"></div>
+            <div class="form-row"><label>Senha</label><input id="loginPassword" type="password" name="password" required placeholder="********" /></div>
+            <div class="field-error" id="loginPasswordError"></div>
+            <button class="button-cta" type="submit">Entrar</button>
+            <div class="login-footer">
+              <button id="forgotPassword" class="link" type="button">Esqueci senha</button>
+              <span style="color:#a9c8ff;font-size:0.82rem">Pressione Enter para enviar</span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section id="panelRegister" class="panel" aria-labelledby="tabRegister">
+        <div class="card">
+          <div class="status">Registre seu restaurante e faça login com email.</div>
+          <form id="formRegister" autocomplete="off" novalidate>
+            <div class="form-row"><label>Nome do Proprietário</label><input type="text" name="name" required placeholder="João Silva" /></div>
+            <div class="form-row"><label>Email</label><input type="email" name="email" required placeholder="seu@email.com" /></div>
+            <div class="form-row"><label>Senha</label><input type="password" name="password" required placeholder="*******" /></div>
+            <div class="form-row"><label>Nome do Restaurante</label><input type="text" name="restauranteNome" required placeholder="Bistrô Ideal" /></div>
+            <div class="form-row"><label>Endereço</label><input type="text" name="restauranteMorada" required placeholder="Avenida Central, 123" /></div>
+            <div class="form-row"><label>NIF</label><input type="text" name="restaurantCode" required placeholder="123456789" /></div>
+            <button class="button-cta" type="submit">Registrar restaurante</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="panelMenu" class="panel" aria-labelledby="tabMenu">
+        <div class="card">
+          <div class="status" id="statusMenu">Gerencie seu cardápio após efetuar login.</div>
+          <form id="menuForm" autocomplete="off" novalidate>
+            <div class="form-row"><label>Nome do Prato</label><input name="nome" required placeholder="Risoto de Camarão" /></div>
+            <div class="form-row"><label>Categoria</label><input name="categoria" required placeholder="Massas" /></div>
+            <div class="form-row"><label>Descrição</label><textarea name="descricao" placeholder="Descrição do prato..."></textarea></div>
+            <div class="form-row"><label>Preço</label><input type="number" step="0.01" name="preco" required placeholder="49.90" /></div>
+            <div class="form-row"><label>Imagem (URL)</label><input name="imagemUrl" placeholder="https://.../prato.jpg" /></div>
+            <button class="button-cta" type="submit">Salvar prato</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 style="color:#d9e9ff;margin:0 0 8px;">Cardápio do restaurante</h3>
+          <div id="menuList" class="grid-menu"><div class="placeholder">Nenhum prato carregado ainda.</div></div>
+        </div>
+      </section>
+
+      <section id="panelSales" class="panel" aria-labelledby="tabSales">
+        <div class="card">
+          <div class="status" id="statusSales">Painel de vendas disponível após login.</div>
+          <div class="form-row"><label>Período</label><select id="salesRange"><option value="7">7 dias</option><option value="30" selected>30 dias</option><option value="90">90 dias</option></select></div>
+          <div id="salesCards" class="grid-menu"></div>
+          <div class="card" style="border:1px solid rgba(255,255,255,0.15);background:rgba(0,31,57,0.5);"><p id="salesSummary" style="margin:0;color:#c3d7f9;"></p></div>
+        </div>
+      </section>
+    </main>
+  </article>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script>
+    const state = { token: null, user: null, restauranteId: null };
+
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const tabMenu = document.getElementById('tabMenu');
+    const tabSales = document.getElementById('tabSales');
+    const panelLogin = document.getElementById('panelLogin');
+    const panelRegister = document.getElementById('panelRegister');
+    const panelMenu = document.getElementById('panelMenu');
+    const panelSales = document.getElementById('panelSales');
+    const statusMenu = document.getElementById('statusMenu');
+    const statusSales = document.getElementById('statusSales');
+    const toast = document.getElementById('toast');
+
+    function showToast(msg, error = false) {
+      toast.textContent = msg;
+      toast.style.background = error ? 'rgba(209, 74, 74, 0.95)' : 'rgba(16, 114, 222, 0.95)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function setTabVisibility(isLoggedIn) {
+      // Só mostra Cardápio e Vendas se logado
+      tabMenu.classList.toggle('hidden', !isLoggedIn);
+      tabSales.classList.toggle('hidden', !isLoggedIn);
+      // Sempre mostra Login/Cadastro
+      tabLogin.classList.remove('hidden');
+      tabRegister.classList.remove('hidden');
+      // Mostra só os painéis corretos
+      panelMenu.classList.toggle('active', isLoggedIn && tabMenu.classList.contains('active'));
+      panelSales.classList.toggle('active', isLoggedIn && tabSales.classList.contains('active'));
+      panelLogin.classList.toggle('active', !isLoggedIn && tabLogin.classList.contains('active'));
+      panelRegister.classList.toggle('active', !isLoggedIn && tabRegister.classList.contains('active'));
+      // marca body para modo minimal quando não logado
+      document.body.classList.toggle('minimal', !isLoggedIn);
+    }
+
+    function switchTab(panel) {
+      [tabLogin, tabRegister, tabMenu, tabSales].forEach((btn) => btn.classList.remove('active'));
+      [panelLogin, panelRegister, panelMenu, panelSales].forEach((p) => p.classList.remove('active'));
+
+      if (panel === 'login') { tabLogin.classList.add('active'); panelLogin.classList.add('active'); }
+      if (panel === 'register') { tabRegister.classList.add('active'); panelRegister.classList.add('active'); }
+      if (panel === 'menu') { if (!state.token) { showToast('Faça login antes', true); return; } tabMenu.classList.add('active'); panelMenu.classList.add('active'); }
+      if (panel === 'sales') { if (!state.token) { showToast('Faça login antes', true); return; } tabSales.classList.add('active'); panelSales.classList.add('active'); }
+    }
+
+    tabLogin.onclick = () => { switchTab('login'); loginEmail.focus(); };
+    tabRegister.onclick = () => switchTab('register');
+    tabMenu.onclick = () => switchTab('menu');
+    tabSales.onclick = () => switchTab('sales');
+
+    setTabVisibility(false);
+    switchTab('login');
+    // Esconde Cardápio e Vendas ao abrir
+    tabMenu.classList.add('hidden');
+    tabSales.classList.add('hidden');
+    window.setTimeout(() => loginEmail.focus(), 100);
+
+    async function apiRequest(url, method = 'GET', body = null) {
+      try {
+        const headers = {};
+        if (body && !(body instanceof FormData)) {
+          headers['Content-Type'] = 'application/json';
+          body = JSON.stringify(body);
+        }
+        if (state.token) {
+          headers['Authorization'] = 'Bearer ' + state.token;
+        }
+        const response = await fetch(url, { method, headers, body });
+        const data = await response.json();
+        if (!response.ok || data.ok === false) {
+          return { ok: false, error: data.error || data.message || 'Erro na API' };
+        }
+        return data;
+      } catch (err) {
+        return { ok: false, error: err.message || 'Erro de rede' };
+      }
+    }
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function passwordStrength(value) {
+      if (value.length < 8) return 'Muito fraca';
+      if (/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/.test(value)) return 'Forte';
+      if (/^(?=.*[a-z])(?=.*\d).+$/.test(value)) return 'Média';
+      return 'Fraca';
+    }
+
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginEmailError = document.getElementById('loginEmailError');
+    const loginPasswordError = document.getElementById('loginPasswordError');
+
+    loginEmail.addEventListener('input', () => {
+      if (!loginEmail.value.trim()) {
+        loginEmailError.textContent = 'Email obrigatório';
+      } else if (!isValidEmail(loginEmail.value.trim())) {
+        loginEmailError.textContent = 'Formato de email inválido';
+      } else {
+        loginEmailError.textContent = '';
+      }
+    });
+
+    loginPassword.addEventListener('input', () => {
+      // No login, só mostrar erro se estiver vazio
+      if (!loginPassword.value) {
+        loginPasswordError.textContent = 'Senha obrigatória';
+        loginPasswordError.style.color = '#ff8f9e';
+      } else {
+        loginPasswordError.textContent = '';
+      }
+    });
+
+    document.getElementById('formLogin').onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const email = form.email.value.trim();
+      const password = form.password.value;
+
+      if (!email || !password) { showToast('Email e senha são obrigatórios', true); return; }
+      if (!isValidEmail(email)) { showToast('Email inválido', true); return; }
+
+      // Corrigir endpoint para login_jwt.php
+      const result = await apiRequest('api/auth/login_jwt.php', 'POST', { email, password });
+      if (!result.ok) { showToast(result.error, true); return; }
+
+      state.token = result.token;
+      state.user = result.user;
+      state.restauranteId = result.user.restauranteId || (result.user.restaurantes?.length ? result.user.restaurantes[0] : null);
+
+      setTabVisibility(true);
+      switchTab('menu');
+      statusMenu.textContent = `Bem-vindo, ${result.user.nome}. Gerencie seu cardápio.`;
+      statusSales.textContent = 'Dados de vendas carregados após login.';
+
+      await refreshMenu();
+      await refreshSales();
+      showToast('Login realizado com sucesso!');
+    };
+
+    document.getElementById('forgotPassword').onclick = () => {
+      const email = loginEmail.value.trim();
+      if (!email || !isValidEmail(email)) {
+        showToast('Informe um email válido para recuperar a senha', true);
+        return;
+      }
+      showToast('Solicitação de recuperação enviada (mock)', false);
+    };
+
+    document.getElementById('formRegister').onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const payload = new URLSearchParams();
+      payload.append('name', form.name.value.trim());
+      payload.append('email', form.email.value.trim());
+      payload.append('password', form.password.value.trim());
+      payload.append('restauranteNome', form.restauranteNome.value.trim());
+      payload.append('restauranteMorada', form.restauranteMorada.value.trim());
+
+      if (!form.email.value.trim()) { showToast('Email obrigatório', true); return; }
+      if (!form.restaurantCode.value.trim()) { showToast('NIF obrigatório', true); return; }
+
+      payload.append('restaurantCode', form.restaurantCode.value.trim());
+      const response = await fetch('api/auth/register_restaurante.php', { method: 'POST', body: payload });
+      const json = await response.json();
+      if (!json.ok) { showToast(json.error || json.message || 'Erro ao cadastrar', true); return; }
+
+      showToast('Cadastro realizado. Faça o login com seu email.');
+      switchTab('login');
+    };
+
+    async function refreshMenu() {
+      const menuList = document.getElementById('menuList');
+      menuList.innerHTML = '<div class="placeholder">Carregando cardápio...</div>';
+      if (!state.restauranteId) { menuList.innerHTML = '<div class="placeholder">Faça login para ver o cardápio</div>'; return; }
+
+      const res = await apiRequest(`api/pratos/list.php?restauranteId=${state.restauranteId}`, 'GET');
+      if (!res.ok) { menuList.innerHTML = `<div class="placeholder">${res.error}</div>`; return; }
+
+      const items = Array.isArray(res.items) ? res.items : [];
+      if (!items.length) { menuList.innerHTML = '<div class="placeholder">Seu cardápio está vazio. Adicione pratos!</div>'; return; }
+
+      menuList.innerHTML = '';
+      items.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'menu-card';
+        card.innerHTML = `
+          <h4>${item.nome}</h4>
+          <small>${item.categoria || 'Sem categoria'}</small>
+          <p>${item.descricao || 'Sem descrição'}</p>
+          <p style="margin:.5rem 0 0;color:#a8c5f2;"><strong>R$ ${Number(item.preco || 0).toFixed(2)}</strong></p>
+        `;
+        menuList.appendChild(card);
+      });
+    }
+
+    document.getElementById('menuForm').onsubmit = async (event) => {
+      event.preventDefault();
+      if (!state.restauranteId) { showToast('Faça login antes', true); return; }
+      const form = event.target;
+      const payload = {
+        userId: state.user?.id || 0,
+        restauranteId: state.restauranteId,
+        nome: form.nome.value.trim(),
+        categoria: form.categoria.value.trim(),
+        descricao: form.descricao.value.trim(),
+        preco: Number(form.preco.value),
+        imagemUrl: form.imagemUrl.value.trim(),
+      };
+
+      if (!payload.nome || !payload.categoria || !payload.preco) {
+        showToast('Nome, categoria e preço são obrigatórios', true);
+        return;
+      }
+
+      const res = await apiRequest('api/pratos/create.php', 'POST', payload);
+      if (!res.ok) { showToast(res.error, true); return; }
+
+      showToast('Prato adicionado com sucesso');
+      form.reset();
+      refreshMenu();
+    };
+
+    async function refreshSales() {
+      if (!state.restauranteId) { return; }
+      statusSales.textContent = 'Carregando vendas...';
+      const dias = document.getElementById('salesRange').value;
+      const res = await apiRequest(`api/sales/list.php?restauranteId=${state.restauranteId}&days=${dias}`);
+
+      if (!res.ok) { statusSales.textContent = 'Erro ao carregar vendas'; showToast(res.error, true); return; }
+
+      statusSales.textContent = `Exibindo vendas para ${dias} dias`;
+      const salesCards = document.getElementById('salesCards');
+      salesCards.innerHTML = '';
+
+      const dados = [
+        { label: 'Total faturado', value: `R$ ${Number(res.totalSales || 0).toFixed(2)}` },
+        { label: 'Quantidade de pedidos', value: res.orderCount || 0 },
+        { label: 'Ticket médio', value: `R$ ${Number(res.averageTicket || 0).toFixed(2)}` },
+        { label: 'Prato mais vendido', value: res.topDish || '-' },
+      ];
+
+      dados.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'menu-card';
+        card.innerHTML = `<h4>${item.value}</h4><p>${item.label}</p>`;
+        salesCards.appendChild(card);
+      });
+
+      document.getElementById('salesSummary').textContent = `Período: ${dias} dias | Total: R$ ${Number(res.totalSales || 0).toFixed(2)}`;
+    }
+
+    document.getElementById('salesRange').onchange = refreshSales;
+
+    window.addEventListener('load', () => {
+      statusMenu.textContent = 'Use login ou cadastro para acessar o portal.';
+      statusSales.textContent = 'Vendas aparecerão após login.';
+    });
+  </script>
+</body>
+</html>
