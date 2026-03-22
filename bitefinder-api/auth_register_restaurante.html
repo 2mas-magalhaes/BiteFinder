@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registar Restaurante</title>
+  <style>body{font-family:sans-serif;max-width:760px;margin:30px auto;padding:0 16px;}label{display:block;margin:8px 0 4px;}input, button, textarea{width:100%;padding:10px;margin-bottom:10px;}</style>
+</head>
+<body>
+  <h1>Registar Conta Restaurante</h1>
+  <form id="registerForm">
+    <label>Nome do proprietário</label><input type="text" name="name" required />
+    <label>Email</label><input type="email" name="email" required />
+    <label>Password</label><input type="password" name="password" required />
+    <label>Nome do restaurante</label><input type="text" name="restauranteNome" required />
+    <label>Morada</label><input type="text" name="restauranteMorada" />
+    <button type="submit">Registar</button>
+  </form>
+  <pre id="resultado"></pre>
+
+  <script>
+    document.getElementById('registerForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const f = event.target;
+      const data = new URLSearchParams(new FormData(f));
+
+      const resp = await fetch('api/auth/register_restaurante.php', {
+        method: 'POST',
+        body: data
+      });
+      const json = await resp.json();
+      document.getElementById('resultado').textContent = JSON.stringify(json, null, 2);
+    });
+  </script>
+</body>
+</html>

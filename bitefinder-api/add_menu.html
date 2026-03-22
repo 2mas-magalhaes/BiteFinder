@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <title>Adicionar Menu (Prato)</title>
+  <style>body{font-family:sans-serif;max-width:760px;margin:30px auto;padding:0 16px;}label{display:block;margin:8px 0 4px;}input, textarea, button{width:100%;padding:10px;margin-bottom:10px;}</style>
+</head>
+<body>
+  <h1>Adicionar Prato</h1>
+  <form id="menuForm">
+    <label>UserId</label><input type="number" name="userId" min="1" required />
+    <label>RestauranteId</label><input type="number" name="restauranteId" min="1" required />
+    <label>Nome do prato</label><input type="text" name="nome" required />
+    <label>Categoria</label><input type="text" name="categoria" />
+    <label>Descrição</label><textarea name="descricao" rows="3"></textarea>
+    <label>Preço (ex: 12.50)</label><input type="number" step="0.01" name="preco" />
+    <label>URL imagem</label><input type="url" name="imagemUrl" />
+    <button type="submit">Criar prato</button>
+  </form>
+  <pre id="resultado"></pre>
+
+  <script>
+    document.getElementById('menuForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const form = new FormData(e.target);
+
+      const payload = {
+        userId: Number(form.get('userId')),
+        restauranteId: Number(form.get('restauranteId')),
+        nome: String(form.get('nome')).trim(),
+        categoria: String(form.get('categoria') || '').trim(),
+        descricao: String(form.get('descricao') || '').trim(),
+        preco: form.get('preco') ? Number(form.get('preco')) : null,
+        imagemUrl: String(form.get('imagemUrl') || '').trim()
+      };
+
+      const res = await fetch('api/pratos/create.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+      });
+
+      const json = await res.json();
+      document.getElementById('resultado').textContent = JSON.stringify(json, null, 2);
+    });
+  </script>
+</body>
+</html>
