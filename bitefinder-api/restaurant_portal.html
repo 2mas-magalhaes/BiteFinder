@@ -338,7 +338,20 @@
   <div id="toast" class="toast" aria-live="polite"></div>
 
   <script>
-    const state = { token: null, user: null, restauranteId: null };
+    // Persistência de sessão (token e user) no localStorage
+    const state = {
+      token: localStorage.getItem('jwtToken') || null,
+      user: null,
+      restauranteId: null
+    };
+    try {
+      const userStr = localStorage.getItem('jwtUser');
+      if (userStr) state.user = JSON.parse(userStr);
+      if (state.user && state.user.restauranteId)
+        state.restauranteId = state.user.restauranteId;
+      else if (state.user && state.user.restaurantes?.length)
+        state.restauranteId = state.user.restaurantes[0];
+    } catch {}
 
     // DOM Elements - Navigation
     const tabLogin = document.getElementById('tabLogin');
@@ -372,6 +385,9 @@
         authLayout.classList.add('hidden');
         dashboardLayout.classList.remove('hidden');
         switchTab('menu');
+        // Salvar sessão
+        localStorage.setItem('jwtToken', state.token || '');
+        localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
       } else {
         authLayout.classList.remove('hidden');
         dashboardLayout.classList.add('hidden');
@@ -379,6 +395,8 @@
         state.token = null;
         state.user = null;
         state.restauranteId = null;
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('jwtUser');
       }
     }
 
@@ -485,6 +503,11 @@
       state.token = result.token;
       state.user = result.user;
       state.restauranteId = result.user.restauranteId || (result.user.restaurantes?.length ? result.user.restaurantes[0] : null);
+      // Salvar sessão
+      localStorage.setItem('jwtToken', state.token || '');
+      localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
+  // Logout global: limpar localStorage
+  document.getElementById('btnSair').onclick = () => setTabVisibility(false);
 
       navRestaurantName.textContent = result.user.nome || 'Parceiro BiteFinder';
 
@@ -576,6 +599,8 @@
         `;
         // Evento de edição inline
         card.querySelector('[data-edit]').onclick = () => {
+                  // Evento de remoção
+                  // Remover prato só disponível no modo edição
           if (card.querySelector('form')) return; // já está editando
           const form = document.createElement('form');
           form.innerHTML = `
@@ -587,13 +612,26 @@
             <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
               <button type="submit" class="button-cta small">Salvar</button>
               <button type="button" class="button-cta small secondary" data-cancel>Cancelar</button>
+              <button type="button" class="button-cta small danger" data-remove-edit>Remover Prato</button>
             </div>
           `;
           // Submissão do update
+                    // Remover prato durante edição
+                    form.querySelector('[data-remove-edit]').onclick = async () => {
+                      if (!confirm('Tem certeza que deseja remover este prato?')) return;
+                      const res = await apiRequest('api/pratos/delete.php', 'POST', {
+                        idPrato: item.id,
+                        userId: state.user?.id || 0,
+                        restauranteId: state.restauranteId
+                      });
+                      if (!res.ok) { showToast(res.error, true); return; }
+                      showToast('Prato removido!');
+                      await refreshMenu();
+                    };
           form.onsubmit = async (e) => {
             e.preventDefault();
             const payload = {
-              idPrato: item.idPrato,
+              idPrato: item.id, // Corrigido: usar o campo correto retornado pelo backend
               userId: state.user?.id || 0,
               restauranteId: state.restauranteId,
               nome: form.nome.value.trim(),
@@ -685,7 +723,8 @@
       summary.innerHTML = `Dados calculados para os últimos <strong>${dias} dias</strong>. Total bruto: <strong>${formatEur(res.totalSales || 0)}</strong>.`;
     }
 
-    document.getElementById('salesRange').onchange = refreshSales;
+    // Removido: painel de vendas não existe mais
+    // document.getElementById('salesRange').onchange = refreshSales;
 
   </script>
 </body>
