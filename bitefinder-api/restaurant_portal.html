@@ -539,17 +539,33 @@
     document.getElementById('formRegister').onsubmit = async (event) => {
       event.preventDefault();
       const form = event.target;
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const password = form.password.value.trim();
+      const restauranteNome = form.restauranteNome.value.trim();
+      const restauranteMorada = form.restauranteMorada.value.trim();
+      const restaurantCode = form.restaurantCode.value.trim();
+
+      if (!name || !email || !password || !restauranteNome || !restauranteMorada || !restaurantCode) {
+        showToast('Preencha todos os campos obrigatórios', true); return;
+      }
+      if (!isValidEmail(email)) { showToast('Email inválido', true); return; }
+      if (password.length < 8) { showToast('A palavra-passe deve ter pelo menos 8 caracteres', true); return; }
+      if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/.test(password)) {
+        showToast('A palavra-passe deve conter maiúsculas, minúsculas e números', true); return;
+      }
+      if (!/^\d{8,}$/.test(restaurantCode)) {
+        showToast('NIF deve conter pelo menos 8 dígitos numéricos', true); return;
+      }
+
       const payload = new URLSearchParams();
-      payload.append('name', form.name.value.trim());
-      payload.append('email', form.email.value.trim());
-      payload.append('password', form.password.value.trim());
-      payload.append('restauranteNome', form.restauranteNome.value.trim());
-      payload.append('restauranteMorada', form.restauranteMorada.value.trim());
+      payload.append('name', name);
+      payload.append('email', email);
+      payload.append('password', password);
+      payload.append('restauranteNome', restauranteNome);
+      payload.append('restauranteMorada', restauranteMorada);
+      payload.append('restaurantCode', restaurantCode);
 
-      if (!form.email.value.trim()) { showToast('Email obrigatório', true); return; }
-      if (!form.restaurantCode.value.trim()) { showToast('NIF obrigatório', true); return; }
-
-      payload.append('restaurantCode', form.restaurantCode.value.trim());
       const response = await fetch('api/auth/register_restaurante.php', { method: 'POST', body: payload });
       const json = await response.json();
       if (!json.ok) { showToast(json.error || json.message || 'Erro ao criar conta', true); return; }
