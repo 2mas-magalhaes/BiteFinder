@@ -29,5 +29,3 @@ respond([
     'ok' => false,
     'error' => 'Este endpoint foi desativado. Utilize api/auth/login_jwt.php para login.'
 ], 410);
-    ], 500);
-}
