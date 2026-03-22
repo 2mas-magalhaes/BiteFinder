@@ -14,7 +14,7 @@ function respond($arr, int $code = 200): void {
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        respond(['ok' => false, 'error' => 'Método inválido'], 405);
+        respond(['ok' => false, 'error' => 'Método HTTP inválido. Use POST.'], 405);
     }
 
     $name = trim((string)($_POST['name'] ?? ''));
@@ -25,11 +25,11 @@ try {
     $restaurantCode = trim((string)($_POST['restaurantCode'] ?? '')); // NIF/CNPJ
 
     if ($name === '' || $email === '' || $password === '' || $restauranteNome === '' || $restauranteMorada === '' || $restaurantCode === '') {
-        respond(['ok' => false, 'error' => 'Campos obrigatórios em falta'], 422);
+        respond(['ok' => false, 'error' => 'Preencha todos os campos obrigatórios.'], 422);
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        respond(['ok' => false, 'error' => 'Email inválido'], 422);
+        respond(['ok' => false, 'error' => 'Formato de email inválido.'], 422);
     }
 
     $pdo = db();
@@ -46,19 +46,19 @@ try {
     }
 
     if (!$restColumn) {
-        respond(['ok' => false, 'error' => 'Tabela Restaurante não contém coluna NIF/CNPJ'], 500);
+        respond(['ok' => false, 'error' => 'Erro de configuração: coluna NIF/CNPJ não encontrada na tabela Restaurante.'], 500);
     }
 
     $st = $pdo->prepare("SELECT 1 FROM dbo.Restaurante WHERE [$restColumn] = :restaurantCode");
     $st->execute(['restaurantCode' => $restaurantCode]);
     if ($st->fetch()) {
-        respond(['ok' => false, 'error' => 'NIF/CNPJ já cadastrado'], 409);
+        respond(['ok' => false, 'error' => 'Já existe um restaurante cadastrado com este NIF/CNPJ.'], 409);
     }
 
     $st = $pdo->prepare('SELECT IdUser FROM dbo.Users WHERE Email = :email');
     $st->execute(['email' => $email]);
     if ($st->fetch()) {
-        respond(['ok' => false, 'error' => 'Email já usado'], 409);
+        respond(['ok' => false, 'error' => 'Já existe uma conta com este email.'], 409);
     }
 
     $passwordHash = password_hash($password, PASSWORD_BCRYPT);
@@ -73,7 +73,7 @@ try {
     $st->execute(['restauranteNome' => $restauranteNome]);
     if ($st->fetch()) {
         $pdo->rollBack();
-        respond(['ok' => false, 'error' => 'Restaurante com este nome já existe'], 409);
+        respond(['ok' => false, 'error' => 'Já existe um restaurante com este nome.'], 409);
     }
 
     $st = $pdo->prepare("INSERT INTO dbo.Restaurante (Nome, Morada, [$restColumn]) VALUES (:nome, :morada, :restaurantCode)");
@@ -85,11 +85,11 @@ try {
 
     $pdo->commit();
 
-    respond(['ok' => true, 'message' => 'Restaurante registado com sucesso', 'userId' => $userId, 'restauranteId' => $restauranteId]);
+    respond(['ok' => true, 'message' => 'Restaurante registado com sucesso! Faça login para começar.', 'userId' => $userId, 'restauranteId' => $restauranteId]);
 
 } catch (Throwable $e) {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    respond(['ok' => false, 'error' => 'Erro interno', 'message' => $e->getMessage()], 500);
+    respond(['ok' => false, 'error' => 'Erro interno do servidor. Tente novamente mais tarde.', 'message' => $e->getMessage()], 500);
 }

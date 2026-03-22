@@ -1,5 +1,21 @@
 <?php
 ob_start();
+// DEBUG TEMPORÁRIO: mostrar todos os erros PHP no JSON de resposta
+ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
+set_error_handler(function($severity, $message, $file, $line) {
+    http_response_code(500);
+    echo json_encode([
+        'ok' => false,
+        'error' => 'PHP ERROR',
+        'message' => $message,
+        'file' => $file,
+        'line' => $line,
+        'severity' => $severity
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+});
 require_once __DIR__ . '/../jwt_functions.php';
 require_once __DIR__ . '/../config/db.php';
 
@@ -54,12 +70,9 @@ try {
 
     respond(['ok' => true, 'token' => $token, 'user' => ['id' => (int)$u['IdUser'], 'nome' => $u['Nome'], 'role' => $u['Role'], 'restaurantes' => $restaurantes]]);
 } catch (Throwable $e) {
-    respond([
-        'ok' => false,
-        'error' => 'Erro interno',
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-        'trace' => $e->getTraceAsString()
-    ], 500);
+        respond([
+            'ok' => false,
+            'error' => 'Erro interno do servidor. Tente novamente mais tarde.',
+            'message' => $e->getMessage(),
+        ], 500);
 }
