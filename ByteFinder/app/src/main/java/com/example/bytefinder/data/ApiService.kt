@@ -166,7 +166,7 @@ data class MyReviewsResponse(
 
 interface ApiService {
 
-    @POST("api/auth/login.php")
+    @POST("api/auth/login_jwt.php")
     suspend fun login(@Body req: LoginRequest): LoginResponse
 
     @GET("api/categorias/list.php")
