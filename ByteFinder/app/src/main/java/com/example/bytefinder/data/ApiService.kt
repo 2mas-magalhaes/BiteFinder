@@ -9,7 +9,8 @@ import retrofit2.http.Query
 
 data class LoginRequest(
     val email: String,
-    val password: String
+    val password: String,
+    val _csrf: String? = null  // CSRF token for cross-site attack protection
 )
 
 data class UserDto(
@@ -24,7 +25,8 @@ data class LoginResponse(
     val token: String?,
     val user: UserDto?,
     val error: String?,
-    val message: String? = null
+    val message: String? = null,
+    val csrf_token: String? = null  // CSRF token for next request
 )
 
 // -------------------- CATEGORIAS --------------------
