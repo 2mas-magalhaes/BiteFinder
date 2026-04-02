@@ -1,21 +1,5 @@
 <?php
 ob_start();
-// DEBUG TEMPORÁRIO: mostrar todos os erros PHP no JSON de resposta
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
-set_error_handler(function($severity, $message, $file, $line) {
-    http_response_code(500);
-    echo json_encode([
-        'ok' => false,
-        'error' => 'PHP ERROR',
-        'message' => $message,
-        'file' => $file,
-        'line' => $line,
-        'severity' => $severity
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-});
 require_once __DIR__ . '/../jwt_functions.php';
 require_once __DIR__ . '/../config/db.php';
 
@@ -58,21 +42,35 @@ try {
     $restaurantes = [];
     if ($u['Role'] === 'restaurante') {
         $r = $pdo->prepare('SELECT RestauranteId FROM dbo.RestauranteUser WHERE UserId = :uid');
-        $r->execute(['uid' => (int)$u['IdUser']]);
-        $restaurantes = array_map(fn($x) => (int)$x['RestauranteId'], $r->fetchAll(PDO::FETCH_ASSOC));
+        $r->execute(['uid' => $u['IdUser']]);
+        $restaurantes = array_column($r->fetchAll(PDO::FETCH_ASSOC), 'RestauranteId');
     }
 
     $token = jwt_encode([
-        'sub' => (int)$u['IdUser'], 
+        'sub' => $u['IdUser'],
+        'email' => $u['Email'],
+        'nome' => $u['Nome'],
         'role' => $u['Role'],
         'restaurantes' => $restaurantes
-    ], 3600);
+    ]);
 
-    respond(['ok' => true, 'token' => $token, 'user' => ['id' => (int)$u['IdUser'], 'nome' => $u['Nome'], 'role' => $u['Role'], 'restaurantes' => $restaurantes]]);
+    respond([
+        'ok' => true,
+        'token' => $token,
+        'user' => [
+            'id' => (int)$u['IdUser'],
+            'nome' => $u['Nome'],
+            'email' => $u['Email'],
+            'role' => $u['Role'],
+            'restaurantes' => $restaurantes
+        ]
+    ], 200);
+
 } catch (Throwable $e) {
-        respond([
-            'ok' => false,
-            'error' => 'Erro interno do servidor. Tente novamente mais tarde.',
-            'message' => $e->getMessage(),
-        ], 500);
+    respond([
+        'ok' => false,
+        'error' => 'Erro interno do servidor',
+        'message' => $e->getMessage()
+    ], 500);
 }
+

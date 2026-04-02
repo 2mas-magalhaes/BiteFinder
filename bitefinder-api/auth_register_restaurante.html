@@ -2,20 +2,168 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Registar Restaurante</title>
-  <style>body{font-family:sans-serif;max-width:760px;margin:30px auto;padding:0 16px;}label{display:block;margin:8px 0 4px;}input, button, textarea{width:100%;padding:10px;margin-bottom:10px;}</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #0f172a;
+      --accent: #2563eb;
+      --bg: #edf2f9;
+      --surface: #ffffff;
+      --border: #d9e2ef;
+      --text: #0b1222;
+      --text-soft: #5f6f89;
+      --shadow: 0 24px 42px -30px rgb(13 32 66 / 0.55);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: 'Manrope', 'Segoe UI', sans-serif;
+      background:
+        radial-gradient(circle at 15% 0%, #dbeafe 0%, rgba(219, 234, 254, 0) 42%),
+        radial-gradient(circle at 85% 0%, #c7d2fe 0%, rgba(199, 210, 254, 0) 35%),
+        linear-gradient(180deg, #f3f7fd 0%, var(--bg) 100%);
+      color: var(--text);
+      padding: 18px;
+    }
+
+    .shell {
+      width: min(100%, 780px);
+      background: rgba(255, 255, 255, 0.93);
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 26px;
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-family: 'Sora', 'Manrope', sans-serif;
+      margin: 0 0 8px;
+      font-size: clamp(1.5rem, 2.4vw, 2rem);
+      letter-spacing: -0.02em;
+    }
+
+    .intro {
+      margin: 0 0 22px;
+      color: var(--text-soft);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px) {
+      .grid.two-cols {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      margin: 0 0 6px;
+      font-weight: 700;
+      font-size: 0.84rem;
+    }
+
+    input, button, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 13px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: border-color .2s, box-shadow .2s;
+      margin: 0;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+    }
+
+    button {
+      border: none;
+      margin-top: 8px;
+      border-radius: 14px;
+      background: linear-gradient(120deg, var(--brand), #1b3357);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    pre {
+      margin-top: 14px;
+      background: #0f172a;
+      color: #dbeafe;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 0.82rem;
+      max-height: 300px;
+      overflow: auto;
+    }
+  </style>
 </head>
 <body>
-  <h1>Registar Conta Restaurante</h1>
-  <form id="registerForm">
-    <label>Nome do proprietário</label><input type="text" name="name" required />
-    <label>Email</label><input type="email" name="email" required />
-    <label>Password</label><input type="password" name="password" required />
-    <label>Nome do restaurante</label><input type="text" name="restauranteNome" required />
-    <label>Morada</label><input type="text" name="restauranteMorada" />
-    <button type="submit">Registar</button>
-  </form>
-  <pre id="resultado"></pre>
+  <section class="shell">
+    <h1>Registar Conta Restaurante</h1>
+    <p class="intro">Cria a conta de parceiro e começa a publicar pratos no ecossistema BiteFinder.</p>
+
+    <form id="registerForm">
+      <div class="grid two-cols">
+        <div class="field">
+          <label>Nome do proprietário</label>
+          <input type="text" name="name" required />
+        </div>
+        <div class="field">
+          <label>Email</label>
+          <input type="email" name="email" required />
+        </div>
+      </div>
+
+      <div class="grid two-cols" style="margin-top:12px;">
+        <div class="field">
+          <label>Password</label>
+          <input type="password" name="password" required />
+        </div>
+        <div class="field">
+          <label>Nome do restaurante</label>
+          <input type="text" name="restauranteNome" required />
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Morada</label>
+        <input type="text" name="restauranteMorada" />
+      </div>
+
+      <button type="submit">Registar Restaurante</button>
+    </form>
+
+    <pre id="resultado"></pre>
+  </section>
 
   <script>
     document.getElementById('registerForm').addEventListener('submit', async event => {

@@ -1,18 +1,54 @@
 <?php
-// C:\bitefinder-api\api\config\db.php
+/**
+ * BiteFinder Database Configuration
+ * Loads credentials from environment variables (.env file)
+ * 
+ * Security: Credentials are never hardcoded in source control
+ * .env file is in .gitignore and should be configured per environment
+ */
+
+require_once __DIR__ . '/env_loader.php';
 
 function db(): PDO {
-    // Para dev local, mete as credenciais aqui (depois podes trocar para getenv)
-    $DB_HOST = 'bitefinderapp.database.windows.net';
-    $DB_NAME = 'free-sql-db-6399592';
-    $DB_USER = 'borges';         // confirma se é mesmo este o login SQL
-    $DB_PASS = 'GGbd123456$'; // mete a password
+    // Load configuration from .env file
+    $db_host = env('DB_HOST', getenv('DB_HOST') ?: 'bitefinderapp.database.windows.net');
+    $db_name = env('DB_NAME', getenv('DB_NAME') ?: 'free-sql-db-6399592');
+    $db_user = env('DB_USER', getenv('DB_USER') ?: '');
+    $db_pass = env('DB_PASS', getenv('DB_PASS') ?: '');
 
-    // Azure SQL normalmente exige Encrypt
-    $dsn = "sqlsrv:Server=$DB_HOST;Database=$DB_NAME;Encrypt=yes;TrustServerCertificate=no";
+    // Validate required credentials
+    if (empty($db_user) || empty($db_pass)) {
+        throw new Exception(
+            'Database credentials not configured. ' .
+            'Please copy .env.example to .env and configure DB_USER and DB_PASS'
+        );
+    }
 
-    return new PDO($dsn, $DB_USER, $DB_PASS, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    // Build DSN for Azure SQL Server
+    // Encrypt=yes: Required for Azure SQL
+    // TrustServerCertificate=no: Forces proper SSL validation (production security)
+    $dsn = sprintf(
+        "sqlsrv:Server=%s;Database=%s;Encrypt=yes;TrustServerCertificate=no",
+        $db_host,
+        $db_name
+    );
+
+    try {
+        $pdo = new PDO($dsn, $db_user, $db_pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
+        ]);
+        
+        return $pdo;
+    } catch (PDOException $e) {
+        // Log detailed error (never expose to client)
+        error_log("Database connection failed: " . $e->getMessage());
+        
+        // Return generic error to client
+        throw new Exception(
+            'Database connection failed. ' .
+            (getenv('APP_ENV') === 'development' ? $e->getMessage() : 'Please contact support.')
+        );
+    }
 }
