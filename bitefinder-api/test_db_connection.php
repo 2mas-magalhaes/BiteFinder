@@ -1,31 +1,17 @@
 <?php
 /**
- * Test script to verify database connection using environment variables
+ * Test script to verify database connection using direct config in db.php
  * Run: php test_db_connection.php
  */
 
-require_once __DIR__ . '/api/config/env_loader.php';
 require_once __DIR__ . '/api/config/db.php';
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
 echo "BiteFinder Database Connection Test\n";
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
 
-// Check environment variables loaded
-echo "1. Environment Variables Loaded:\n";
-$env_vars = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASS'];
-foreach ($env_vars as $var) {
-    $value = getenv($var);
-    if ($value) {
-        if ($var === 'DB_PASS') {
-            echo "   ✅ $var = " . str_repeat('*', strlen($value)) . " (hidden)\n";
-        } else {
-            echo "   ✅ $var = $value\n";
-        }
-    } else {
-        echo "   ❌ $var = NOT SET\n";
-    }
-}
+echo "1. Configuration Source:\n";
+echo "   ✅ Using direct credentials from api/config/db.php\n";
 
 echo "\n2. Attempting Database Connection...\n";
 try {
