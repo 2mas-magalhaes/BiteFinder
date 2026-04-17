@@ -2,19 +2,18 @@
 /**
  * JWT Authentication Functions for BiteFinder
  * 
- * Security: JWT secret is loaded from .env file, not hardcoded
+ * Security: JWT secret configured directly in source for university project
  * Algorithm: HS256 (HMAC SHA-256)
  * Expiry: Configurable, defaults to 1 hour (3600 seconds)
  */
 
-require_once __DIR__ . '/config/env_loader.php';
-
-// Get JWT_SECRET from environment, fallback to strong default
-$JWT_SECRET = env('JWT_SECRET', 's3cr3t_b1t3f1nd3r_2026!_change_in_production');
+// University project setup: keep JWT settings in source.
+$JWT_SECRET = 's3cr3t_b1t3f1nd3r_2026!_jwt_key_min_32chars_for_production';
+$JWT_EXPIRY = 3600;
 
 // Validate JWT_SECRET length (min 32 chars for security)
 if (strlen($JWT_SECRET) < 32) {
-    error_log("WARNING: JWT_SECRET is too short (< 32 chars). Update .env file for production!");
+    error_log("WARNING: JWT_SECRET is too short (< 32 chars). Update jwt_functions.php for production!");
 }
 
 function base64url_encode($data) {
@@ -30,11 +29,11 @@ function base64url_decode($data) {
 }
 
 function jwt_encode($payload, $exp = null) {
-    global $JWT_SECRET;
+    global $JWT_SECRET, $JWT_EXPIRY;
     
-    // Use exp from .env or parameter (3600 = 1 hour default)
+    // Use configured default expiry or explicit parameter.
     if ($exp === null) {
-        $exp = (int)env('JWT_EXPIRY', 3600);
+        $exp = $JWT_EXPIRY;
     }
     
     $header = ['alg' => 'HS256', 'typ' => 'JWT'];
