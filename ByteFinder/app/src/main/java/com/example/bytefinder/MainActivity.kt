@@ -7,10 +7,15 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,6 +25,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bytefinder.data.ApiClient
 import com.example.bytefinder.data.ApiService
 import com.example.bytefinder.data.DataRepository
+import com.example.bytefinder.ui.components.ClayBottomNav
+import com.example.bytefinder.ui.components.NavTab
+import com.example.bytefinder.ui.screens.ClayAccountScreen
+import com.example.bytefinder.ui.screens.ClaySearchScreen
 import com.example.bytefinder.ui.screens.ClayBusinessScreen
 import com.example.bytefinder.ui.screens.ClayLoginScreen
 import com.example.bytefinder.ui.screens.ClayMyReviewsScreen
@@ -31,6 +40,9 @@ import com.example.bytefinder.ui.viewmodel.HomeViewModelFactory
 
 private enum class AppScreen {
     HOME,
+    SEARCH,
+    NEAR,
+    ACCOUNT,
     BUSINESS,
     MY_REVIEWS,
     DETAIL
@@ -62,6 +74,7 @@ private fun AppRoot(repository: DataRepository) {
     var currentScreen by remember { mutableStateOf(AppScreen.HOME) }
     var detailReturnScreen by remember { mutableStateOf(AppScreen.HOME) }
     var selectedPratoId by remember { mutableStateOf<Int?>(null) }
+    var selectedTab by remember { mutableStateOf(NavTab.HOME) }
 
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(repository)
@@ -70,6 +83,7 @@ private fun AppRoot(repository: DataRepository) {
     fun goHome() {
         selectedPratoId = null
         currentScreen = AppScreen.HOME
+        selectedTab = NavTab.HOME
     }
 
     fun signOut() {
@@ -80,7 +94,12 @@ private fun AppRoot(repository: DataRepository) {
         currentUserRestaurants = emptyList()
         selectedPratoId = null
         currentScreen = AppScreen.HOME
+        selectedTab = NavTab.HOME
     }
+
+    // Ecrãs que mostram a bottom nav
+    val showBottomNav = token != null &&
+        currentScreen !in listOf(AppScreen.DETAIL, AppScreen.BUSINESS, AppScreen.MY_REVIEWS)
 
     if (token == null) {
         ClayLoginScreen(
@@ -91,83 +110,145 @@ private fun AppRoot(repository: DataRepository) {
                 userName = nome
                 currentUserRole = role
                 currentUserRestaurants = restaurantes
-                currentScreen = if (role == "restaurante") AppScreen.BUSINESS else AppScreen.HOME
+                currentScreen = AppScreen.HOME
+                selectedTab = NavTab.HOME
             }
         )
     } else {
-        AnimatedContent(
-            targetState = currentScreen,
-            transitionSpec = {
-                val direction = if (targetState.ordinal >= initialState.ordinal) 1 else -1
-                (slideInHorizontally(
-                    animationSpec = tween(durationMillis = 330, easing = FastOutSlowInEasing),
-                    initialOffsetX = { direction * (it / 6) }
-                ) + fadeIn(animationSpec = tween(260))) togetherWith
-                    (slideOutHorizontally(
-                        animationSpec = tween(durationMillis = 230, easing = FastOutSlowInEasing),
-                        targetOffsetX = { -direction * (it / 8) }
-                    ) + fadeOut(animationSpec = tween(190)))
-            },
-            label = "screen-motion"
-        ) { screen ->
-            when (screen) {
-                AppScreen.HOME -> {
-                    HomeScreen(
-                        viewModel = homeViewModel,
-                        repository = repository,
-                        userName = userName ?: "Utilizador",
-                        isRestaurantUser = (currentUserRole == "restaurante"),
-                        onPratoClick = { pratoId ->
-                            selectedPratoId = pratoId
-                            detailReturnScreen = AppScreen.HOME
-                            currentScreen = AppScreen.DETAIL
-                        },
-                        onOpenBusiness = { currentScreen = AppScreen.BUSINESS },
-                        onOpenMyReviews = { currentScreen = AppScreen.MY_REVIEWS },
-                        onSignOut = { signOut() },
-                        onGoHome = { goHome() }
-                    )
-                }
+        Column(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
+            // ── Conteúdo principal (cresce, empurra a nav bar para baixo) ──
+            Box(modifier = androidx.compose.ui.Modifier.weight(1f)) {
+                AnimatedContent(
+                    targetState = currentScreen,
+                    transitionSpec = {
+                        val isTabSwitch = targetState in listOf(
+                            AppScreen.HOME, AppScreen.SEARCH, AppScreen.NEAR, AppScreen.ACCOUNT
+                        ) && initialState in listOf(
+                            AppScreen.HOME, AppScreen.SEARCH, AppScreen.NEAR, AppScreen.ACCOUNT
+                        )
+                        if (isTabSwitch) {
+                            fadeIn(tween(220)) togetherWith fadeOut(tween(180))
+                        } else {
+                            val direction = if (targetState.ordinal >= initialState.ordinal) 1 else -1
+                            (slideInHorizontally(
+                                animationSpec = tween(330, easing = FastOutSlowInEasing),
+                                initialOffsetX = { direction * (it / 6) }
+                            ) + fadeIn(tween(260))) togetherWith
+                                (slideOutHorizontally(
+                                    animationSpec = tween(230, easing = FastOutSlowInEasing),
+                                    targetOffsetX = { -direction * (it / 8) }
+                                ) + fadeOut(tween(190)))
+                        }
+                    },
+                    label = "screen-motion"
+                ) { screen ->
+                    when (screen) {
+                        AppScreen.HOME -> HomeScreen(
+                            viewModel = homeViewModel,
+                            repository = repository,
+                            userName = userName ?: "Utilizador",
+                            isRestaurantUser = (currentUserRole == "restaurante"),
+                            nearModeActive = false,
+                            onPratoClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.HOME
+                                currentScreen = AppScreen.DETAIL
+                            },
+                            onGoHome = { goHome() }
+                        )
 
-                AppScreen.BUSINESS -> {
-                    ClayBusinessScreen(
-                        repository = repository,
-                        currentUserId = currentUserId ?: 0,
-                        restauranteIds = currentUserRestaurants,
-                        onBack = { currentScreen = AppScreen.HOME },
-                        onPratoClick = { pratoId ->
-                            selectedPratoId = pratoId
-                            detailReturnScreen = AppScreen.BUSINESS
-                            currentScreen = AppScreen.DETAIL
-                        },
-                        onGoHome = { goHome() }
-                    )
-                }
+                        AppScreen.NEAR -> HomeScreen(
+                            viewModel = homeViewModel,
+                            repository = repository,
+                            userName = userName ?: "Utilizador",
+                            isRestaurantUser = (currentUserRole == "restaurante"),
+                            nearModeActive = true,
+                            onPratoClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.NEAR
+                                currentScreen = AppScreen.DETAIL
+                            },
+                            onGoHome = { goHome() }
+                        )
 
-                AppScreen.MY_REVIEWS -> {
-                    ClayMyReviewsScreen(
-                        repository = repository,
-                        userId = currentUserId ?: 0,
-                        onBack = { currentScreen = AppScreen.HOME },
-                        onPratoClick = { pratoId ->
-                            selectedPratoId = pratoId
-                            detailReturnScreen = AppScreen.MY_REVIEWS
-                            currentScreen = AppScreen.DETAIL
-                        },
-                        onGoHome = { goHome() }
-                    )
-                }
+                        AppScreen.ACCOUNT -> ClayAccountScreen(
+                            userName = userName ?: "Utilizador",
+                            userRole = currentUserRole ?: "user",
+                            isRestaurantUser = (currentUserRole == "restaurante"),
+                            onOpenBusiness = {
+                                currentScreen = AppScreen.BUSINESS
+                            },
+                            onOpenMyReviews = {
+                                currentScreen = AppScreen.MY_REVIEWS
+                            },
+                            onSignOut = { signOut() }
+                        )
 
-                AppScreen.DETAIL -> {
-                    ClayPratoDetailScreen(
-                        repository = repository,
-                        pratoId = selectedPratoId ?: 0,
-                        currentUserId = currentUserId ?: 0,
-                        restaurantIds = currentUserRestaurants,
-                        onBack = { currentScreen = detailReturnScreen },
-                        onGoHome = { goHome() }
-                    )
+                        AppScreen.BUSINESS -> ClayBusinessScreen(
+                            repository = repository,
+                            currentUserId = currentUserId ?: 0,
+                            restauranteIds = currentUserRestaurants,
+                            onBack = { currentScreen = AppScreen.ACCOUNT; selectedTab = NavTab.ACCOUNT },
+                            onPratoClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.BUSINESS
+                                currentScreen = AppScreen.DETAIL
+                            },
+                            onGoHome = { goHome() }
+                        )
+
+                        AppScreen.MY_REVIEWS -> ClayMyReviewsScreen(
+                            repository = repository,
+                            userId = currentUserId ?: 0,
+                            onBack = { currentScreen = AppScreen.ACCOUNT; selectedTab = NavTab.ACCOUNT },
+                            onPratoClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.MY_REVIEWS
+                                currentScreen = AppScreen.DETAIL
+                            },
+                            onGoHome = { goHome() }
+                        )
+
+                        AppScreen.SEARCH -> ClaySearchScreen(
+                            viewModel = homeViewModel,
+                            onPratoClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.SEARCH
+                                currentScreen = AppScreen.DETAIL
+                            },
+                            onCategorySelected = { category ->
+                                homeViewModel.onCategorySelected(category)
+                                selectedTab = NavTab.HOME
+                                currentScreen = AppScreen.HOME
+                            }
+                        )
+
+                        AppScreen.DETAIL -> ClayPratoDetailScreen(
+                            repository = repository,
+                            pratoId = selectedPratoId ?: 0,
+                            currentUserId = currentUserId ?: 0,
+                            restaurantIds = currentUserRestaurants,
+                            onBack = { currentScreen = detailReturnScreen },
+                            onGoHome = { goHome() }
+                        )
+                    }
                 }
+            }
+
+            // ── Bottom Navigation Bar ──────────────────────────────────
+            if (showBottomNav) {
+                ClayBottomNav(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tab ->
+                        selectedTab = tab
+                        currentScreen = when (tab) {
+                            NavTab.HOME    -> AppScreen.HOME
+                            NavTab.SEARCH  -> AppScreen.SEARCH
+                            NavTab.NEAR    -> AppScreen.NEAR
+                            NavTab.ACCOUNT -> AppScreen.ACCOUNT
+                        }
+                    }
+                )
             }
         }
     }

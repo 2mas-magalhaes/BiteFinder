@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
@@ -72,8 +73,12 @@ fun FilterBar(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("🎯", fontSize = 16.sp)
-                    Spacer(Modifier.width(8.dp))
+                    Icon(
+                        imageVector = Icons.Filled.FilterAlt,
+                        contentDescription = null,
+                        tint = ClayTextDark,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                     Text(
                         "Filtros",
                         fontWeight = FontWeight.SemiBold,

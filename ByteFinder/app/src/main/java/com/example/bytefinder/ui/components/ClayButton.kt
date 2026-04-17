@@ -1,8 +1,8 @@
 package com.example.bytefinder.ui.components
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -15,7 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
@@ -25,16 +25,11 @@ import androidx.compose.ui.unit.sp
 import com.example.bytefinder.ui.theme.*
 
 /**
- * ClayButton — Botão Claymorphism com Triple Shadow.
+ * ClayButton — Botão flat pill matte.
  *
- * PERFORMANCE:
- * - Outer shadow: Modifier.shadow() — hardware-accelerated, gratuito
- * - Inset shadows: drawWithCache em claySurface() — zero allocs/frame
- * - Animações: 2 (era 7) — scale + elevation
- *
- * SQUISH EFFECT:
- * - scale: 1.0 → 0.95 com Spring
- * - elevation: 8dp → 2dp (botão "afunda" reduzindo sombra)
+ * Sem inset shadows — cor sólida saturada sobre fundo escuro
+ * já cria o contraste visual do Claymorphism.
+ * Squish via scale Spring (1 animação, hardware layer).
  */
 @Composable
 fun ClayButton(
@@ -50,40 +45,31 @@ fun ClayButton(
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
 
-    val fillColor = if (isSecondary) ClayBlueLight else containerColor
-    val txtColor = if (isSecondary) ClayTextDark else contentColor
+    val fillColor = when {
+        !enabled        -> (if (isSecondary) ClayBlueLight else containerColor).copy(alpha = 0.4f)
+        isSecondary     -> Color.White.copy(alpha = 0.12f)   // ghost pill sobre fundo escuro
+        else            -> containerColor
+    }
+    val txtColor = when {
+        !enabled    -> contentColor.copy(alpha = 0.4f)
+        isSecondary -> Color.White
+        else        -> contentColor
+    }
     val shape = RoundedCornerShape(cornerRadius)
 
-    // ── 2 animações (era 7) ─────────────────────────────────────
+    // 1 animação: scale com spring bounce
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.95f else 1f,
-        animationSpec = spring(dampingRatio = 0.45f, stiffness = 400f),
+        targetValue = if (pressed) 0.94f else 1f,
+        animationSpec = spring(dampingRatio = 0.42f, stiffness = 420f),
         label = "btn-scale"
-    )
-    val elevation by animateDpAsState(
-        targetValue = if (pressed) 2.dp else 8.dp,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = 500f),
-        label = "btn-elev"
     )
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            // graphicsLayer → hardware layer no GPU; scale sem redraw
             .graphicsLayer { scaleX = scale; scaleY = scale }
-            // 1. OUTER SHADOW — hardware-accelerated, não redraw por frame
-            .shadow(
-                elevation = if (enabled) elevation else 0.dp,
-                shape = shape,
-                clip = false,
-                ambientColor = Color(0xFF0E223F).copy(alpha = 0.08f),
-                spotColor = Color(0xFF0E223F).copy(alpha = 0.12f)
-            )
-            // 2 + 3. INSET SHADOWS — drawWithCache, zero allocs/frame
-            .claySurface(
-                cornerRadius = cornerRadius,
-                fillColor = if (enabled) fillColor else fillColor.copy(alpha = 0.4f)
-            )
+            .clip(shape)
+            .background(fillColor)
             .clickable(
                 interactionSource = interaction,
                 indication = null,
@@ -96,7 +82,7 @@ fun ClayButton(
             text = text,
             fontWeight = FontWeight.Bold,
             fontSize = 15.sp,
-            color = if (enabled) txtColor else txtColor.copy(alpha = 0.5f)
+            color = txtColor
         )
     }
 }

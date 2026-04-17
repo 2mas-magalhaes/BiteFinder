@@ -31,6 +31,8 @@ import coil.compose.AsyncImage
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.MyReviewItemDto
 import com.example.bytefinder.ui.components.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import com.example.bytefinder.ui.theme.*
 
 /**
@@ -82,7 +84,7 @@ fun ClayMyReviewsScreen(
         Spacer(Modifier.height(16.dp))
 
         Text(
-            text = "As minhas avaliações ⭐",
+            text = "As minhas avaliações",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 22.sp,
             color = ClayTextDark
@@ -97,7 +99,7 @@ fun ClayMyReviewsScreen(
 
         if (erro != null) {
             EmptyState(
-                emoji = "😕",
+                icon = Icons.Filled.Warning,
                 title = "Algo correu mal",
                 description = erro ?: "Erro desconhecido"
             )

@@ -9,6 +9,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.RateReview
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SentimentDissatisfied
+import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,15 +36,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bytefinder.ui.theme.*
 
-/**
- * EmptyState — Composable para estados vazios com animação de entrada.
- *
- * Mostra um emoji/ícone grande, um título e uma descrição amigável.
- * Aparece com animação spring bounce para criar impacto visual.
- */
 @Composable
 fun EmptyState(
-    emoji: String = "🍽",
+    icon: ImageVector = Icons.Filled.Info,
     title: String = "Nada encontrado",
     description: String = "Tenta ajustar os filtros ou pesquisar algo diferente.",
     modifier: Modifier = Modifier
@@ -64,12 +69,11 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Emoji grande como "ilustração"
-        Text(
-            text = emoji,
-            fontSize = 64.sp,
-            modifier = Modifier.size(80.dp),
-            textAlign = TextAlign.Center
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = ClayTextLight,
+            modifier = Modifier.size(72.dp)
         )
 
         Spacer(Modifier.height(20.dp))
@@ -99,7 +103,7 @@ fun EmptyState(
 @Composable
 fun EmptySearchState(query: String) {
     EmptyState(
-        emoji = "🔍",
+        icon = Icons.Filled.Search,
         title = "Sem resultados para \"$query\"",
         description = "Experimenta pesquisar por outro prato ou restaurante."
     )
@@ -108,7 +112,7 @@ fun EmptySearchState(query: String) {
 @Composable
 fun EmptyCategoryState(category: String) {
     EmptyState(
-        emoji = "😔",
+        icon = Icons.Filled.SentimentDissatisfied,
         title = "Ops, não encontrámos $category nesta zona!",
         description = "Experimenta mudar a localização ou escolher outra categoria."
     )
@@ -117,7 +121,7 @@ fun EmptyCategoryState(category: String) {
 @Composable
 fun EmptyReviewsState() {
     EmptyState(
-        emoji = "✍️",
+        icon = Icons.Filled.RateReview,
         title = "Ainda sem avaliações",
         description = "Sê o primeiro a avaliar este prato e ajuda outros foodies!"
     )
@@ -126,7 +130,7 @@ fun EmptyReviewsState() {
 @Composable
 fun EmptyMyReviewsState() {
     EmptyState(
-        emoji = "📝",
+        icon = Icons.Filled.RateReview,
         title = "Ainda não avaliaste nenhum prato",
         description = "Explora os pratos e partilha a tua opinião!"
     )
@@ -135,7 +139,7 @@ fun EmptyMyReviewsState() {
 @Composable
 fun EmptyBusinessState() {
     EmptyState(
-        emoji = "🏪",
+        icon = Icons.Filled.Storefront,
         title = "Sem pratos neste restaurante",
         description = "Adiciona pratos para começar a receber avaliações."
     )
@@ -144,7 +148,7 @@ fun EmptyBusinessState() {
 @Composable
 fun EmptyFilterState() {
     EmptyState(
-        emoji = "🎯",
+        icon = Icons.Filled.FilterAlt,
         title = "Nenhum prato corresponde aos filtros",
         description = "Tenta alargar a pesquisa removendo alguns filtros."
     )
