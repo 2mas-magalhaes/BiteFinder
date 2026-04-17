@@ -27,10 +27,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.ui.components.*
+import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
 
@@ -72,15 +73,12 @@ fun HomeScreen(
     repository: DataRepository,
     userName: String,
     isRestaurantUser: Boolean,
+    nearModeActive: Boolean = false,
     onPratoClick: (Int) -> Unit,
-    onOpenBusiness: () -> Unit,
-    onOpenMyReviews: () -> Unit,
-    onSignOut: () -> Unit,
     onGoHome: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
-    var menuExpanded by remember { mutableStateOf(false) }
     var city by remember { mutableStateOf("Lisboa, Portugal") }
     var street by remember { mutableStateOf("Avenida de Berna 13A") }
     var showLocationDialog by remember { mutableStateOf(false) }
@@ -90,7 +88,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClayCream)
+            .claySceneBackground()
             .statusBarsPadding()
     ) {
         // ─── TOP BAR: Localização + Menu ────────────────────────────────
@@ -108,7 +106,7 @@ fun HomeScreen(
             Icon(
                 imageVector = Icons.Default.LocationOn,
                 contentDescription = "Localização",
-                tint = ClayOrange,
+                tint = ClayOrangeBolt,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(Modifier.width(8.dp))
@@ -117,56 +115,35 @@ fun HomeScreen(
                     text = city,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
-                    color = ClayTextDark
+                    color = ClayOnDark
                 )
                 Text(
                     text = street,
-                    color = ClayTextLight,
+                    color = ClayOnDarkSecond,
                     fontSize = 12.sp
                 )
             }
-            Box {
-                ClayCard(
-                    onClick = { menuExpanded = true },
-                    backgroundColor = ClayBeige,
-                    cornerRadius = 50.dp,
-                    elevation = 3.dp,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Menu,
-                        contentDescription = "Menu",
-                        tint = ClayOrange,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxSize()
-                    )
-                }
 
-                DropdownMenu(
-                    expanded = menuExpanded,
-                    onDismissRequest = { menuExpanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("👋 $userName", fontWeight = FontWeight.SemiBold) },
-                        onClick = {}
-                    )
-                    if (isRestaurantUser) {
-                        DropdownMenuItem(
-                            text = { Text("🏪 Business") },
-                            onClick = { menuExpanded = false; onOpenBusiness() }
+            AsyncImage(
+                model = "https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png",
+                contentDescription = "BiteFinder",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier
+                    .size(36.dp)
+                    .drawWithContent {
+                        drawContext.canvas.nativeCanvas.saveLayer(
+                            0f, 0f, size.width, size.height,
+                            android.graphics.Paint().apply {
+                                xfermode = android.graphics.PorterDuffXfermode(
+                                    android.graphics.PorterDuff.Mode.SCREEN
+                                )
+                            }
                         )
+                        drawContent()
+                        drawContext.canvas.nativeCanvas.restore()
                     }
-                    DropdownMenuItem(
-                        text = { Text("⭐ As minhas avaliações") },
-                        onClick = { menuExpanded = false; onOpenMyReviews() }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("🚪 Sair") },
-                        onClick = { menuExpanded = false; onSignOut() }
-                    )
-                }
-            }
+            )
+
         }
 
         // ─── CONTEÚDO SCROLLÁVEL ────────────────────────────────────────
@@ -210,7 +187,12 @@ fun HomeScreen(
                                         .padding(horizontal = 16.dp, vertical = 14.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text("🍽", fontSize = 16.sp)
+                                    Icon(
+                                        imageVector = Icons.Filled.Restaurant,
+                                        contentDescription = null,
+                                        tint = ClayTextMedium,
+                                        modifier = Modifier.size(18.dp)
+                                    )
                                     Spacer(Modifier.width(12.dp))
                                     Column {
                                         Text(item.nome, fontWeight = FontWeight.Medium, fontSize = 15.sp, color = ClayTextDark)
@@ -256,12 +238,12 @@ fun HomeScreen(
                         if (state.searchQuery.isNotBlank()) viewModel.clearSearch()
                         else viewModel.onBackFromViewAll()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar", tint = ClayTextDark)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Voltar", tint = ClayOnDark)
                     }
                     Spacer(Modifier.width(8.dp))
                     val title = if (state.searchQuery.isNotBlank()) "Resultados da pesquisa"
                         else "Todos os ${state.viewAllCategory}"
-                    Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = ClayTextDark)
+                    Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = ClayOnDark)
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -295,7 +277,7 @@ fun HomeScreen(
                             modifier = Modifier.clickable { viewModel.onCategorySelected(cat) }
                         ) {
                             ClayCard(
-                                backgroundColor = if (isSelected) ClayOrange.copy(alpha = 0.15f)
+                                backgroundColor = if (isSelected) ClayWhite.copy(alpha = 0.18f)
                                     else getCategoryColor(cat).copy(alpha = 0.4f),
                                 cornerRadius = 50.dp,
                                 elevation = if (isSelected) 6.dp else 3.dp,
@@ -315,7 +297,7 @@ fun HomeScreen(
                             Text(
                                 text = cat,
                                 fontSize = 12.sp,
-                                color = if (isSelected) ClayOrange else ClayTextDark,
+                                color = if (isSelected) ClayOnDark else ClayOnDarkSecond,
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
                             )
                         }
@@ -453,14 +435,14 @@ private fun SectionHeader(
             text = title,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = ClayTextDark,
+            color = ClayOnDark,
             modifier = Modifier.weight(1f)
         )
         Text(
             text = "Ver tudo →",
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
-            color = ClayOrange,
+            color = ClayOnDarkSecond,
             modifier = Modifier.clickable { onViewAll() }
         )
     }

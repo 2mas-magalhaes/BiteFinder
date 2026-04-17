@@ -44,7 +44,7 @@ val ClayShadowOuter = Color(0x120E223F)   // Sombra exterior leve
 
 // ─── PALETA CLAY SATURADA MATTE (sem gradientes, cores sólidas) ──────────────
 
-val ClayOrangeBolt  = Color(0xFFFF8C42)   // Laranja Bolt — vibrante matte
+val ClayOrangeBolt  = ClayBlueSoft        // Alias → azul suave (sem laranja)
 val ClayMustard     = Color(0xFFF2C94C)   // Amarelo Mostarda
 val ClayMintGreen   = Color(0xFF6FCF97)   // Verde Menta
 val ClayPastelPink  = Color(0xFFFF9FAD)   // Rosa Pastel
@@ -68,3 +68,9 @@ val ClayCategory = mapOf(
 
 fun getCategoryColor(category: String): Color =
     ClayCategory[category] ?: ClayBluePale
+
+// ─── SCENE DARK (fundo Claymorphism) ─────────────────────────────────────────
+
+val ClayDarkNavy     = Color(0xFF0A1628)  // Fundo principal escuro
+val ClayOnDark       = Color.White        // Texto sobre fundo escuro
+val ClayOnDarkSecond = Color(0x99FFFFFF)  // Texto secundário sobre escuro (60% white)

@@ -40,6 +40,8 @@ import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.data.UpdatePratoRequest
 import com.example.bytefinder.ui.components.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Storefront
 import com.example.bytefinder.ui.theme.*
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -110,7 +112,7 @@ fun ClayBusinessScreen(
         Spacer(Modifier.height(14.dp))
 
         if (restauranteIds.isEmpty()) {
-            EmptyState(emoji = "🏪", title = "Sem restaurante associado", description = "Este utilizador não está associado a nenhum restaurante.")
+            EmptyState(icon = Icons.Filled.Storefront, title = "Sem restaurante associado", description = "Este utilizador não está associado a nenhum restaurante.")
             return@Column
         }
 

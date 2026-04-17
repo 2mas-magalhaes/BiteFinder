@@ -36,15 +36,12 @@ import androidx.compose.ui.unit.dp
  *
  * @param cornerRadius   Raio dos cantos (mínimo 24dp)
  * @param fillColor      Cor sólida matte (NUNCA gradiente)
- * @param highlightAlpha Opacidade do highlight inset top-left  (0.0–1.0)
  * @param depthAlpha     Opacidade da profundidade inset bottom-right (0.0–1.0)
  */
 fun Modifier.claySurface(
     cornerRadius: Dp = 24.dp,
     fillColor: Color = Color.White,
-    // ── 2. Inner Top-Left Highlight ──────────────────────────────
-    highlightAlpha: Float = 0.55f,
-    // ── 3. Inner Bottom-Right Depth ──────────────────────────────
+    // ── Inner Bottom-Right Depth ──────────────────────────────────
     depthAlpha: Float = 0.18f,
 ): Modifier = this
     .clip(RoundedCornerShape(cornerRadius))
@@ -65,12 +62,6 @@ fun Modifier.claySurface(
             style = NativePaint.Style.FILL
         }
 
-        // Paint — inset highlight (top-left)
-        val hlPaint = NativePaint(NativePaint.ANTI_ALIAS_FLAG).apply {
-            color = Color.White.copy(alpha = highlightAlpha).toArgb()
-            maskFilter = BlurMaskFilter(blurR, BlurMaskFilter.Blur.NORMAL)
-        }
-
         // Paint — inset depth (bottom-right)
         val dpPaint = NativePaint(NativePaint.ANTI_ALIAS_FLAG).apply {
             color = depthColor.copy(alpha = depthAlpha).toArgb()
@@ -80,17 +71,6 @@ fun Modifier.claySurface(
         // Clip path — fica dentro do shape arredondado
         val clipPath = NativePath().apply {
             addRoundRect(0f, 0f, size.width, size.height, cr, cr, NativePath.Direction.CW)
-        }
-
-        // Frame EVEN_ODD: hole deslocado (+off,+off) → gap no topo-esquerda
-        val hlFrame = NativePath().apply {
-            fillType = NativePath.FillType.EVEN_ODD
-            addRect(-200f, -200f, size.width + 200f, size.height + 200f, NativePath.Direction.CW)
-            addRoundRect(
-                insetOffset, insetOffset,
-                size.width + insetOffset, size.height + insetOffset,
-                cr, cr, NativePath.Direction.CW
-            )
         }
 
         // Frame EVEN_ODD: hole deslocado (-off,-off) → gap no fundo-direita
@@ -116,12 +96,6 @@ fun Modifier.claySurface(
 
             // Conteúdo composable (imagens, textos, etc.)
             drawContent()
-
-            // Inset highlight — top-left (luz plástica)
-            canvas.save()
-            canvas.clipPath(clipPath)
-            canvas.drawPath(hlFrame, hlPaint)
-            canvas.restore()
 
             // Inset depth — bottom-right (volume 3D)
             canvas.save()

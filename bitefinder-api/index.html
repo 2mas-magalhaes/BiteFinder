@@ -570,7 +570,9 @@
 
     // Toast Notification
     function showToast(msg, error = false) {
-      toast.innerHTML = error ? `⚠️ ${msg}` : `✅ ${msg}`;
+      toast.innerHTML = error
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>${msg}`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${msg}`;
       toast.style.background = error ? '#ef4444' : '#10b981';
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3500);

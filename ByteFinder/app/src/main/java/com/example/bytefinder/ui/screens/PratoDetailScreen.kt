@@ -58,6 +58,8 @@ import com.example.bytefinder.data.PratoDetailDto
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.data.UpdatePratoRequest
 import com.example.bytefinder.ui.components.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import com.example.bytefinder.ui.theme.*
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -165,7 +167,7 @@ fun ClayPratoDetailScreen(
             // Erro sem dados
             if (erro != null && prato == null) {
                 EmptyState(
-                    emoji = "😕",
+                    icon = Icons.Filled.Warning,
                     title = "Algo correu mal",
                     description = erro ?: "Erro desconhecido"
                 )
@@ -177,7 +179,7 @@ fun ClayPratoDetailScreen(
             // Editar prato (owner)
             if (isMyRestaurant) {
                 ClayButton(
-                    text = "✏️ Editar prato",
+                    text = "Editar prato",
                     onClick = { showEditDialog = true },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -311,7 +313,7 @@ fun ClayPratoDetailScreen(
                         // Formulário de avaliação
                         if (minhaAvaliacao == null || editingMyReview) {
                             Text(
-                                text = if (minhaAvaliacao == null) "Dá a tua opinião 💬" else "Editar a tua opinião",
+                                text = if (minhaAvaliacao == null) "Dá a tua opinião" else "Editar a tua opinião",
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 color = ClayTextDark
@@ -446,7 +448,7 @@ fun ClayPratoDetailScreen(
                         EmbeddedMap(lat = prato!!.restauranteLatitude!!, lng = prato!!.restauranteLongitude!!)
                         Spacer(Modifier.height(12.dp))
                         ClayButton(
-                            text = "📍 Abrir no Maps",
+                            text = "Abrir no Maps",
                             onClick = {
                                 val lat = prato!!.restauranteLatitude; val lng = prato!!.restauranteLongitude
                                 val label = Uri.encode(prato!!.restauranteNome)

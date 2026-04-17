@@ -50,6 +50,7 @@ import coil.compose.AsyncImage
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.ui.components.ClayButton
 import com.example.bytefinder.ui.components.ClayCard
+import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
 import kotlinx.coroutines.launch
 
@@ -118,7 +119,7 @@ fun ClayLoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClaySurface)
+            .claySceneBackground()
             .statusBarsPadding()
             .imePadding()
             .padding(20.dp),
@@ -168,7 +169,7 @@ fun ClayLoginScreen(
                     Spacer(Modifier.height(4.dp))
 
                     Text(
-                        text = "Encontra o prato certo, já 🍽",
+                        text = "Encontra o prato certo",
                         color = ClayTextMedium,
                         fontSize = 14.sp
                     )
@@ -265,12 +266,12 @@ fun ClayLoginScreen(
                             )
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                "👤 goncalo@teste.com / 123456",
+                                "goncalo@teste.com / 123456",
                                 fontSize = 11.sp,
                                 color = ClayTextLight
                             )
                             Text(
-                                "🏪 restaurante@teste.com / 123456",
+                                "restaurante@teste.com / 123456",
                                 fontSize = 11.sp,
                                 color = ClayTextLight
                             )
