@@ -81,6 +81,7 @@ private fun AppRoot(repository: DataRepository) {
     )
 
     fun goHome() {
+        homeViewModel.resetToDefault()
         selectedPratoId = null
         currentScreen = AppScreen.HOME
         selectedTab = NavTab.HOME
@@ -240,12 +241,16 @@ private fun AppRoot(repository: DataRepository) {
                 ClayBottomNav(
                     selectedTab = selectedTab,
                     onTabSelected = { tab ->
-                        selectedTab = tab
-                        currentScreen = when (tab) {
-                            NavTab.HOME    -> AppScreen.HOME
-                            NavTab.SEARCH  -> AppScreen.SEARCH
-                            NavTab.NEAR    -> AppScreen.NEAR
-                            NavTab.ACCOUNT -> AppScreen.ACCOUNT
+                        if (tab == NavTab.HOME) {
+                            goHome()
+                        } else {
+                            selectedTab = tab
+                            currentScreen = when (tab) {
+                                NavTab.HOME    -> AppScreen.HOME
+                                NavTab.SEARCH  -> AppScreen.SEARCH
+                                NavTab.NEAR    -> AppScreen.NEAR
+                                NavTab.ACCOUNT -> AppScreen.ACCOUNT
+                            }
                         }
                     }
                 )

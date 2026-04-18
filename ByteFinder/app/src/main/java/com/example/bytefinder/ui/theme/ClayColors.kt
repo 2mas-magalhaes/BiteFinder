@@ -53,16 +53,13 @@ val ClaySkyBlue     = Color(0xFF7EC8E3)   // Azul Céu
 
 // Categorias — tons saturados matte, cada um distinto
 val ClayCategory = mapOf(
-    "Bifanas"      to ClayOrangeBolt,
-    "Francesinha"  to Color(0xFFE85C5C),  // Vermelho tomatada
-    "Tradicional"  to ClayMustard,
-    "Bacalhau"     to ClaySkyBlue,
-    "Petiscos"     to ClayMintGreen,
-    "Doces"        to ClayPastelPink,
-    "Leitão"       to Color(0xFFD4A76A),  // Caramelo dourado
-    "Cozido"       to Color(0xFFA8D8B9),  // Verde salva
+    "Pizza"        to Color(0xFFE85C5C),  // Vermelho tomate
     "Marisco"      to Color(0xFF7FACD6),  // Azul oceano
-    "Vegetariano"  to Color(0xFF81C784),  // Verde folha
+    "Francesinha"  to Color(0xFFD4A76A),  // Caramelo dourado
+    "Hambúrguer"   to ClayMustard,        // Amarelo mostarda
+    "Sushi"        to ClayMintGreen,      // Verde menta
+    "Pasta"        to ClayOrangeBolt,     // Azul suave
+    "Sobremesas"   to ClayPastelPink,     // Rosa pastel
     "Todos"        to ClayBluePale
 )
 

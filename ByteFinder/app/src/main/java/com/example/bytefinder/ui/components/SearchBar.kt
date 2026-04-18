@@ -36,7 +36,7 @@ fun ClaySearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Procurar bifana, francesinha, bacalhau..."
+    placeholder: String = "Procurar pizza, sushi, burger..."
 ) {
     ClayCard(
         modifier = modifier.fillMaxWidth(),

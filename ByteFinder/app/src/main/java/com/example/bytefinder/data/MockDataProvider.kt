@@ -12,23 +12,20 @@ object MockDataProvider {
 
     // ─── Categorias ─────────────────────────────────────────────────────
     val categorias = listOf(
-        "Bifanas", "Francesinha", "Tradicional", "Bacalhau",
-        "Petiscos", "Doces", "Leitão", "Cozido", "Marisco", "Vegetariano"
+        "Pizza", "Marisco", "Francesinha", "Hambúrguer",
+        "Sushi", "Pasta", "Sobremesas"
     )
 
     // ─── Imagens por Categoria (URLs Unsplash otimizadas) ───────────────
     val categoryImages = mapOf(
         "Todos" to "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&q=80&w=200",
-        "Bifanas" to "https://images.unsplash.com/photo-1628191010210-a59de33e5941?auto=format&fit=crop&q=80&w=200",
-        "Francesinha" to "https://images.unsplash.com/photo-1544025162-836b9e28e469?auto=format&fit=crop&q=80&w=200",
-        "Tradicional" to "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=200",
-        "Bacalhau" to "https://images.unsplash.com/photo-1599458252573-56ae36120de1?auto=format&fit=crop&q=80&w=200",
-        "Petiscos" to "https://images.unsplash.com/photo-1541544741938-0af808871ccd?auto=format&fit=crop&q=80&w=200",
-        "Doces" to "https://images.unsplash.com/photo-1481504225026-669de4a706b8?auto=format&fit=crop&q=80&w=200",
-        "Leitão" to "https://images.unsplash.com/photo-1594041680534-e8d9b2db90cf?auto=format&fit=crop&q=80&w=200",
-        "Cozido" to "https://images.unsplash.com/photo-1547596009-842cdd0d84c1?auto=format&fit=crop&q=80&w=200",
-        "Marisco" to "https://images.unsplash.com/photo-1565680018434-b513d5e1051e?auto=format&fit=crop&q=80&w=200",
-        "Vegetariano" to "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=200"
+        "Pizza" to "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=200",
+        "Marisco" to "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&q=80&w=200",
+        "Francesinha" to "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Francesinha_Sandwich_%28cropped%29.jpg/330px-Francesinha_Sandwich_%28cropped%29.jpg",
+        "Hambúrguer" to "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=200",
+        "Sushi" to "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&q=80&w=200",
+        "Pasta" to "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=200",
+        "Sobremesas" to "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Pastel_de_nata_%2818616473070%29.jpg/330px-Pastel_de_nata_%2818616473070%29.jpg"
     )
 
     fun getCategoryImageUrl(name: String): String =
@@ -48,70 +45,51 @@ object MockDataProvider {
     )
 
     val restaurantes = listOf(
-        MockRestaurante(1, "Casa das Bifanas", "Rua Augusta 42", "Lisboa", "Baixa", 38.7108, -9.1368),
-        MockRestaurante(2, "O Velho Eurico", "Largo São Cristóvão 3", "Lisboa", "Alfama", 38.7139, -9.1310),
-        MockRestaurante(3, "Cervejaria Ramiro", "Av. Almirante Reis 1", "Lisboa", "Intendente", 38.7213, -9.1353),
-        MockRestaurante(4, "Taberna da Rua das Flores", "Rua das Flores 340", "Porto", "Ribeira", 41.1450, -8.6150),
-        MockRestaurante(5, "Café Santiago", "Rua Passos Manuel 226", "Porto", "Bolhão", 41.1496, -8.6050),
-        MockRestaurante(6, "Solar dos Presuntos", "Rua das Portas de Sto Antão 150", "Lisboa", "Restauradores", 38.7162, -9.1420),
-        MockRestaurante(7, "Pastéis de Belém", "Rua de Belém 84", "Lisboa", "Belém", 38.6975, -9.2031),
-        MockRestaurante(8, "A Cozinha do Martinho", "Rua Larga 18", "Coimbra", "Alta", 40.2085, -8.4265),
-        MockRestaurante(9, "Tasca do Chico", "Rua dos Remédios 83", "Lisboa", "Alfama", 38.7125, -9.1275),
-        MockRestaurante(10, "Cantinho do Avillez", "Rua dos Duques de Bragança 7", "Lisboa", "Chiado", 38.7095, -9.1440),
-        MockRestaurante(11, "Marisqueira Nunes", "Rua Bartolomeu Dias 112", "Lisboa", "Belém", 38.6960, -9.2060),
-        MockRestaurante(12, "O Botanista", "Rua da Mãe d'Água 49", "Lisboa", "Príncipe Real", 38.7180, -9.1510)
+        MockRestaurante(2, "Pizzaria Luzzo Amadora", "Av. Cruzeiro Seixas 5 e 7", "Amadora", "Centro", 38.7763, -9.2197),
+        MockRestaurante(3, "Cervejaria Ramiro", "Av. Almirante Reis 1H", "Lisboa", "Intendente", 38.7223, -9.1353),
+        MockRestaurante(5, "Café Santiago", "Rua de Passos Manuel 226", "Porto", "Bolhão", 41.1496, -8.6100),
+        MockRestaurante(7, "Pastéis de Belém", "Rua de Belém 84-92", "Lisboa", "Belém", 38.6975, -9.2030),
+        MockRestaurante(9, "Hamburgueria do Bairro", "Rua da Madalena 200", "Lisboa", "Baixa", 38.7100, -9.1330),
+        MockRestaurante(10, "Sushicafé Avenida", "Rua Barata Salgueiro 28", "Lisboa", "Avenida", 38.7260, -9.1470),
+        MockRestaurante(11, "Pasta Non Basta", "Rua do Alecrim 21", "Lisboa", "Chiado", 38.7100, -9.1450)
     )
 
     // ─── Pratos Mock ────────────────────────────────────────────────────
 
     val pratos: List<PratoDto> = listOf(
-        // Bifanas — Espalhadas por Lisboa e Porto
-        PratoDto(1, "Bifana Clássica", "Bifanas", "Bifana de porco marinada em massa de pimentão, servida em pão crocante", 3.50, "https://images.unsplash.com/photo-1628191010210-a59de33e5941?auto=format&fit=crop&q=80&w=400", 1, "Casa das Bifanas", 4.7, 128),
-        PratoDto(2, "Bifana Especial com Queijo", "Bifanas", "Bifana com queijo da Serra derretido e molho picante da casa", 4.50, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=400", 2, "O Velho Eurico", 4.3, 85),
-        PratoDto(3, "Bifana do Porto", "Bifanas", "Receita tradicional portuense com molho de cerveja preta", 3.80, "https://images.unsplash.com/photo-1551782450-a2132b4ba21d?auto=format&fit=crop&q=80&w=400", 4, "Taberna da Rua das Flores", 4.9, 201),
-        PratoDto(4, "Mini Bifanas (6 un.)", "Bifanas", "Mini bifanas perfeitas para petiscar, com molho à parte", 6.00, "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&q=80&w=400", 9, "Tasca do Chico", 4.1, 67),
+        // Pizza — Pizzaria Luzzo Amadora
+        PratoDto(1, "Margherita", "Pizza", "Pizza clássica com molho de tomate, mozzarella e manjericão", 13.20, "https://bitefinderstorage.blob.core.windows.net/pratos/margherita1.png", 2, "Pizzaria Luzzo Amadora", 4.8, 312),
+        PratoDto(2, "Pepperoni", "Pizza", "Pizza com pepperoni picante e mozzarella", 15.30, "https://bitefinderstorage.blob.core.windows.net/pratos/pepperoni1.png", 2, "Pizzaria Luzzo Amadora", 4.7, 256),
+        PratoDto(3, "Funghi", "Pizza", "Pizza com cogumelos frescos e mozzarella", 15.30, "https://bitefinderstorage.blob.core.windows.net/pratos/funghi.png", 2, "Pizzaria Luzzo Amadora", 4.5, 178),
 
-        // Francesinhas
-        PratoDto(5, "Francesinha Original", "Francesinha", "A verdadeira francesinha do Porto com molho secreto", 12.50, "https://images.unsplash.com/photo-1544025162-836b9e28e469?auto=format&fit=crop&q=80&w=400", 5, "Café Santiago", 4.8, 312),
-        PratoDto(6, "Francesinha Vegetariana", "Francesinha", "Versão vegetariana com seitan e cogumelos, molho de tomate", 11.00, "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=400", 4, "Taberna da Rua das Flores", 4.2, 54),
-        PratoDto(7, "Francesinha Especial Santiago", "Francesinha", "Com ovo estrelado, batata frita caseira e molho extra", 14.00, "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&q=80&w=400", 5, "Café Santiago", 4.9, 445),
+        // Marisco — Cervejaria Ramiro
+        PratoDto(4, "Gambas al Ajillo", "Marisco", "Gambas frescas salteadas em azeite com alho e malagueta", 18.50, "https://images.unsplash.com/photo-1565680018434-b513d5e5fd47?auto=format&fit=crop&q=80&w=400", 3, "Cervejaria Ramiro", 4.8, 234),
+        PratoDto(5, "Amêijoas à Bulhão Pato", "Marisco", "Amêijoas frescas com azeite, alho, coentros e limão", 22.00, "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Am%C3%AAijoas_%C3%A0_Bulh%C3%A3o_Pato.jpg/960px-Am%C3%AAijoas_%C3%A0_Bulh%C3%A3o_Pato.jpg", 3, "Cervejaria Ramiro", 4.7, 187),
+        PratoDto(6, "Lavagante Grelhado", "Marisco", "Lavagante fresco grelhado com manteiga de ervas", 45.00, "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Grilled_Lobster_%288558909573%29.jpg/960px-Grilled_Lobster_%288558909573%29.jpg", 3, "Cervejaria Ramiro", 4.9, 145),
 
-        // Tradicional
-        PratoDto(8, "Cozido à Portuguesa", "Tradicional", "Cozido completo com carnes variadas, enchidos, legumes e arroz", 15.00, "https://images.unsplash.com/photo-1547596009-842cdd0d84c1?auto=format&fit=crop&q=80&w=400", 6, "Solar dos Presuntos", 4.6, 178),
-        PratoDto(9, "Arroz de Pato", "Tradicional", "Arroz de pato no forno com chouriço e bacon crocante", 13.50, "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=400", 10, "Cantinho do Avillez", 4.5, 134),
-        PratoDto(10, "Feijoada Transmontana", "Tradicional", "Feijoada rica com orelha, pé e enchidos de Trás-os-Montes", 12.00, "https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&q=80&w=400", 8, "A Cozinha do Martinho", 4.4, 89),
+        // Francesinha — Café Santiago
+        PratoDto(7, "Francesinha Especial", "Francesinha", "Francesinha com fiambre, linguiça, salsicha fresca, bife e ovo, coberta com queijo e molho especial", 14.00, "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Francesinha_Sandwich_%28cropped%29.jpg/960px-Francesinha_Sandwich_%28cropped%29.jpg", 5, "Café Santiago", 4.9, 445),
+        PratoDto(8, "Mini Francesinha", "Francesinha", "Versão mini da clássica francesinha do Porto", 9.50, "https://images.unsplash.com/photo-1513185158878-8d8c2a2a3da3?auto=format&fit=crop&q=80&w=400", 5, "Café Santiago", 4.6, 178),
 
-        // Bacalhau
-        PratoDto(11, "Bacalhau à Brás", "Bacalhau", "Bacalhau desfiado com batata palha, ovo e azeitonas", 14.00, "https://images.unsplash.com/photo-1599458252573-56ae36120de1?auto=format&fit=crop&q=80&w=400", 6, "Solar dos Presuntos", 4.7, 215),
-        PratoDto(12, "Bacalhau com Natas", "Bacalhau", "Gratinado de bacalhau com natas dourado no forno", 13.00, "https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=400", 2, "O Velho Eurico", 4.5, 99),
-        PratoDto(13, "Pastéis de Bacalhau (6 un.)", "Bacalhau", "Pastéis crocantes de bacalhau da avó, fritos na hora", 7.50, "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=400", 9, "Tasca do Chico", 4.6, 156),
+        // Hambúrguer — Hamburgueria do Bairro
+        PratoDto(9, "Classic Smash Burger", "Hambúrguer", "Dois smash patties de 90g, queijo cheddar, pickles, cebola caramelizada e molho especial", 12.50, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&q=80&w=400", 9, "Hamburgueria do Bairro", 4.7, 201),
+        PratoDto(10, "Bacon Cheese Burger", "Hambúrguer", "Burger 180g com bacon crocante, queijo cheddar derretido, alface e tomate", 14.00, "https://images.unsplash.com/photo-1553979459-d2229ba7433b?auto=format&fit=crop&q=80&w=400", 9, "Hamburgueria do Bairro", 4.5, 156),
+        PratoDto(11, "Truffle Burger", "Hambúrguer", "Burger 200g com queijo brie, rúcula, cogumelos e maionese de trufa", 16.00, "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?auto=format&fit=crop&q=80&w=400", 9, "Hamburgueria do Bairro", 4.8, 89),
 
-        // Petiscos
-        PratoDto(14, "Prego no Prato", "Petiscos", "Bife de vaca com ovo a cavalo e batatas fritas", 9.50, "https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&q=80&w=400", 1, "Casa das Bifanas", 4.3, 78),
-        PratoDto(15, "Tábua de Queijos e Enchidos", "Petiscos", "Seleção de queijos regionais com presunto e chouriço", 12.00, "https://images.unsplash.com/photo-1541544741938-0af808871ccd?auto=format&fit=crop&q=80&w=400", 4, "Taberna da Rua das Flores", 4.4, 91),
-        PratoDto(16, "Pataniscas de Bacalhau", "Petiscos", "Pataniscas douradas servidas com arroz de feijão", 8.50, "https://images.unsplash.com/photo-1562967916-eb82221dfb92?auto=format&fit=crop&q=80&w=400", 3, "Cervejaria Ramiro", 4.2, 67),
+        // Sushi — Sushicafé Avenida
+        PratoDto(12, "Nigiri de Salmão (6 pcs)", "Sushi", "Seis peças de nigiri com salmão fresco do Atlântico", 14.00, "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&q=80&w=400", 10, "Sushicafé Avenida", 4.6, 134),
+        PratoDto(13, "Dragon Roll (8 pcs)", "Sushi", "Roll especial com camarão tempura, abacate, enguia e tobiko", 16.50, "https://images.unsplash.com/photo-1617196034796-73dfa7b1fd56?auto=format&fit=crop&q=80&w=400", 10, "Sushicafé Avenida", 4.7, 98),
+        PratoDto(14, "Sashimi Misto", "Sushi", "Seleção de 15 fatias de sashimi: salmão, atum e robalo", 22.00, "https://images.unsplash.com/photo-1534482421-64566f976cfa?auto=format&fit=crop&q=80&w=400", 10, "Sushicafé Avenida", 4.8, 167),
 
-        // Doces
-        PratoDto(17, "Pastel de Nata", "Doces", "O autêntico pastel de Belém com canela e açúcar em pó", 1.50, "https://images.unsplash.com/photo-1481504225026-669de4a706b8?auto=format&fit=crop&q=80&w=400", 7, "Pastéis de Belém", 4.9, 523),
-        PratoDto(18, "Bola de Berlim", "Doces", "Bola de Berlim recheada com creme pasteleiro artesanal", 2.00, "https://images.unsplash.com/photo-1558326567-98ae2405596b?auto=format&fit=crop&q=80&w=400", 7, "Pastéis de Belém", 4.5, 198),
-        PratoDto(19, "Pudim Abade de Priscos", "Doces", "Pudim tradicional minhoto com calda de caramelo", 4.50, "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&q=80&w=400", 8, "A Cozinha do Martinho", 4.3, 45),
+        // Pasta — Pasta Non Basta
+        PratoDto(15, "Carbonara", "Pasta", "Spaghetti com guanciale, ovo, pecorino romano e pimenta preta", 13.50, "https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=400", 11, "Pasta Non Basta", 4.5, 99),
+        PratoDto(16, "Lasagna della Casa", "Pasta", "Lasanha tradicional com ragù de carne, béchamel e parmigiano", 13.00, "https://images.unsplash.com/photo-1574894709920-11b28e7367e3?auto=format&fit=crop&q=80&w=400", 11, "Pasta Non Basta", 4.6, 112),
+        PratoDto(17, "Penne all'Arrabbiata", "Pasta", "Penne com molho de tomate picante, alho e salsa", 11.50, "https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&q=80&w=400", 11, "Pasta Non Basta", 4.3, 78),
 
-        // Leitão
-        PratoDto(20, "Leitão da Bairrada", "Leitão", "Leitão assado com pele estaladiça ao estilo da Bairrada", 16.00, "https://images.unsplash.com/photo-1594041680534-e8d9b2db90cf?auto=format&fit=crop&q=80&w=400", 8, "A Cozinha do Martinho", 4.8, 167),
-        PratoDto(21, "Sandes de Leitão", "Leitão", "Sandes generosa de leitão com mostarda e rúcula", 7.00, "https://images.unsplash.com/photo-1553909489-cd47e0907980?auto=format&fit=crop&q=80&w=400", 6, "Solar dos Presuntos", 4.4, 73),
-
-        // Cozido
-        PratoDto(22, "Cozido à Portuguesa Completo", "Cozido", "Cozido tradicional completo para 2 pessoas", 28.00, "https://images.unsplash.com/photo-1547596009-842cdd0d84c1?auto=format&fit=crop&q=80&w=400", 6, "Solar dos Presuntos", 4.7, 89),
-
-        // Marisco
-        PratoDto(23, "Amêijoas à Bulhão Pato", "Marisco", "Amêijoas frescas com alho, coentros e azeite", 14.00, "https://images.unsplash.com/photo-1565680018434-b513d5e1051e?auto=format&fit=crop&q=80&w=400", 3, "Cervejaria Ramiro", 4.8, 234),
-        PratoDto(24, "Camarão Tigre Grelhado", "Marisco", "Camarão tigre grelhado com manteiga de alho", 22.00, "https://images.unsplash.com/photo-1565680018434-b513d5e1051e?auto=format&fit=crop&q=80&w=400", 3, "Cervejaria Ramiro", 4.6, 187),
-        PratoDto(25, "Arroz de Marisco", "Marisco", "Arroz cremoso com camarão, amêijoas e lagostim", 18.00, "https://images.unsplash.com/photo-1534080564583-6be75777b70a?auto=format&fit=crop&q=80&w=400", 11, "Marisqueira Nunes", 4.7, 145),
-
-        // Vegetariano
-        PratoDto(26, "Bowl Buddha Português", "Vegetariano", "Bowl com grão, abacate, tomate seco e queijo de cabra", 10.50, "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&q=80&w=400", 12, "O Botanista", 4.5, 88),
-        PratoDto(27, "Açorda de Espargos", "Vegetariano", "Açorda cremosa de espargos verdes com ovo escalfado", 9.00, "https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&q=80&w=400", 12, "O Botanista", 4.3, 56),
-        PratoDto(28, "Migas de Couve com Feijão", "Vegetariano", "Migas alentejanas de couve com feijão branco", 8.50, "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&q=80&w=400", 10, "Cantinho do Avillez", 4.2, 42)
+        // Sobremesas — Pastéis de Belém
+        PratoDto(18, "Pastel de Belém", "Sobremesas", "O original pastel de nata de Belém com canela e açúcar em pó", 1.30, "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Pastel_de_nata_%2818616473070%29.jpg/960px-Pastel_de_nata_%2818616473070%29.jpg", 7, "Pastéis de Belém", 4.9, 523),
+        PratoDto(19, "Tarte de Amêndoa", "Sobremesas", "Tarte crocante de amêndoa do Algarve com gelado de baunilha", 4.50, "https://images.unsplash.com/photo-1519915028121-7d3463d20b13?auto=format&fit=crop&q=80&w=400", 7, "Pastéis de Belém", 4.5, 198),
+        PratoDto(20, "Mousse de Chocolate", "Sobremesas", "Mousse de chocolate negro belga com raspas de chocolate", 5.00, "https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?auto=format&fit=crop&q=80&w=400", 7, "Pastéis de Belém", 4.7, 145)
     )
 
     // ─── Detalhes dos Pratos ────────────────────────────────────────────

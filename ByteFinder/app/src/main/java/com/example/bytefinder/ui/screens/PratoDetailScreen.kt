@@ -2,10 +2,6 @@ package com.example.bytefinder.ui.screens
 
 import android.content.Intent
 import android.net.Uri
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -47,8 +43,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.AsyncImage
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.example.bytefinder.data.AvaliacaoDto
 import com.example.bytefinder.data.CreateAvaliacaoRequest
 import com.example.bytefinder.data.CreateRespostaRequest
@@ -551,34 +555,28 @@ private fun ClayEditPratoDialog(
 
 @Composable
 private fun EmbeddedMap(lat: Double, lng: Double) {
-    val html = """
-        <!DOCTYPE html><html><head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}#map{width:100%;height:100%;border-radius:18px}</style>
-        </head><body><div id="map"></div><script>
-        var map=L.map('map').setView([$lat,$lng],16);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
-        L.marker([$lat,$lng]).addTo(map);
-        </script></body></html>
-    """.trimIndent()
-
-    AndroidView(
-        factory = { context ->
-            WebView(context).apply {
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                settings.cacheMode = WebSettings.LOAD_DEFAULT
-                settings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                overScrollMode = WebView.OVER_SCROLL_NEVER
-                isVerticalScrollBarEnabled = false
-                isHorizontalScrollBarEnabled = false
-                webChromeClient = WebChromeClient()
-                webViewClient = object : WebViewClient() {}
-                loadDataWithBaseURL("https://localhost/", html, "text/html", "UTF-8", null)
-            }
-        },
-        modifier = Modifier.fillMaxWidth().height(220.dp).clip(RoundedCornerShape(18.dp))
-    )
+    val position = LatLng(lat, lng)
+    val cameraPositionState = rememberCameraPositionState {
+        this.position = CameraPosition.fromLatLngZoom(position, 16f)
+    }
+    GoogleMap(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(220.dp)
+            .clip(RoundedCornerShape(18.dp)),
+        cameraPositionState = cameraPositionState,
+        uiSettings = MapUiSettings(
+            zoomControlsEnabled = false,
+            scrollGesturesEnabled = false,
+            zoomGesturesEnabled = false,
+            rotationGesturesEnabled = false,
+            tiltGesturesEnabled = false,
+            myLocationButtonEnabled = false
+        ),
+        properties = MapProperties()
+    ) {
+        Marker(
+            state = MarkerState(position = position)
+        )
+    }
 }
