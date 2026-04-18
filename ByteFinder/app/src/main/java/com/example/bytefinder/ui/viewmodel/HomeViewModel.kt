@@ -141,6 +141,21 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         _state.value = _state.value.copy(viewAllCategory = null)
     }
 
+    fun resetToDefault() {
+        _state.value = _state.value.copy(
+            selectedCategory = "Todos",
+            searchQuery = "",
+            searchSuggestions = emptyList(),
+            selectedCity = "Todas",
+            selectedZone = "Todas",
+            selectedPriceRange = null,
+            isFiltersExpanded = false,
+            viewAllCategory = null
+        )
+        _searchInput.value = ""
+        applyFilters()
+    }
+
     fun clearSearch() {
         _state.value = _state.value.copy(
             searchQuery = "",

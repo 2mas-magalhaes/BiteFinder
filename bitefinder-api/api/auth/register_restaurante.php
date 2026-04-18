@@ -17,12 +17,20 @@ try {
         respond(['ok' => false, 'error' => 'Método HTTP inválido. Use POST.'], 405);
     }
 
-    $name = trim((string)($_POST['name'] ?? ''));
-    $email = trim(strtolower((string)($_POST['email'] ?? '')));
-    $password = (string)($_POST['password'] ?? '');
-    $restauranteNome = trim((string)($_POST['restauranteNome'] ?? ''));
-    $restauranteMorada = trim((string)($_POST['restauranteMorada'] ?? ''));
-    $restaurantCode = trim((string)($_POST['restaurantCode'] ?? '')); // NIF/CNPJ
+    // Accept both JSON body and form POST
+    $input = $_POST;
+    if (empty($input)) {
+        $raw = file_get_contents('php://input');
+        $json = json_decode($raw, true);
+        if (is_array($json)) $input = $json;
+    }
+
+    $name = trim((string)($input['name'] ?? ''));
+    $email = trim(strtolower((string)($input['email'] ?? '')));
+    $password = (string)($input['password'] ?? '');
+    $restauranteNome = trim((string)($input['restauranteNome'] ?? ''));
+    $restauranteMorada = trim((string)($input['restauranteMorada'] ?? ''));
+    $restaurantCode = trim((string)($input['restaurantCode'] ?? '')); // NIF/CNPJ
 
     if ($name === '' || $email === '' || $password === '' || $restauranteNome === '' || $restauranteMorada === '' || $restaurantCode === '') {
         respond(['ok' => false, 'error' => 'Preencha todos os campos obrigatórios.'], 422);

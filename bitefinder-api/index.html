@@ -9,23 +9,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --brand: #0f172a;
-      --brand-hover: #1e293b;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --accent-soft: #dbeafe;
-      --bg: #edf2f9;
-      --surface: #ffffff;
-      --border: #d9e2ef;
-      --text: #0b1222;
-      --text-soft: #5f6f89;
-      --success: #12b76a;
-      --error: #ef4444;
+      --brand: #1B6EC2;
+      --brand-hover: #1453A0;
+      --accent: #1B6EC2;
+      --accent-hover: #1453A0;
+      --accent-soft: rgba(27,110,194,0.15);
+      --bg: #0C1829;
+      --bg-elevated: #111F33;
+      --surface: #162033;
+      --surface-light: #1A2740;
+      --border: rgba(255,255,255,0.08);
+      --text: #F0F4FA;
+      --text-soft: #8FA3BF;
+      --success: #34C67A;
+      --error: #E85C5C;
+      --yellow: #FFC107;
       --radius: 24px;
-      --shadow-sm: 0 4px 12px 0 rgba(15, 23, 42, 0.05);
-      --shadow: 0 16px 48px -12px rgba(15, 23, 42, 0.08);
-      --shadow-lg: 0 24px 64px -16px rgba(15, 23, 42, 0.1);
-      --ring: rgba(37, 99, 235, 0.3);
+      --shadow-sm: 0 4px 12px 0 rgba(0,0,0,0.25);
+      --shadow: 0 16px 48px -12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 24px 64px -16px rgba(0,0,0,0.5);
+      --ring: rgba(27,110,194,0.4);
       font-family: 'Manrope', 'Segoe UI', sans-serif;
     }
 
@@ -33,10 +36,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at 12% 8%, #dbeafe 0%, rgba(219, 234, 254, 0) 40%),
-        radial-gradient(circle at 88% 5%, #c7d2fe 0%, rgba(199, 210, 254, 0) 38%),
-        linear-gradient(180deg, #f3f7fd 0%, var(--bg) 100%);
+      background: var(--bg);
       color: var(--text);
     }
 
@@ -53,7 +53,7 @@
     .auth-banner {
       display: none;
       width: 47%;
-      background: linear-gradient(165deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+      background: linear-gradient(165deg, rgba(12, 24, 41, 0.5), rgba(12, 24, 41, 0.92)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
       color: white;
       padding: 3.6rem;
       flex-direction: column;
@@ -65,12 +65,12 @@
     .auth-banner::before {
       content: '';
       position: absolute;
-      width: 220px;
-      height: 220px;
+      width: 260px;
+      height: 260px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(37, 99, 235, 0.65) 0%, rgba(37, 99, 235, 0) 70%);
-      top: -40px;
-      right: -40px;
+      background: radial-gradient(circle, rgba(27,110,194,0.5) 0%, rgba(27,110,194,0) 70%);
+      top: -50px;
+      right: -50px;
     }
     
     @media (min-width: 1024px) {
@@ -89,7 +89,7 @@
     }
     .auth-banner p {
       font-size: 1.25rem;
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.75);
       max-width: 500px;
       line-height: 1.6;
       position: relative;
@@ -106,12 +106,13 @@
     }
 
     .kpi-pill {
-      background: rgba(248, 250, 252, 0.15);
-      border: 1px solid rgba(248, 250, 252, 0.28);
+      background: rgba(27,110,194,0.2);
+      border: 1px solid rgba(27,110,194,0.35);
       border-radius: 999px;
       padding: 0.5rem 0.9rem;
       font-size: 0.82rem;
       font-weight: 700;
+      color: #D6E8F8;
       backdrop-filter: blur(4px);
     }
     
@@ -121,6 +122,7 @@
       flex-direction: column;
       justify-content: center;
       padding: 2rem 1.3rem;
+      background: var(--bg);
     }
     
     .auth-card {
@@ -128,7 +130,7 @@
       max-width: 520px;
       margin: 0 auto;
       background: var(--surface);
-      border: 1px solid rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--border);
       border-radius: 32px;
       box-shadow: var(--shadow-lg);
       padding: 48px;
@@ -143,14 +145,14 @@
       border-radius: 24px;
       margin-bottom: 24px;
       box-shadow: var(--shadow);
-      border: 1px solid rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--border);
     }
-    .auth-header h2 { font-size: 2.25rem; font-weight: 800; margin: 0 0 8px; color: var(--brand); letter-spacing: -0.03em; }
+    .auth-header h2 { font-size: 2.25rem; font-weight: 800; margin: 0 0 8px; color: var(--text); letter-spacing: -0.03em; }
     .auth-header p { color: var(--text-soft); font-size: 1.1rem; margin: 0; }
     
     .auth-tabs {
       display: flex;
-      background: #edf2fb;
+      background: var(--bg-elevated);
       padding: 4px;
       border-radius: 12px;
       margin-bottom: 2rem;
@@ -168,17 +170,17 @@
       transition: all 0.2s ease;
     }
     .auth-tabs button.active {
-      background: var(--surface);
-      color: var(--text);
-      box-shadow: 0 8px 18px -16px rgba(13, 33, 64, 0.85);
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.5);
     }
     
     /* ---- DASHBOARD LAYOUT ---- */
-    .dashboard-layout { min-height: 100vh; display: flex; flex-direction: column; }
+    .dashboard-layout { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
     
     .dash-nav {
-      background: rgba(255, 255, 255, 0.86);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(17, 31, 51, 0.92);
+      border-bottom: 1px solid var(--border);
       padding: 0 1.6rem;
       display: flex;
       justify-content: space-between;
@@ -187,15 +189,15 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(16px);
     }
     
-    .dash-brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05rem; }
+    .dash-brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05rem; color: var(--text); }
     .dash-brand img {
       width: 38px;
       height: 38px;
       border-radius: 10px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
+      border: 1px solid var(--border);
     }
     
     .dash-menu { display: flex; gap: 4px; height: 100%; align-items: center; }
@@ -210,21 +212,21 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-    .dash-menu button:hover { background: #e9f0fb; color: var(--text); }
-    .dash-menu button.active { background: #dbeafe; color: var(--accent); }
+    .dash-menu button:hover { background: rgba(27,110,194,0.12); color: var(--text); }
+    .dash-menu button.active { background: var(--accent-soft); color: var(--accent); }
     
     .dash-logout {
       font-size: 0.9rem;
-      color: #b91c1c;
-      background: #fee2e2;
-      border: none;
+      color: #E85C5C;
+      background: rgba(232,92,92,0.12);
+      border: 1px solid rgba(232,92,92,0.2);
       cursor: pointer;
       font-weight: 700;
       border-radius: 999px;
       padding: 10px 14px;
-      transition: transform 0.2s ease;
+      transition: all 0.2s ease;
     }
-    .dash-logout:hover { transform: translateY(-1px); }
+    .dash-logout:hover { background: rgba(232,92,92,0.2); transform: translateY(-1px); }
     
     .dash-content { max-width: 1220px; margin: 0 auto; padding: 2rem 1.2rem 2.5rem; width: 100%; flex: 1; }
     
@@ -235,7 +237,7 @@
     
     .card {
       background: var(--surface);
-      border: none;
+      border: 1px solid var(--border);
       border-radius: 24px;
       padding: 32px;
       box-shadow: var(--shadow);
@@ -252,24 +254,24 @@
     @media (min-width: 640px) { .form-grid.two-cols { grid-template-columns: 1fr 1fr; } }
     
     .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
-    .form-row label { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .form-row label { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
     .form-row input, .form-row select, .form-row textarea { 
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: var(--surface);
+      background: var(--bg-elevated);
       color: var(--text);
       padding: 12px 14px;
       font-size: 0.95rem;
       font-family: inherit;
       transition: all .2s ease;
     }
-    .form-row input::placeholder, .form-row textarea::placeholder { color: #94a3b8; }
+    .form-row input::placeholder, .form-row textarea::placeholder { color: #5f7390; }
     .form-row input:focus, .form-row select:focus, .form-row textarea:focus { 
       outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); 
     }
     .form-row textarea { min-height: 74px; resize: vertical; }
     
-    .field-error { color: #ef4444; font-size: 0.8rem; margin-top: -6px; min-height: 1.1rem; }
+    .field-error { color: var(--error); font-size: 0.8rem; margin-top: -6px; min-height: 1.1rem; }
     
     .button-cta { 
       width: 100%;
@@ -283,9 +285,9 @@
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex; justify-content: center; align-items: center; gap: 12px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.4);
     }
-    .button-cta:hover { transform: scale(1.01); box-shadow: var(--shadow); background: var(--brand-hover); }
+    .button-cta:hover { transform: scale(1.01); box-shadow: 0 8px 24px -4px rgba(27,110,194,0.5); background: var(--brand-hover); }
     .button-cta.secondary { background: var(--accent); color: white; }
     .button-cta.secondary:hover { background: var(--accent-hover); }
     .button-cta.danger { background: var(--error); color: white; }
@@ -296,7 +298,7 @@
     }
     
     .page-header { margin-bottom: 40px; }
-    .page-header h2 { font-size: 2.5rem; font-weight: 800; color: var(--brand); margin: 0 0 12px; letter-spacing: -0.03em; }
+    .page-header h2 { font-size: 2.5rem; font-weight: 800; color: var(--text); margin: 0 0 12px; letter-spacing: -0.03em; }
     .page-header p { color: var(--text-soft); font-size: 1.15rem; margin: 0; }
 
     .section-eyebrow {
@@ -304,8 +306,8 @@
       align-items: center;
       gap: 6px;
       border-radius: 999px;
-      background: #dbeafe;
-      color: #1e40af;
+      background: var(--accent-soft);
+      color: var(--accent);
       font-weight: 700;
       font-size: 0.74rem;
       letter-spacing: 0.07em;
@@ -318,7 +320,7 @@
     .data-card { 
       border: 1px solid var(--border);
       border-radius: 18px;
-      background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+      background: var(--surface-light);
       padding: 18px;
       transition: box-shadow 0.2s, transform 0.2s;
       box-shadow: var(--shadow-sm);
@@ -337,8 +339,10 @@
       padding: 6px 10px;
       line-height: 1;
     }
+    .data-card .form-row label { color: var(--text-soft); }
+    .data-card .form-row input, .data-card .form-row textarea { background: var(--bg-elevated); color: var(--text); border-color: var(--border); }
     
-    .metric-value { font-size: 2rem; font-weight: 800; margin: 0; color: var(--brand); }
+    .metric-value { font-size: 2rem; font-weight: 800; margin: 0; color: var(--text); }
     .metric-label { color: var(--text-soft); margin: 4px 0 0; font-size: 0.9rem; font-weight: 500; }
     
     .toast {
@@ -346,7 +350,7 @@
       right: 18px;
       bottom: 18px;
       z-index: 9999;
-      background: #1e293b;
+      background: var(--surface-light);
       color: #fff;
       padding: 12px 18px;
       border-radius: 10px;
@@ -490,7 +494,7 @@
         <div class="form-grid two-cols" style="align-items: start;">
           <!-- Formulário de Prato -->
           <div class="card">
-            <h3 style="margin: 0 0 1rem; font-size: 1.1rem;">Adicionar Novo Prato</h3>
+            <h3 style="margin: 0 0 1rem; font-size: 1.1rem; color: var(--text);">Adicionar Novo Prato</h3>
             <p style="margin: 0 0 1rem; color: var(--text-soft); font-size: 0.9rem;">Publique pratos com foto, descrição e preço para aparecer com destaque na pesquisa.</p>
             <form id="menuForm" autocomplete="off" novalidate>
               <div class="form-row">
@@ -573,7 +577,7 @@
       toast.innerHTML = error
         ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>${msg}`
         : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${msg}`;
-      toast.style.background = error ? '#ef4444' : '#10b981';
+      toast.style.background = error ? 'var(--error)' : 'var(--success)';
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3500);
     }
@@ -793,7 +797,7 @@
           </div>
           <p>${item.descricao || 'Nenhuma descrição fornecida.'}</p>
           <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-            <button class="button-cta small" data-edit="${item.idPrato}">Editar</button>
+            <button class="button-cta small" data-edit="${item.id}">Editar</button>
           </div>
         `;
         // Evento de edição inline

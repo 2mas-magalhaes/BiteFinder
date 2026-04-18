@@ -29,16 +29,16 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Cake
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DinnerDining
-import androidx.compose.material.icons.filled.EggAlt
-import androidx.compose.material.icons.filled.EmojiFoodBeverage
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LocalPizza
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.RiceBowl
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SetMeal
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Storefront
@@ -78,13 +78,13 @@ import com.example.bytefinder.ui.viewmodel.HomeViewModel
 private data class InspirationItem(val label: String, val icon: ImageVector)
 
 private val inspirationCategories = listOf(
-    InspirationItem("Hambúrgueres", Icons.Filled.DinnerDining),
     InspirationItem("Pizza", Icons.Filled.LocalPizza),
+    InspirationItem("Hambúrgueres", Icons.Filled.DinnerDining),
     InspirationItem("Sushi", Icons.Filled.RiceBowl),
-    InspirationItem("Bifanas", Icons.Filled.Restaurant),
-    InspirationItem("Frango", Icons.Filled.EggAlt),
-    InspirationItem("Café", Icons.Filled.EmojiFoodBeverage),
-    InspirationItem("Restaurante", Icons.Filled.Storefront),
+    InspirationItem("Pasta", Icons.Filled.Restaurant),
+    InspirationItem("Marisco", Icons.Filled.SetMeal),
+    InspirationItem("Sobremesas", Icons.Filled.Cake),
+    InspirationItem("Francesinha", Icons.Filled.Storefront),
 )
 
 // ─── Ecrã de pesquisa ────────────────────────────────────────────────────────
@@ -112,7 +112,7 @@ fun ClaySearchScreen(
     var activeChip by remember { mutableStateOf<String?>(null) }
 
     // Histórico (mock local — sem persistência por enquanto)
-    val searchHistory = remember { mutableStateOf(listOf("bacalhau", "francesinha", "bifana")) }
+    val searchHistory = remember { mutableStateOf(listOf("pizza", "sushi", "burger")) }
 
     val hasQuery = state.searchQuery.isNotBlank()
     val hasSuggestions = state.searchSuggestions.isNotEmpty()

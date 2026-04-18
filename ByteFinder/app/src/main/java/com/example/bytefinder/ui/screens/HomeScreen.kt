@@ -44,18 +44,53 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import coil.transform.Transformation
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
+
+/** Coil transformation that smoothly removes white/light background pixels. */
+private class RemoveWhiteTransformation : Transformation {
+    override val cacheKey = "remove_white_bg_smooth"
+    override suspend fun transform(input: android.graphics.Bitmap, size: coil.size.Size): android.graphics.Bitmap {
+        val w = input.width
+        val h = input.height
+        val pixels = IntArray(w * h)
+        input.getPixels(pixels, 0, w, 0, 0, w, h)
+
+        for (i in pixels.indices) {
+            val pixel = pixels[i]
+            val r = android.graphics.Color.red(pixel)
+            val g = android.graphics.Color.green(pixel)
+            val b = android.graphics.Color.blue(pixel)
+            val a = android.graphics.Color.alpha(pixel)
+
+            // Luminance in 0..255
+            val lum = (0.299 * r + 0.587 * g + 0.114 * b)
+
+            // Smooth fade: fully transparent above 245, fully opaque below 200
+            // Gradual transition in between
+            if (lum > 200) {
+                val factor = ((245.0 - lum) / 45.0).coerceIn(0.0, 1.0)
+                val newAlpha = (a * factor).toInt()
+                pixels[i] = android.graphics.Color.argb(newAlpha, r, g, b)
+            }
+        }
+
+        val output = android.graphics.Bitmap.createBitmap(w, h, android.graphics.Bitmap.Config.ARGB_8888)
+        output.setPixels(pixels, 0, w, 0, 0, w, h)
+        return output
+    }
+}
 
 /**
  * HomeScreen — Ecrã principal da app com layout Bolt Food + Claymorphism.
@@ -125,23 +160,15 @@ fun HomeScreen(
             }
 
             AsyncImage(
-                model = "https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png",
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data("https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png")
+                    .transformations(RemoveWhiteTransformation())
+                    .build(),
                 contentDescription = "BiteFinder",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .size(36.dp)
-                    .drawWithContent {
-                        drawContext.canvas.nativeCanvas.saveLayer(
-                            0f, 0f, size.width, size.height,
-                            android.graphics.Paint().apply {
-                                xfermode = android.graphics.PorterDuffXfermode(
-                                    android.graphics.PorterDuff.Mode.SCREEN
-                                )
-                            }
-                        )
-                        drawContent()
-                        drawContext.canvas.nativeCanvas.restore()
-                    }
+                    .clickable { onGoHome() }
             )
 
         }
@@ -263,7 +290,7 @@ fun HomeScreen(
             } else {
                 // ─── CATEGORIAS (Carrossel horizontal) ──────────────────
                 val displayCats = listOf("Todos") + state.categorias.ifEmpty {
-                    listOf("Bifanas", "Francesinha", "Tradicional", "Bacalhau", "Petiscos", "Doces")
+                    listOf("Pizza", "Marisco", "Francesinha", "Hambúrguer", "Sushi", "Pasta", "Sobremesas")
                 }
 
                 LazyRow(
