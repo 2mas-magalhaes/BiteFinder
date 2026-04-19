@@ -28,6 +28,7 @@ data class HomeState(
     val selectedCategory: String = "Todos",
     val allPratos: List<PratoDto> = emptyList(),
     val filteredPratos: List<PratoDto> = emptyList(),
+    val featuredPratos: List<PratoDto> = emptyList(),
     val searchSuggestions: List<PratoDto> = emptyList(),
     val searchQuery: String = "",
     val selectedCity: String = "Todas",
@@ -72,6 +73,7 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
                     isLoading = false
                 )
                 applyFilters()
+                refreshFeatured()
             } catch (_: Exception) {
                 _state.value = _state.value.copy(isLoading = false)
             }
@@ -91,7 +93,7 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
                 .distinctUntilChanged()
                 .collect { query ->
                     val suggestions = if (query.trim().length >= 2) {
-                        repository.getSearchSuggestions(query)
+                        repository.getSearchSuggestions(query, _state.value.selectedCity)
                     } else {
                         emptyList()
                     }
@@ -137,6 +139,7 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
             locationLoaded = true
         )
         applyFilters()
+        refreshFeatured()
     }
 
     fun onZoneChanged(zone: String) {
@@ -204,6 +207,13 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         )
         val deduplicated = repository.deduplicatePratos(filtered)
         _state.value = s.copy(filteredPratos = deduplicated)
+    }
+
+    private fun refreshFeatured() {
+        val city = _state.value.selectedCity
+        _state.value = _state.value.copy(
+            featuredPratos = repository.getDestacados(city)
+        )
     }
 }
 

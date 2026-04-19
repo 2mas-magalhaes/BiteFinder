@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -50,6 +51,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -249,12 +251,13 @@ fun HomeScreen(
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data("https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png")
-                    .transformations(RemoveWhiteTransformation())
+                    .crossfade(true)
                     .build(),
                 contentDescription = "BiteFinder",
-                contentScale = ContentScale.Fit,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(36.dp)
+                    .clip(CircleShape)
                     .clickable { onGoHome() }
             )
 
@@ -427,6 +430,51 @@ fun HomeScreen(
 
                 Spacer(Modifier.height(28.dp))
 
+                // ─── SECÇÃO DESTAQUE: Pratos em destaque (patrocinados) ─
+                if (state.featuredPratos.isNotEmpty() && !state.isLoading) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("⭐", fontSize = 18.sp)
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                "Em Destaque",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = ClayOnDark
+                            )
+                        }
+                        Text(
+                            "Patrocinado",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = ClayOnDarkSecond
+                        )
+                    }
+
+                    Spacer(Modifier.height(14.dp))
+
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(state.featuredPratos) { prato ->
+                            FeaturedDishCard(
+                                prato = prato,
+                                modifier = Modifier.width(260.dp),
+                                onClick = { onPratoClick(prato.id) }
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(28.dp))
+                }
+
                 // ─── SECÇÃO 1: Melhores da categoria ────────────────────
                 if (state.isLoading) {
                     Column(Modifier.padding(horizontal = 24.dp)) {
@@ -554,4 +602,102 @@ private fun PratosGrid(
         }
     }
     Spacer(Modifier.height(32.dp))
+}
+
+// ─── Featured Dish Card (destaque patrocinado) ──────────────────────────────
+
+@Composable
+private fun FeaturedDishCard(
+    prato: com.example.bytefinder.data.PratoDto,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    ClayCard(
+        modifier = modifier.clickable(onClick = onClick),
+        backgroundColor = Color(0xFF111E30),
+        cornerRadius = 20.dp,
+        elevation = 8.dp
+    ) {
+        Column {
+            Box {
+                AsyncImage(
+                    model = prato.imagemUrl,
+                    contentDescription = prato.nome,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                )
+                // Featured badge
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(
+                            Color(0xFFFFB800),
+                            RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .align(Alignment.TopStart)
+                ) {
+                    Text(
+                        "⭐ DESTAQUE",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF1A1A00),
+                        letterSpacing = 0.5.sp
+                    )
+                }
+            }
+            Column(modifier = Modifier.padding(12.dp)) {
+                if (!prato.categoria.isNullOrBlank()) {
+                    Text(
+                        prato.categoria.uppercase(),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFFB800),
+                        letterSpacing = 0.5.sp
+                    )
+                    Spacer(Modifier.height(2.dp))
+                }
+                Text(
+                    prato.nome,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    color = ClayOnDark,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Text(
+                    prato.restauranteNome,
+                    fontSize = 12.sp,
+                    color = ClayOnDarkSecond,
+                    maxLines = 1
+                )
+                Spacer(Modifier.height(6.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        prato.preco?.let { String.format(java.util.Locale.US, "%.2f €", it) } ?: "—",
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 15.sp,
+                        color = Color(0xFFFFB800)
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("★", color = ClayYellowDeep, fontSize = 14.sp)
+                        Spacer(Modifier.width(2.dp))
+                        Text(
+                            String.format(java.util.Locale.US, "%.1f", prato.ratingMedio),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp,
+                            color = ClayOnDarkSecond
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

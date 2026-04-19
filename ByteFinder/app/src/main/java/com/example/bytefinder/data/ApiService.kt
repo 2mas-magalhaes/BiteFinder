@@ -50,7 +50,8 @@ data class PratoDto(
     val restauranteId: Int,
     val restauranteNome: String,
     val ratingMedio: Double,
-    val totalAvaliacoes: Int
+    val totalAvaliacoes: Int,
+    val destacado: Boolean = false
 )
 
 data class PratosListResponse(
@@ -138,6 +139,29 @@ data class UpdatePratoRequest(
     val imagemUrl: String?
 )
 
+data class CreatePratoRequest(
+    val userId: Int,
+    val restauranteId: Int,
+    val nome: String,
+    val descricao: String?,
+    val categoria: String?,
+    val preco: Double?,
+    val imagemUrl: String?
+)
+
+data class DeletePratoRequest(
+    val idPrato: Int,
+    val userId: Int,
+    val restauranteId: Int
+)
+
+data class ToggleDestacadoRequest(
+    val idPrato: Int,
+    val userId: Int,
+    val restauranteId: Int,
+    val destacado: Boolean
+)
+
 data class BasicOkResponse(
     val ok: Boolean,
     val error: String? = null,
@@ -216,5 +240,15 @@ interface ApiService {
     @POST("api/pratos/update.php")
     suspend fun updatePrato(
         @Body req: UpdatePratoRequest
+    ): BasicOkResponse
+
+    @POST("api/pratos/create.php")
+    suspend fun createPrato(
+        @Body req: CreatePratoRequest
+    ): BasicOkResponse
+
+    @POST("api/pratos/delete.php")
+    suspend fun deletePrato(
+        @Body req: DeletePratoRequest
     ): BasicOkResponse
 }

@@ -103,7 +103,7 @@ fun ClayRestaurantDetailScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClayCream)
+            .claySceneBackground()
     ) {
         if (isLoading) {
             Column(
@@ -337,14 +337,14 @@ fun ClayRestaurantDetailScreen(
                 "Ementa",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = ClayTextDark,
+                color = ClayOnDark,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 "${pratos.size} pratos disponíveis",
                 fontSize = 13.sp,
-                color = ClayTextLight,
+                color = ClayOnDarkSecond,
                 modifier = Modifier.padding(horizontal = 4.dp)
             )
 
@@ -385,7 +385,7 @@ fun ClayRestaurantDetailScreen(
                         Text(
                             text = "${pratosCategoria.size} ${if (pratosCategoria.size == 1) "prato" else "pratos"}",
                             fontSize = 12.sp,
-                            color = ClayTextLight
+                            color = ClayOnDarkSecond
                         )
                     }
 
@@ -436,7 +436,7 @@ private fun StatBadge(
         Text(
             text = label,
             fontSize = 11.sp,
-            color = ClayTextLight
+            color = ClayOnDarkSecond
         )
     }
 }

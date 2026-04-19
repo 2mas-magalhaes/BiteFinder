@@ -1,0 +1,934 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BiteFinder Restaurante</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand: #1B6EC2;
+      --brand-hover: #1453A0;
+      --accent: #1B6EC2;
+      --accent-hover: #1453A0;
+      --accent-soft: rgba(27,110,194,0.15);
+      --bg: #0C1829;
+      --bg-elevated: #111F33;
+      --surface: #162033;
+      --surface-light: #1A2740;
+      --border: rgba(255,255,255,0.08);
+      --text: #F0F4FA;
+      --text-soft: #8FA3BF;
+      --success: #34C67A;
+      --error: #E85C5C;
+      --yellow: #FFC107;
+      --radius: 24px;
+      --shadow-sm: 0 4px 12px 0 rgba(0,0,0,0.25);
+      --shadow: 0 16px 48px -12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 24px 64px -16px rgba(0,0,0,0.5);
+      --ring: rgba(27,110,194,0.4);
+      font-family: 'Manrope', 'Segoe UI', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Sora', 'Manrope', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    
+    .hidden { display: none !important; }
+    
+    /* ---- AUTH LAYOUT (SPLIT SCREEN) ---- */
+    .auth-layout { display: flex; min-height: 100vh; position: relative; }
+    
+    .auth-banner {
+      display: none;
+      width: 47%;
+      background: linear-gradient(165deg, rgba(12, 24, 41, 0.5), rgba(12, 24, 41, 0.92)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+      color: white;
+      padding: 3.6rem;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-banner::before {
+      content: '';
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(27,110,194,0.5) 0%, rgba(27,110,194,0) 70%);
+      top: -50px;
+      right: -50px;
+    }
+    
+    @media (min-width: 1024px) {
+      .auth-banner { display: flex; }
+    }
+    
+    .auth-banner h1 {
+      font-size: clamp(3rem, 5vw, 4.5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+      max-width: 600px;
+      position: relative;
+      z-index: 1;
+    }
+    .auth-banner p {
+      font-size: 1.25rem;
+      color: rgba(255, 255, 255, 0.75);
+      max-width: 500px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+
+    .auth-kpis {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .kpi-pill {
+      background: rgba(27,110,194,0.2);
+      border: 1px solid rgba(27,110,194,0.35);
+      border-radius: 999px;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #D6E8F8;
+      backdrop-filter: blur(4px);
+    }
+    
+    .auth-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem 1.3rem;
+      background: var(--bg);
+    }
+    
+    .auth-card {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      box-shadow: var(--shadow-lg);
+      padding: 48px;
+    }
+    
+    .auth-card.register-mode { max-width: 720px; }
+    
+    .auth-header { text-align: center; margin-bottom: 32px; }
+    .auth-header img {
+      width: 80px;
+      height: 80px;
+      border-radius: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+    .auth-header h2 { font-size: 2.25rem; font-weight: 800; margin: 0 0 8px; color: var(--text); letter-spacing: -0.03em; }
+    .auth-header p { color: var(--text-soft); font-size: 1.1rem; margin: 0; }
+    
+    .auth-tabs {
+      display: flex;
+      background: var(--bg-elevated);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+    .auth-tabs button {
+      flex: 1;
+      padding: 11px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .auth-tabs button.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.5);
+    }
+    
+    /* ---- DASHBOARD LAYOUT ---- */
+    .dashboard-layout { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+    
+    .dash-nav {
+      background: rgba(17, 31, 51, 0.92);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.6rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 74px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+    }
+    
+    .dash-brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.05rem; color: var(--text); }
+    .dash-brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    
+    .dash-menu { display: flex; gap: 4px; height: 100%; align-items: center; }
+    .dash-menu button {
+      background: transparent;
+      border: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-soft);
+      padding: 9px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .dash-menu button:hover { background: rgba(27,110,194,0.12); color: var(--text); }
+    .dash-menu button.active { background: var(--accent-soft); color: var(--accent); }
+    
+    .dash-logout {
+      font-size: 0.9rem;
+      color: #E85C5C;
+      background: rgba(232,92,92,0.12);
+      border: 1px solid rgba(232,92,92,0.2);
+      cursor: pointer;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 10px 14px;
+      transition: all 0.2s ease;
+    }
+    .dash-logout:hover { background: rgba(232,92,92,0.2); transform: translateY(-1px); }
+    
+    .dash-content { max-width: 1220px; margin: 0 auto; padding: 2rem 1.2rem 2.5rem; width: 100%; flex: 1; }
+    
+    /* ---- COMMON COMPONENTS ---- */
+    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .form-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .form-grid.two-cols { grid-template-columns: 1fr 1fr; } }
+    
+    .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1rem; }
+    .form-row label { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
+    .form-row input, .form-row select, .form-row textarea { 
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg-elevated);
+      color: var(--text);
+      padding: 12px 14px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: all .2s ease;
+    }
+    .form-row input::placeholder, .form-row textarea::placeholder { color: #5f7390; }
+    .form-row input:focus, .form-row select:focus, .form-row textarea:focus { 
+      outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--ring); 
+    }
+    .form-row textarea { min-height: 74px; resize: vertical; }
+    
+    .field-error { color: var(--error); font-size: 0.8rem; margin-top: -6px; min-height: 1.1rem; }
+    
+    .button-cta { 
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 16px 24px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: white;
+      background: var(--brand);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; justify-content: center; align-items: center; gap: 12px;
+      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.4);
+    }
+    .button-cta:hover { transform: scale(1.01); box-shadow: 0 8px 24px -4px rgba(27,110,194,0.5); background: var(--brand-hover); }
+    .button-cta.secondary { background: var(--accent); color: white; }
+    .button-cta.secondary:hover { background: var(--accent-hover); }
+    .button-cta.danger { background: var(--error); color: white; }
+    .button-cta.small {
+      width: auto;
+      padding: 10px 16px;
+      font-size: 0.95rem;
+    }
+    
+    .page-header { margin-bottom: 40px; }
+    .page-header h2 { font-size: 2.5rem; font-weight: 800; color: var(--text); margin: 0 0 12px; letter-spacing: -0.03em; }
+    .page-header p { color: var(--text-soft); font-size: 1.15rem; margin: 0; }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.74rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      margin-bottom: 0.85rem;
+    }
+    
+    .grid-menu { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); }
+    .data-card { 
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--surface-light);
+      padding: 18px;
+      transition: box-shadow 0.2s, transform 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .data-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+    .data-card h4 { margin: 0 0 4px; font-size: 1.1rem; color: var(--text); }
+    .data-card small { color: var(--accent); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;}
+    .data-card p { margin: 8px 0 0; color: var(--text-soft); font-size: 0.9rem; line-height: 1.4; }
+    .data-card .price {
+      margin-top: 12px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 999px;
+      padding: 6px 10px;
+      line-height: 1;
+    }
+    .data-card .form-row label { color: var(--text-soft); }
+    .data-card .form-row input, .data-card .form-row textarea { background: var(--bg-elevated); color: var(--text); border-color: var(--border); }
+    
+    .metric-value { font-size: 2rem; font-weight: 800; margin: 0; color: var(--text); }
+    .metric-label { color: var(--text-soft); margin: 4px 0 0; font-size: 0.9rem; font-weight: 500; }
+    
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 9999;
+      background: var(--surface-light);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      transform: translateY(12px);
+      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: min(90vw, 420px);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    
+    .empty-state { text-align: center; padding: 3rem 1rem; border: 1px dashed var(--border); border-radius: var(--radius); color: var(--text-soft); }
+
+    @media (max-width: 1023px) {
+      .auth-content { padding: 1.1rem; }
+      .auth-card { border-radius: 22px; }
+      .dash-nav { height: auto; min-height: 70px; flex-wrap: wrap; gap: 0.6rem; padding: 0.8rem 1rem; }
+      .dash-content { padding: 1.2rem 0.9rem 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= LAYOUT DE AUTENTICAÇÃO ================= -->
+  <div id="authLayout" class="auth-layout">
+    <div class="auth-banner">
+      <h1>Aumente as reservas do seu restaurante.</h1>
+      <p>Junte-se à BiteFinder e conecte o seu espaço a milhares de clientes à procura da próxima grande refeição.</p>
+      <div class="auth-kpis">
+        <span class="kpi-pill">Onboarding em minutos</span>
+        <span class="kpi-pill">Gestão de menu em tempo real</span>
+        <span class="kpi-pill">Dashboard de performance</span>
+      </div>
+    </div>
+    
+    <div class="auth-content">
+      <div id="authCard" class="auth-card">
+        <div class="auth-header">
+          <img src="https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png" alt="BiteFinder" />
+          <h2>Portal do Parceiro</h2>
+          <p>Gerencie o seu restaurante com facilidade</p>
+        </div>
+        
+        <div class="auth-tabs">
+          <button id="tabLogin" class="active" type="button">Entrar</button>
+          <button id="tabRegister" type="button">Criar Conta</button>
+        </div>
+        
+        <!-- PAINEL LOGIN -->
+        <section id="panelLogin" class="panel active">
+          <form id="formLogin" autocomplete="off" novalidate>
+            <div class="form-row">
+              <label>Email profissional</label>
+              <input id="loginEmail" type="email" name="email" required placeholder="geral@restaurante.com" />
+              <div class="field-error" id="loginEmailError"></div>
+            </div>
+            <div class="form-row">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label>Palavra-passe</label>
+                <a href="#" id="forgotPassword" style="font-size:0.8rem; color:var(--accent); text-decoration:none; font-weight:500;">Esqueceu-se?</a>
+              </div>
+              <input id="loginPassword" type="password" name="password" required placeholder="••••••••" />
+              <div class="field-error" id="loginPasswordError"></div>
+            </div>
+            <button class="button-cta" type="submit" style="margin-top: 8px;">Entrar na conta</button>
+          </form>
+        </section>
+        
+        <!-- PAINEL REGISTRO -->
+        <section id="panelRegister" class="panel">
+          <form id="formRegister" autocomplete="off" novalidate>
+            <div class="form-grid two-cols">
+              <div class="form-row">
+                <label>Nome do Proprietário</label>
+                <input type="text" name="name" required placeholder="Ex: João Silva" />
+              </div>
+              <div class="form-row">
+                <label>Nome do Restaurante</label>
+                <input type="text" name="restauranteNome" required placeholder="Ex: Tasca do Zé" />
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Morada Completa</label>
+              <input type="text" name="restauranteMorada" required placeholder="Rua Augusta 123, Lisboa" />
+            </div>
+            <div class="form-grid two-cols">
+              <div class="form-row">
+                <label>NIF (Número de Identificação)</label>
+                <input type="text" name="restaurantCode" required placeholder="123456789" />
+              </div>
+              <div class="form-row">
+                <label>Telemóvel / Telefone</label>
+                <input type="tel" name="phone" placeholder="+351 900 000 000" />
+              </div>
+            </div>
+            <hr style="border:0; border-top:1px solid var(--border); margin: 1rem 0;" />
+            <div class="form-row">
+              <label>Email de Acesso</label>
+              <input type="email" name="email" required placeholder="geral@restaurante.com" />
+            </div>
+            <div class="form-row">
+              <label>Palavra-passe Segura</label>
+              <input type="password" name="password" required placeholder="Mínimo de 8 caracteres" />
+            </div>
+            <button class="button-cta" type="submit" style="margin-top: 12px;">Criar Conta de Parceiro</button>
+          </form>
+        </section>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LAYOUT DO DASHBOARD ================= -->
+  <div id="dashboardLayout" class="dashboard-layout hidden">
+    <nav class="dash-nav">
+      <div class="dash-brand">
+        <img src="https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png" alt="BiteFinder" />
+        <span id="navRestaurantName">BiteFinder</span>
+      </div>
+      <div class="dash-menu">
+        <button id="tabMenu" type="button" class="active">Menu & Pratos</button>
+          <!-- <button id="tabSales" type="button">Vendas & Relatórios</button> -->
+      </div>
+      <button id="btnSair" class="dash-logout">Terminar Sessão</button>
+    </nav>
+    
+    <main class="dash-content">
+      
+      <!-- PAINEL GESTÃO DE MENU -->
+      <section id="panelMenu" class="panel active">
+        <div class="page-header">
+          <span class="section-eyebrow">Portal Profissional</span>
+          <h2>Gestão do Cardápio</h2>
+          <p>Adicione, edite ou remova os pratos disponíveis no seu restaurante.</p>
+        </div>
+        
+        <div class="form-grid two-cols" style="align-items: start;">
+          <!-- Formulário de Prato -->
+          <div class="card">
+            <h3 style="margin: 0 0 1rem; font-size: 1.1rem; color: var(--text);">Adicionar Novo Prato</h3>
+            <p style="margin: 0 0 1rem; color: var(--text-soft); font-size: 0.9rem;">Publique pratos com foto, descrição e preço para aparecer com destaque na pesquisa.</p>
+            <form id="menuForm" autocomplete="off" novalidate>
+              <div class="form-row">
+                <label>Nome do Prato</label>
+                <input name="nome" required placeholder="Ex: Risoto de Camarão" />
+              </div>
+              <div class="form-grid two-cols" style="gap: 1rem; margin-bottom:0;">
+                <div class="form-row">
+                  <label>Categoria</label>
+                  <input name="categoria" required placeholder="Ex: Massas" />
+                </div>
+                <div class="form-row">
+                  <label>Preço (€)</label>
+                  <input type="number" step="0.01" name="preco" required placeholder="14.90" />
+                </div>
+              </div>
+              <div class="form-row">
+                <label>Descrição</label>
+                <textarea name="descricao" placeholder="Descreva os ingredientes e detalhes do prato..."></textarea>
+              </div>
+              <div class="form-row">
+                <label>URL da Imagem</label>
+                <input name="imagemUrl" placeholder="https://exemplo.com/imagem.jpg" />
+              </div>
+              <button class="button-cta secondary" type="submit">Adicionar ao Cardápio</button>
+            </form>
+          </div>
+          
+          <!-- Lista de Pratos -->
+          <div>
+            <div id="menuList" class="grid-menu" style="grid-template-columns: 1fr;">
+              <div class="empty-state">A carregar pratos...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAINEL VENDAS E RELATÓRIOS -->
+    </main>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script>
+    // Persistência de sessão (token e user) no localStorage
+    const state = {
+      token: localStorage.getItem('jwtToken') || null,
+      user: null,
+      restauranteId: null
+    };
+    try {
+      const userStr = localStorage.getItem('jwtUser');
+      if (userStr) state.user = JSON.parse(userStr);
+      if (state.user && state.user.restauranteId)
+        state.restauranteId = state.user.restauranteId;
+      else if (state.user && state.user.restaurantes?.length)
+        state.restauranteId = state.user.restaurantes[0];
+    } catch {}
+
+    // DOM Elements - Navigation
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const tabMenu = document.getElementById('tabMenu');
+    
+    // DOM Elements - Panels
+    const panelLogin = document.getElementById('panelLogin');
+    const panelRegister = document.getElementById('panelRegister');
+    const panelMenu = document.getElementById('panelMenu');
+    
+    // DOM Elements - Layouts
+    const authLayout = document.getElementById('authLayout');
+    const authCard = document.getElementById('authCard');
+    const dashboardLayout = document.getElementById('dashboardLayout');
+    const navRestaurantName = document.getElementById('navRestaurantName');
+    
+    const toast = document.getElementById('toast');
+
+    // Toast Notification
+    function showToast(msg, error = false) {
+      toast.innerHTML = error
+        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>${msg}`
+        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${msg}`;
+      toast.style.background = error ? 'var(--error)' : 'var(--success)';
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // Toggle App State (Logged in vs Logged out)
+    function setTabVisibility(isLoggedIn) {
+      if (isLoggedIn) {
+        authLayout.classList.add('hidden');
+        dashboardLayout.classList.remove('hidden');
+        switchTab('menu');
+        // Salvar sessão
+        localStorage.setItem('jwtToken', state.token || '');
+        localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
+      } else {
+        authLayout.classList.remove('hidden');
+        dashboardLayout.classList.add('hidden');
+        switchTab('login');
+        state.token = null;
+        state.user = null;
+        state.restauranteId = null;
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('jwtUser');
+      }
+    }
+
+    // Tab Switching Logic
+    function switchTab(panel) {
+      // Remove active states
+      [tabLogin, tabRegister, tabMenu].forEach((btn) => btn.classList.remove('active'));
+      [panelLogin, panelRegister, panelMenu].forEach((p) => p.classList.remove('active'));
+
+      if (panel === 'login') { 
+        tabLogin.classList.add('active'); panelLogin.classList.add('active'); 
+        authCard.classList.remove('register-mode');
+      }
+      if (panel === 'register') { 
+        tabRegister.classList.add('active'); panelRegister.classList.add('active'); 
+        authCard.classList.add('register-mode'); // Alarga o card para o formulário grid
+      }
+      if (panel === 'menu' && state.token) { 
+        tabMenu.classList.add('active'); panelMenu.classList.add('active'); 
+      }
+    }
+
+    // Event Listeners for Tabs
+    tabLogin.onclick = () => { switchTab('login'); loginEmail.focus(); };
+    tabRegister.onclick = () => switchTab('register');
+    tabMenu.onclick = () => switchTab('menu');
+    
+    document.getElementById('btnSair').onclick = () => setTabVisibility(false);
+
+    // Initialize View
+    setTabVisibility(false);
+    window.setTimeout(() => loginEmail.focus(), 100);
+
+    // Helper: API Fetcher
+    async function apiRequest(url, method = 'GET', body = null) {
+      try {
+        const headers = {};
+        if (body && !(body instanceof FormData)) {
+          headers['Content-Type'] = 'application/json';
+          body = JSON.stringify(body);
+        }
+        if (state.token) {
+          headers['Authorization'] = 'Bearer ' + state.token;
+        }
+        const response = await fetch(url, { method, headers, body });
+        const data = await response.json();
+        if (!response.ok || data.ok === false) {
+          return { ok: false, error: data.error || data.message || 'Erro na API' };
+        }
+        return data;
+      } catch (err) {
+        return { ok: false, error: err.message || 'Erro de rede' };
+      }
+    }
+
+    // Form Validations
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    function passwordStrength(value) {
+      if (value.length < 8) return 'Muito fraca';
+      if (/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/.test(value)) return 'Forte';
+      if (/^(?=.*[a-z])(?=.*\d).+$/.test(value)) return 'Média';
+      return 'Fraca';
+    }
+
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginEmailError = document.getElementById('loginEmailError');
+    const loginPasswordError = document.getElementById('loginPasswordError');
+
+    loginEmail.addEventListener('input', () => {
+      if (!loginEmail.value.trim()) {
+        loginEmailError.textContent = 'O email é obrigatório';
+      } else if (!isValidEmail(loginEmail.value.trim())) {
+        loginEmailError.textContent = 'Formato de email inválido';
+      } else {
+        loginEmailError.textContent = '';
+      }
+    });
+
+    loginPassword.addEventListener('input', () => {
+      if (!loginPassword.value) {
+        loginPasswordError.textContent = 'A palavra-passe é obrigatória';
+      } else {
+        loginPasswordError.textContent = '';
+      }
+    });
+
+    // Handle Login
+    document.getElementById('formLogin').onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const email = form.email.value.trim();
+      const password = form.password.value;
+
+      if (!email || !password) { showToast('Preencha os campos de acesso', true); return; }
+      if (!isValidEmail(email)) { showToast('Email inválido', true); return; }
+
+      const result = await apiRequest('api/auth/login_jwt.php', 'POST', { email, password });
+      if (!result.ok) { showToast(result.error, true); return; }
+
+      state.token = result.token;
+      state.user = result.user;
+      state.restauranteId = result.user.restauranteId || (result.user.restaurantes?.length ? result.user.restaurantes[0] : null);
+      // Salvar sessão
+      localStorage.setItem('jwtToken', state.token || '');
+      localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
+  // Logout global: limpar localStorage
+  document.getElementById('btnSair').onclick = () => setTabVisibility(false);
+
+      navRestaurantName.textContent = result.user.nome || 'Parceiro BiteFinder';
+
+      setTabVisibility(true);
+      await refreshMenu();
+      showToast(`Bem-vindo(a) de volta!`);
+      form.reset();
+    };
+
+    // Forgot Password Mock
+    document.getElementById('forgotPassword').onclick = () => {
+      const email = loginEmail.value.trim();
+      if (!email || !isValidEmail(email)) {
+        showToast('Preencha um email válido no campo acima', true);
+        return;
+      }
+      showToast('Enviamos um link de recuperação para o seu email.');
+    };
+
+    // Handle Registration
+    document.getElementById('formRegister').onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const password = form.password.value.trim();
+      const restauranteNome = form.restauranteNome.value.trim();
+      const restauranteMorada = form.restauranteMorada.value.trim();
+      const restaurantCode = form.restaurantCode.value.trim();
+
+      if (!name || !email || !password || !restauranteNome || !restauranteMorada || !restaurantCode) {
+        showToast('Preencha todos os campos obrigatórios', true); return;
+      }
+      if (!isValidEmail(email)) { showToast('Email inválido', true); return; }
+      if (password.length < 8) { showToast('A palavra-passe deve ter pelo menos 8 caracteres', true); return; }
+      if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/.test(password)) {
+        showToast('A palavra-passe deve conter maiúsculas, minúsculas e números', true); return;
+      }
+      if (!/^\d{8,}$/.test(restaurantCode)) {
+        showToast('NIF deve conter pelo menos 8 dígitos numéricos', true); return;
+      }
+
+      const payload = {
+        name,
+        email,
+        password,
+        restauranteNome,
+        restauranteMorada,
+        restaurantCode
+      };
+      const result = await apiRequest('api/auth/register_restaurante.php', 'POST', payload);
+      if (!result.ok) { showToast(result.error || result.message || 'Erro ao criar conta', true); return; }
+
+      showToast('Conta criada com sucesso! Faça login para começar.');
+      form.reset();
+      switchTab('login');
+      loginEmail.focus();
+    };
+
+    // Dashboard: Refresh Menu
+    async function refreshMenu() {
+      const menuList = document.getElementById('menuList');
+      menuList.innerHTML = '<div class="empty-state">A carregar pratos...</div>';
+      if (!state.restauranteId) { menuList.innerHTML = '<div class="empty-state">Ocorreu um erro de sincronização</div>'; return; }
+
+      const res = await apiRequest(`api/pratos/list.php?restauranteId=${state.restauranteId}`, 'GET');
+      if (!res.ok) { menuList.innerHTML = `<div class="empty-state" style="color:var(--error);">${res.error}</div>`; return; }
+
+      const items = Array.isArray(res.items) ? res.items : [];
+      if (!items.length) { menuList.innerHTML = '<div class="empty-state">O seu cardápio está vazio.<br>Adicione o primeiro prato ao lado.</div>'; return; }
+
+      menuList.innerHTML = '';
+      items.forEach((item) => {
+        const card = document.createElement('article');
+        card.className = 'data-card';
+        const precoEur = new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(item.preco || 0);
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <small>${item.categoria || 'Sem categoria'}</small>
+              <h4>${item.nome}</h4>
+            </div>
+            <div class="price">${precoEur}</div>
+          </div>
+          <p>${item.descricao || 'Nenhuma descrição fornecida.'}</p>
+          <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <button class="button-cta small" data-edit="${item.id}">Editar</button>
+          </div>
+        `;
+        // Evento de edição inline
+        card.querySelector('[data-edit]').onclick = () => {
+                  // Evento de remoção
+                  // Remover prato só disponível no modo edição
+          if (card.querySelector('form')) return; // já está editando
+          const form = document.createElement('form');
+          form.innerHTML = `
+            <div class="form-row"><label>Nome</label><input name="nome" value="${item.nome}" required /></div>
+            <div class="form-row"><label>Categoria</label><input name="categoria" value="${item.categoria || ''}" required /></div>
+            <div class="form-row"><label>Preço (€)</label><input name="preco" type="number" step="0.01" value="${item.preco}" required /></div>
+            <div class="form-row"><label>Descrição</label><textarea name="descricao">${item.descricao || ''}</textarea></div>
+            <div class="form-row"><label>Imagem</label><input name="imagemUrl" value="${item.imagemUrl || ''}" /></div>
+            <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+              <button type="submit" class="button-cta small">Salvar</button>
+              <button type="button" class="button-cta small secondary" data-cancel>Cancelar</button>
+              <button type="button" class="button-cta small danger" data-remove-edit>Remover Prato</button>
+            </div>
+          `;
+          // Submissão do update
+                    // Remover prato durante edição
+                    form.querySelector('[data-remove-edit]').onclick = async () => {
+                      if (!confirm('Tem certeza que deseja remover este prato?')) return;
+                      const res = await apiRequest('api/pratos/delete.php', 'POST', {
+                        idPrato: item.id,
+                        userId: state.user?.id || 0,
+                        restauranteId: state.restauranteId
+                      });
+                      if (!res.ok) { showToast(res.error, true); return; }
+                      showToast('Prato removido!');
+                      await refreshMenu();
+                    };
+          form.onsubmit = async (e) => {
+            e.preventDefault();
+            const payload = {
+              idPrato: item.id, // Corrigido: usar o campo correto retornado pelo backend
+              userId: state.user?.id || 0,
+              restauranteId: state.restauranteId,
+              nome: form.nome.value.trim(),
+              categoria: form.categoria.value.trim(),
+              descricao: form.descricao.value.trim(),
+              preco: Number(form.preco.value),
+              imagemUrl: form.imagemUrl.value.trim(),
+            };
+            if (!payload.nome || !payload.categoria || !payload.preco) {
+              showToast('Nome, Categoria e Preço são obrigatórios', true);
+              return;
+            }
+            const res = await apiRequest('api/pratos/update.php', 'POST', payload);
+            if (!res.ok) { showToast(res.error, true); return; }
+            showToast('Prato atualizado!');
+            await refreshMenu();
+          };
+          // Cancelar edição
+          form.querySelector('[data-cancel]').onclick = () => {
+            refreshMenu();
+          };
+          card.innerHTML = '';
+          card.appendChild(form);
+        };
+        menuList.appendChild(card);
+      });
+    }
+
+    // Dashboard: Add Menu Item
+    document.getElementById('menuForm').onsubmit = async (event) => {
+      event.preventDefault();
+      if (!state.restauranteId) { showToast('Erro de sessão', true); return; }
+      const form = event.target;
+      const payload = {
+        userId: state.user?.id || 0,
+        restauranteId: state.restauranteId,
+        nome: form.nome.value.trim(),
+        categoria: form.categoria.value.trim(),
+        descricao: form.descricao.value.trim(),
+        preco: Number(form.preco.value),
+        imagemUrl: form.imagemUrl.value.trim(),
+      };
+
+      if (!payload.nome || !payload.categoria || !payload.preco) {
+        showToast('Nome, Categoria e Preço são obrigatórios', true);
+        return;
+      }
+
+      const res = await apiRequest('api/pratos/create.php', 'POST', payload);
+      if (!res.ok) { showToast(res.error, true); return; }
+
+      showToast('Prato adicionado ao cardápio!');
+      form.reset();
+      refreshMenu();
+    };
+
+    // Dashboard: Refresh Sales
+    async function refreshSales() {
+      if (!state.restauranteId) { return; }
+      
+      const summary = document.getElementById('salesSummary');
+      summary.textContent = 'A carregar dados...';
+      
+      const dias = document.getElementById('salesRange').value;
+      const res = await apiRequest(`api/sales/list.php?restauranteId=${state.restauranteId}&days=${dias}`);
+
+      if (!res.ok) { summary.textContent = 'Erro ao carregar vendas'; showToast(res.error, true); return; }
+
+      const salesCards = document.getElementById('salesCards');
+      salesCards.innerHTML = '';
+      
+      const formatEur = (val) => new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(val);
+
+      const dados = [
+        { label: 'Total Faturado', value: formatEur(res.totalSales || 0) },
+        { label: 'Total de Pedidos', value: res.orderCount || 0 },
+        { label: 'Ticket Médio', value: formatEur(res.averageTicket || 0) },
+        { label: 'Produto Estrela', value: res.topDish || 'N/A' },
+      ];
+
+      dados.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'data-card';
+        card.style.textAlign = 'center';
+        card.innerHTML = `<h4 class="metric-value">${item.value}</h4><p class="metric-label">${item.label}</p>`;
+        salesCards.appendChild(card);
+      });
+
+      summary.innerHTML = `Dados calculados para os últimos <strong>${dias} dias</strong>. Total bruto: <strong>${formatEur(res.totalSales || 0)}</strong>.`;
+    }
+
+    // Removido: painel de vendas não existe mais
+    // document.getElementById('salesRange').onchange = refreshSales;
+
+  </script>
+</body>
+</html>

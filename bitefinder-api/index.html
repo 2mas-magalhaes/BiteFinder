@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -211,6 +211,9 @@
       border-radius: 9px;
       cursor: pointer;
       transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .dash-menu button:hover { background: rgba(27,110,194,0.12); color: var(--text); }
     .dash-menu button.active { background: var(--accent-soft); color: var(--accent); }
@@ -228,8 +231,48 @@
     }
     .dash-logout:hover { background: rgba(232,92,92,0.2); transform: translateY(-1px); }
     
-    .dash-content { max-width: 1220px; margin: 0 auto; padding: 2rem 1.2rem 2.5rem; width: 100%; flex: 1; }
-    
+    .dash-content { max-width: 1320px; margin: 0 auto; padding: 2rem 1.2rem 2.5rem; width: 100%; flex: 1; }
+
+    .demo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,193,7,0.15);
+      border: 1px solid rgba(255,193,7,0.3);
+      color: var(--yellow);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      margin-left: 12px;
+    }
+
+    /* ---- Restaurant Selector ---- */
+    .restaurant-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .restaurant-chip {
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-light);
+      color: var(--text-soft);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .restaurant-chip:hover { border-color: var(--accent); color: var(--text); background: rgba(27,110,194,0.08); }
+    .restaurant-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.5);
+    }
+
     /* ---- COMMON COMPONENTS ---- */
     .panel { display: none; animation: fadeIn 0.3s ease; }
     .panel.active { display: block; }
@@ -294,12 +337,18 @@
     .button-cta.small {
       width: auto;
       padding: 10px 16px;
-      font-size: 0.95rem;
+      font-size: 0.85rem;
+    }
+    .button-cta.icon-btn {
+      width: auto;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      border-radius: 12px;
     }
     
-    .page-header { margin-bottom: 40px; }
-    .page-header h2 { font-size: 2.5rem; font-weight: 800; color: var(--text); margin: 0 0 12px; letter-spacing: -0.03em; }
-    .page-header p { color: var(--text-soft); font-size: 1.15rem; margin: 0; }
+    .page-header { margin-bottom: 32px; }
+    .page-header h2 { font-size: 2.2rem; font-weight: 800; color: var(--text); margin: 0 0 8px; letter-spacing: -0.03em; }
+    .page-header p { color: var(--text-soft); font-size: 1.1rem; margin: 0; }
 
     .section-eyebrow {
       display: inline-flex;
@@ -315,35 +364,222 @@
       padding: 6px 10px;
       margin-bottom: 0.85rem;
     }
-    
-    .grid-menu { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); }
-    .data-card { 
+
+    /* ---- Stats Bar ---- */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--surface-light);
       border: 1px solid var(--border);
       border-radius: 18px;
-      background: var(--surface-light);
       padding: 18px;
-      transition: box-shadow 0.2s, transform 0.2s;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .stat-emoji { margin-bottom: 6px; display: flex; justify-content: center; color: var(--accent); }
+    .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text); margin: 0; }
+    .stat-label { color: var(--text-soft); font-size: 0.82rem; font-weight: 500; margin: 2px 0 0; }
+
+    /* ---- Dish Grid ---- */
+    .dish-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    }
+
+    .dish-card {
+      background: var(--surface-light);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
       box-shadow: var(--shadow-sm);
     }
-    .data-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
-    .data-card h4 { margin: 0 0 4px; font-size: 1.1rem; color: var(--text); }
-    .data-card small { color: var(--accent); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;}
-    .data-card p { margin: 8px 0 0; color: var(--text-soft); font-size: 0.9rem; line-height: 1.4; }
-    .data-card .price {
-      margin-top: 12px;
-      font-size: 1.02rem;
+    .dish-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .dish-card.is-destaque {
+      border-color: rgba(255,184,0,0.35);
+      box-shadow: 0 4px 16px -4px rgba(255,184,0,0.15);
+    }
+
+    .dish-card-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: var(--bg-elevated);
+      display: block;
+    }
+
+    .dish-card-body { padding: 16px; }
+
+    .dish-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .dish-category-badge {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .dish-price {
       font-weight: 800;
+      font-size: 1.05rem;
       color: var(--accent);
       background: var(--accent-soft);
+      padding: 4px 10px;
       border-radius: 999px;
-      padding: 6px 10px;
-      line-height: 1;
     }
-    .data-card .form-row label { color: var(--text-soft); }
-    .data-card .form-row input, .data-card .form-row textarea { background: var(--bg-elevated); color: var(--text); border-color: var(--border); }
-    
-    .metric-value { font-size: 2rem; font-weight: 800; margin: 0; color: var(--text); }
-    .metric-label { color: var(--text-soft); margin: 4px 0 0; font-size: 0.9rem; font-weight: 500; }
+
+    .dish-card h4 {
+      margin: 6px 0 4px;
+      font-size: 1.1rem;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .dish-card-desc {
+      color: var(--text-soft);
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin: 0 0 10px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .dish-card-rating {
+      color: var(--yellow);
+      font-weight: 700;
+      font-size: 0.88rem;
+    }
+
+    .dish-card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .dish-card-actions button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    .btn-edit {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: rgba(27,110,194,0.3) !important;
+    }
+    .btn-edit:hover { background: var(--accent); color: white; transform: translateY(-1px); }
+    .btn-delete {
+      background: rgba(232,92,92,0.1);
+      color: var(--error);
+      border-color: rgba(232,92,92,0.2) !important;
+    }
+    .btn-delete:hover { background: var(--error); color: white; transform: translateY(-1px); }
+    .btn-destaque {
+      background: rgba(255,243,208,0.1);
+      color: #C99A14;
+      border-color: rgba(255,193,7,0.25) !important;
+    }
+    .btn-destaque:hover { background: #FFB800; color: #1A1A00; }
+    .btn-destaque.active {
+      background: linear-gradient(135deg, #FFB800, #FF9500);
+      color: #1A1A00;
+      border-color: rgba(255,184,0,0.5) !important;
+      box-shadow: 0 2px 8px -2px rgba(255,184,0,0.4);
+    }
+
+    .destaque-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(135deg, #FFB800, #FF9500);
+      color: #1A1A00;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 8px rgba(255,184,0,0.4);
+    }
+
+    .dish-card-img-wrap {
+      position: relative;
+    }
+
+    /* ---- Image Preview ---- */
+    .img-preview-box {
+      width: 100%;
+      height: 160px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px dashed var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-soft);
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .img-preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ---- Edit Modal ---- */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      animation: fadeIn 0.2s;
+    }
+    .modal-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 32px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-card h3 { margin: 0 0 1.2rem; font-size: 1.3rem; }
     
     .toast {
       position: fixed;
@@ -373,6 +609,11 @@
       .auth-card { border-radius: 22px; }
       .dash-nav { height: auto; min-height: 70px; flex-wrap: wrap; gap: 0.6rem; padding: 0.8rem 1rem; }
       .dash-content { padding: 1.2rem 0.9rem 2rem; }
+    }
+
+    @media (max-width: 640px) {
+      .dish-grid { grid-template-columns: 1fr; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -473,16 +714,19 @@
       <div class="dash-brand">
         <img src="https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png" alt="BiteFinder" />
         <span id="navRestaurantName">BiteFinder</span>
+
       </div>
       <div class="dash-menu">
-        <button id="tabMenu" type="button" class="active">Menu & Pratos</button>
-          <!-- <button id="tabSales" type="button">Vendas & Relatórios</button> -->
+        <button id="tabMenu" type="button" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Cardápio</button>
       </div>
       <button id="btnSair" class="dash-logout">Terminar Sessão</button>
     </nav>
     
     <main class="dash-content">
       
+      <!-- Restaurant Selector -->
+      <div id="restaurantSelector" class="restaurant-selector hidden"></div>
+
       <!-- PAINEL GESTÃO DE MENU -->
       <section id="panelMenu" class="panel active">
         <div class="page-header">
@@ -490,21 +734,30 @@
           <h2>Gestão do Cardápio</h2>
           <p>Adicione, edite ou remova os pratos disponíveis no seu restaurante.</p>
         </div>
+
+        <!-- Stats Bar -->
+        <div id="statsBar" class="stats-bar"></div>
         
         <div class="form-grid two-cols" style="align-items: start;">
           <!-- Formulário de Prato -->
-          <div class="card">
-            <h3 style="margin: 0 0 1rem; font-size: 1.1rem; color: var(--text);">Adicionar Novo Prato</h3>
-            <p style="margin: 0 0 1rem; color: var(--text-soft); font-size: 0.9rem;">Publique pratos com foto, descrição e preço para aparecer com destaque na pesquisa.</p>
+          <div class="card" style="position: sticky; top: 90px;">
+            <h3 style="margin: 0 0 0.6rem; font-size: 1.1rem; color: var(--text);">Adicionar Novo Prato</h3>
+            <p style="margin: 0 0 1rem; color: var(--text-soft); font-size: 0.85rem;">Publique pratos com foto, descrição e preço.</p>
+            
+            <!-- Image Preview -->
+            <div id="addImagePreview" class="img-preview-box">
+              <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Pré-visualização da imagem</span>
+            </div>
+
             <form id="menuForm" autocomplete="off" novalidate>
               <div class="form-row">
-                <label>Nome do Prato</label>
+                <label>Nome do Prato *</label>
                 <input name="nome" required placeholder="Ex: Risoto de Camarão" />
               </div>
               <div class="form-grid two-cols" style="gap: 1rem; margin-bottom:0;">
                 <div class="form-row">
                   <label>Categoria</label>
-                  <input name="categoria" required placeholder="Ex: Massas" />
+                  <input name="categoria" required placeholder="Ex: Marisco" />
                 </div>
                 <div class="form-row">
                   <label>Preço (€)</label>
@@ -513,11 +766,11 @@
               </div>
               <div class="form-row">
                 <label>Descrição</label>
-                <textarea name="descricao" placeholder="Descreva os ingredientes e detalhes do prato..."></textarea>
+                <textarea name="descricao" placeholder="Descreva os ingredientes e detalhes..."></textarea>
               </div>
               <div class="form-row">
                 <label>URL da Imagem</label>
-                <input name="imagemUrl" placeholder="https://exemplo.com/imagem.jpg" />
+                <input name="imagemUrl" id="addImageUrl" placeholder="https://exemplo.com/imagem.jpg" />
               </div>
               <button class="button-cta secondary" type="submit">Adicionar ao Cardápio</button>
             </form>
@@ -525,115 +778,164 @@
           
           <!-- Lista de Pratos -->
           <div>
-            <div id="menuList" class="grid-menu" style="grid-template-columns: 1fr;">
+            <div id="menuList" class="dish-grid">
               <div class="empty-state">A carregar pratos...</div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- PAINEL VENDAS E RELATÓRIOS -->
     </main>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <h3>Editar Prato</h3>
+      <div id="editImagePreview" class="img-preview-box">
+        <span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Pré-visualização</span>
+      </div>
+      <form id="editForm" autocomplete="off" novalidate>
+        <div class="form-row"><label>Nome *</label><input name="nome" required /></div>
+        <div class="form-grid two-cols" style="gap:1rem; margin-bottom:0;">
+          <div class="form-row"><label>Categoria</label><input name="categoria" /></div>
+          <div class="form-row"><label>Preço (€)</label><input name="preco" type="number" step="0.01" /></div>
+        </div>
+        <div class="form-row"><label>Descrição</label><textarea name="descricao"></textarea></div>
+        <div class="form-row"><label>URL da Imagem</label><input name="imagemUrl" id="editImageUrl" /></div>
+        <input type="hidden" name="idPrato" />
+        <div style="display:flex; gap:8px; margin-top:0.5rem;">
+          <button type="submit" class="button-cta small" style="flex:1;">Guardar</button>
+          <button type="button" class="button-cta small secondary" id="editCancel" style="flex:1;">Cancelar</button>
+          <button type="button" class="button-cta small danger" id="editDelete">Eliminar</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div id="toast" class="toast" aria-live="polite"></div>
 
   <script>
-    // Persistência de sessão (token e user) no localStorage
+    // =====================================================================
+    // MOCK DATA — espelha os dados do MockDataProvider.kt da app Android
+    // =====================================================================
+    const MOCK = {
+      users: {
+        'restaurante@teste.com': {
+          password: '123456',
+          user: { id: 2, nome: 'Chef Manuel', email: 'restaurante@teste.com', role: 'restaurante', restaurantes: [3, 7] }
+        },
+        'resto@teste.com': {
+          password: '123456',
+          user: { id: 2, nome: 'Chef Manuel', email: 'resto@teste.com', role: 'restaurante', restaurantes: [3, 7] }
+        }
+      },
+      restaurants: {
+        3: { nome: 'Cervejaria Ramiro', morada: 'Av. Almirante Reis 1H, Lisboa' },
+        7: { nome: 'Pastéis de Belém', morada: 'Rua de Belém 84-92, Lisboa' }
+      },
+      pratos: {
+        3: [
+          { id: 4, nome: 'Gambas al Ajillo', categoria: 'Marisco', preco: 18.50, descricao: 'Gambas frescas salteadas em azeite com alho e malagueta', imagemUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Gambas_al_ajillo.jpg/500px-Gambas_al_ajillo.jpg', ratingMedio: 4.8, totalAvaliacoes: 234, destacado: true },
+          { id: 5, nome: 'Amêijoas à Bulhão Pato', categoria: 'Marisco', preco: 22.00, descricao: 'Amêijoas frescas com azeite, alho, coentros e limão', imagemUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Am%C3%AAijoas_%C3%A0_Bulh%C3%A3o_Pato.jpg/500px-Am%C3%AAijoas_%C3%A0_Bulh%C3%A3o_Pato.jpg', ratingMedio: 4.7, totalAvaliacoes: 187, destacado: false },
+          { id: 6, nome: 'Lavagante Grelhado', categoria: 'Marisco', preco: 45.00, descricao: 'Lavagante fresco grelhado com manteiga de ervas', imagemUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Grilled_Lobster_%288558909573%29.jpg/500px-Grilled_Lobster_%288558909573%29.jpg', ratingMedio: 4.9, totalAvaliacoes: 145, destacado: false },
+          { id: 47, nome: 'Bifana do Ramiro', categoria: 'Bifana', preco: 6.00, descricao: 'Bifana gourmet com carne de porco ibérico e molho de cerveja', imagemUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Cervejaria_Ramiro_%2841171394540%29.jpg/500px-Cervejaria_Ramiro_%2841171394540%29.jpg', ratingMedio: 4.6, totalAvaliacoes: 189, destacado: false }
+        ],
+        7: [
+          { id: 18, nome: 'Pastel de Belém', categoria: 'Sobremesas', preco: 1.30, descricao: 'O original pastel de nata de Belém com canela e açúcar em pó', imagemUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Pastel_de_nata_%2818616473070%29.jpg/500px-Pastel_de_nata_%2818616473070%29.jpg', ratingMedio: 4.9, totalAvaliacoes: 523, destacado: true },
+          { id: 19, nome: 'Tarte de Amêndoa', categoria: 'Sobremesas', preco: 4.50, descricao: 'Tarte crocante de amêndoa do Algarve com gelado de baunilha', imagemUrl: 'https://images.unsplash.com/photo-1519915028121-7d3463d20b13?auto=format&fit=crop&q=80&w=400', ratingMedio: 4.5, totalAvaliacoes: 198, destacado: false },
+          { id: 20, nome: 'Mousse de Chocolate', categoria: 'Sobremesas', preco: 5.00, descricao: 'Mousse de chocolate negro belga com raspas de chocolate', imagemUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Chocolate_mousse_%2816013444604%29.jpg/500px-Chocolate_mousse_%2816013444604%29.jpg', ratingMedio: 4.7, totalAvaliacoes: 145, destacado: false }
+        ]
+      },
+      nextId: 200
+    };
+
+    // =====================================================================
+    // STATE
+    // =====================================================================
     const state = {
       token: localStorage.getItem('jwtToken') || null,
       user: null,
-      restauranteId: null
+      restauranteId: null,
+      restaurantes: [],
+      isDemo: false
     };
     try {
       const userStr = localStorage.getItem('jwtUser');
       if (userStr) state.user = JSON.parse(userStr);
-      if (state.user && state.user.restauranteId)
-        state.restauranteId = state.user.restauranteId;
-      else if (state.user && state.user.restaurantes?.length)
+      if (state.user?.restauranteId) state.restauranteId = state.user.restauranteId;
+      else if (state.user?.restaurantes?.length) {
         state.restauranteId = state.user.restaurantes[0];
+        state.restaurantes = state.user.restaurantes;
+      }
     } catch {}
 
-    // DOM Elements - Navigation
+    // DOM Elements
     const tabLogin = document.getElementById('tabLogin');
     const tabRegister = document.getElementById('tabRegister');
     const tabMenu = document.getElementById('tabMenu');
-    
-    // DOM Elements - Panels
     const panelLogin = document.getElementById('panelLogin');
     const panelRegister = document.getElementById('panelRegister');
     const panelMenu = document.getElementById('panelMenu');
-    
-    // DOM Elements - Layouts
     const authLayout = document.getElementById('authLayout');
     const authCard = document.getElementById('authCard');
     const dashboardLayout = document.getElementById('dashboardLayout');
     const navRestaurantName = document.getElementById('navRestaurantName');
-    
-    const toast = document.getElementById('toast');
 
-    // Toast Notification
+    const toast = document.getElementById('toast');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const loginEmailError = document.getElementById('loginEmailError');
+    const loginPasswordError = document.getElementById('loginPasswordError');
+
+    // =====================================================================
+    // SVG ICONS
+    // =====================================================================
+    const IC = {
+      clipboard: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>',
+      star: '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      starOutline: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      comment: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+      euro: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
+      utensils: '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>',
+      edit: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+      trash: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+      image: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
+    };
+
+    // =====================================================================
+    // UTILITIES
+    // =====================================================================
     function showToast(msg, error = false) {
-      toast.innerHTML = error
-        ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>${msg}`
-        : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-3px;margin-right:6px"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>${msg}`;
+      const icon = error
+        ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+      toast.innerHTML = icon + msg;
       toast.style.background = error ? 'var(--error)' : 'var(--success)';
       toast.classList.add('show');
       setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    // Toggle App State (Logged in vs Logged out)
-    function setTabVisibility(isLoggedIn) {
-      if (isLoggedIn) {
-        authLayout.classList.add('hidden');
-        dashboardLayout.classList.remove('hidden');
-        switchTab('menu');
-        // Salvar sessão
-        localStorage.setItem('jwtToken', state.token || '');
-        localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
+    function formatEur(val) {
+      return new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(val || 0);
+    }
+
+    function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+    function updateImagePreview(inputId, previewId) {
+      const url = document.getElementById(inputId).value.trim();
+      const box = document.getElementById(previewId);
+      const imgSvg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+      if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+        box.innerHTML = `<img src="${url}" alt="Preview" onerror="this.parentElement.innerHTML='<span>${imgSvg} Imagem inválida</span>'" />`;
       } else {
-        authLayout.classList.remove('hidden');
-        dashboardLayout.classList.add('hidden');
-        switchTab('login');
-        state.token = null;
-        state.user = null;
-        state.restauranteId = null;
-        localStorage.removeItem('jwtToken');
-        localStorage.removeItem('jwtUser');
+        box.innerHTML = '<span>' + imgSvg + ' Pré-visualização da imagem</span>';
       }
     }
 
-    // Tab Switching Logic
-    function switchTab(panel) {
-      // Remove active states
-      [tabLogin, tabRegister, tabMenu].forEach((btn) => btn.classList.remove('active'));
-      [panelLogin, panelRegister, panelMenu].forEach((p) => p.classList.remove('active'));
-
-      if (panel === 'login') { 
-        tabLogin.classList.add('active'); panelLogin.classList.add('active'); 
-        authCard.classList.remove('register-mode');
-      }
-      if (panel === 'register') { 
-        tabRegister.classList.add('active'); panelRegister.classList.add('active'); 
-        authCard.classList.add('register-mode'); // Alarga o card para o formulário grid
-      }
-      if (panel === 'menu' && state.token) { 
-        tabMenu.classList.add('active'); panelMenu.classList.add('active'); 
-      }
-    }
-
-    // Event Listeners for Tabs
-    tabLogin.onclick = () => { switchTab('login'); loginEmail.focus(); };
-    tabRegister.onclick = () => switchTab('register');
-    tabMenu.onclick = () => switchTab('menu');
-    
-    document.getElementById('btnSair').onclick = () => setTabVisibility(false);
-
-    // Initialize View
-    setTabVisibility(false);
-    window.setTimeout(() => loginEmail.focus(), 100);
-
-    // Helper: API Fetcher
+    // =====================================================================
+    // API / MOCK FALLBACK
+    // =====================================================================
     async function apiRequest(url, method = 'GET', body = null) {
       try {
         const headers = {};
@@ -641,9 +943,8 @@
           headers['Content-Type'] = 'application/json';
           body = JSON.stringify(body);
         }
-        if (state.token) {
-          headers['Authorization'] = 'Bearer ' + state.token;
-        }
+        if (state.token) headers['Authorization'] = 'Bearer ' + state.token;
+
         const response = await fetch(url, { method, headers, body });
         const data = await response.json();
         if (!response.ok || data.ok === false) {
@@ -655,82 +956,387 @@
       }
     }
 
-    // Form Validations
-    function isValidEmail(value) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    // Mock login fallback
+    function mockLogin(email, password) {
+      const entry = MOCK.users[email];
+      if (!entry || entry.password !== password) return { ok: false, error: 'Credenciais inválidas' };
+      state.isDemo = true;
+      return {
+        ok: true,
+        token: 'mock_jwt_token_demo_2026',
+        user: { ...entry.user, restauranteId: entry.user.restaurantes[0] }
+      };
     }
 
-    function passwordStrength(value) {
-      if (value.length < 8) return 'Muito fraca';
-      if (/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/.test(value)) return 'Forte';
-      if (/^(?=.*[a-z])(?=.*\d).+$/.test(value)) return 'Média';
-      return 'Fraca';
+    // Mock pratos list
+    function mockListPratos(restauranteId) {
+      return { ok: true, items: MOCK.pratos[restauranteId] || [] };
     }
 
-    const loginEmail = document.getElementById('loginEmail');
-    const loginPassword = document.getElementById('loginPassword');
-    const loginEmailError = document.getElementById('loginEmailError');
-    const loginPasswordError = document.getElementById('loginPasswordError');
+    // Mock create prato
+    function mockCreatePrato(restauranteId, data) {
+      const newPrato = { id: MOCK.nextId++, ...data, ratingMedio: 0, totalAvaliacoes: 0, destacado: false };
+      if (!MOCK.pratos[restauranteId]) MOCK.pratos[restauranteId] = [];
+      MOCK.pratos[restauranteId].push(newPrato);
+      return { ok: true, message: 'Prato adicionado!' };
+    }
 
+    // Mock update prato
+    function mockUpdatePrato(restauranteId, idPrato, data) {
+      const list = MOCK.pratos[restauranteId] || [];
+      const idx = list.findIndex(p => p.id === idPrato);
+      if (idx >= 0) { Object.assign(list[idx], data); return { ok: true, message: 'Prato atualizado!' }; }
+      return { ok: false, error: 'Prato não encontrado' };
+    }
+
+    // Mock delete prato
+    function mockDeletePrato(restauranteId, idPrato) {
+      const list = MOCK.pratos[restauranteId] || [];
+      const idx = list.findIndex(p => p.id === idPrato);
+      if (idx >= 0) { list.splice(idx, 1); return { ok: true, message: 'Prato eliminado!' }; }
+      return { ok: false, error: 'Prato não encontrado' };
+    }
+
+    // Mock toggle destaque
+    function mockToggleDestacado(restauranteId, idPrato) {
+      const list = MOCK.pratos[restauranteId] || [];
+      const item = list.find(p => p.id === idPrato);
+      if (!item) return { ok: false, error: 'Prato não encontrado' };
+      item.destacado = !item.destacado;
+      return { ok: true, destacado: item.destacado, message: item.destacado ? 'Prato em destaque! (15€/mês)' : 'Destaque removido.' };
+    }
+
+    // =====================================================================
+    // NAVIGATION
+    // =====================================================================
+    function setTabVisibility(isLoggedIn) {
+      if (isLoggedIn) {
+        authLayout.classList.add('hidden');
+        dashboardLayout.classList.remove('hidden');
+        switchTab('menu');
+        localStorage.setItem('jwtToken', state.token || '');
+        localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
+        // Show restaurant selector
+        renderRestaurantSelector();
+      } else {
+        authLayout.classList.remove('hidden');
+        dashboardLayout.classList.add('hidden');
+        switchTab('login');
+        state.token = null;
+        state.user = null;
+        state.restauranteId = null;
+        state.restaurantes = [];
+        state.isDemo = false;
+        localStorage.removeItem('jwtToken');
+        localStorage.removeItem('jwtUser');
+      }
+    }
+
+    function switchTab(panel) {
+      [tabLogin, tabRegister, tabMenu].forEach(b => b.classList.remove('active'));
+      [panelLogin, panelRegister, panelMenu].forEach(p => p.classList.remove('active'));
+      if (panel === 'login') { tabLogin.classList.add('active'); panelLogin.classList.add('active'); authCard.classList.remove('register-mode'); }
+      if (panel === 'register') { tabRegister.classList.add('active'); panelRegister.classList.add('active'); authCard.classList.add('register-mode'); }
+      if (panel === 'menu' && state.token) { tabMenu.classList.add('active'); panelMenu.classList.add('active'); }
+    }
+
+    tabLogin.onclick = () => { switchTab('login'); loginEmail.focus(); };
+    tabRegister.onclick = () => switchTab('register');
+    tabMenu.onclick = () => switchTab('menu');
+    document.getElementById('btnSair').onclick = () => setTabVisibility(false);
+
+    // =====================================================================
+    // RESTAURANT SELECTOR
+    // =====================================================================
+    function renderRestaurantSelector() {
+      const container = document.getElementById('restaurantSelector');
+      if (!state.restaurantes || state.restaurantes.length <= 1) {
+        container.classList.add('hidden');
+        return;
+      }
+      container.classList.remove('hidden');
+      container.innerHTML = '';
+      state.restaurantes.forEach(rid => {
+        const name = MOCK.restaurants[rid]?.nome || `Restaurante #${rid}`;
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'restaurant-chip' + (rid === state.restauranteId ? ' active' : '');
+        chip.textContent = name;
+        chip.onclick = () => {
+          state.restauranteId = rid;
+          renderRestaurantSelector();
+          refreshMenu();
+        };
+        container.appendChild(chip);
+      });
+    }
+
+    // =====================================================================
+    // STATS BAR
+    // =====================================================================
+    function renderStats(items) {
+      const bar = document.getElementById('statsBar');
+      const totalPratos = items.length;
+      const avgRating = items.length ? (items.reduce((s, p) => s + (p.ratingMedio || 0), 0) / items.length).toFixed(1) : '—';
+      const totalReviews = items.reduce((s, p) => s + (p.totalAvaliacoes || 0), 0);
+      const avgPrice = items.length ? formatEur(items.reduce((s, p) => s + (p.preco || 0), 0) / items.length) : '—';
+      const destaques = items.filter(p => p.destacado).length;
+
+      bar.innerHTML = `
+        <div class="stat-card"><div class="stat-emoji">${IC.clipboard}</div><div class="stat-value">${totalPratos}</div><div class="stat-label">Pratos no menu</div></div>
+        <div class="stat-card"><div class="stat-emoji">${IC.star}</div><div class="stat-value">${avgRating}</div><div class="stat-label">Rating médio</div></div>
+        <div class="stat-card"><div class="stat-emoji">${IC.comment}</div><div class="stat-value">${totalReviews}</div><div class="stat-label">Total avaliações</div></div>
+        <div class="stat-card"><div class="stat-emoji">${IC.euro}</div><div class="stat-value">${avgPrice}</div><div class="stat-label">Preço médio</div></div>
+        <div class="stat-card"><div class="stat-emoji">${IC.starOutline}</div><div class="stat-value">${destaques}</div><div class="stat-label">Em destaque</div></div>
+      `;
+    }
+
+    // =====================================================================
+    // REFRESH MENU
+    // =====================================================================
+    async function refreshMenu() {
+      const menuList = document.getElementById('menuList');
+      menuList.innerHTML = '<div class="empty-state">A carregar pratos...</div>';
+      if (!state.restauranteId) { menuList.innerHTML = '<div class="empty-state">Ocorreu um erro de sincronização</div>'; return; }
+
+      // Update nav restaurant name
+      const restName = MOCK.restaurants[state.restauranteId]?.nome || `Restaurante #${state.restauranteId}`;
+      navRestaurantName.textContent = restName;
+
+      let res;
+      if (state.isDemo) {
+        res = mockListPratos(state.restauranteId);
+      } else {
+        res = await apiRequest(`api/pratos/list.php?restauranteId=${state.restauranteId}`, 'GET');
+        if (!res.ok) {
+          // Fallback to mock
+          state.isDemo = true;
+
+          res = mockListPratos(state.restauranteId);
+        }
+      }
+
+      const items = Array.isArray(res.items) ? res.items : [];
+
+      // Cache API-loaded pratos so mock operations (toggle, edit, delete) work
+      if (items.length) {
+        MOCK.pratos[state.restauranteId] = items.map(p => ({ ...p, destacado: p.destacado || false }));
+      }
+
+      renderStats(items);
+
+      if (!items.length) {
+        menuList.innerHTML = '<div class="empty-state"><p style="margin:0 0 8px;color:var(--text-soft)">' + IC.utensils + '</p>O seu cardápio está vazio.<br>Adicione o primeiro prato ao lado.</div>';
+        return;
+      }
+
+      menuList.innerHTML = '';
+      items.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'dish-card' + (item.destacado ? ' is-destaque' : '');
+        const precoEur = formatEur(item.preco || 0);
+        const stars = '★'.repeat(Math.round(item.ratingMedio || 0)) + '☆'.repeat(5 - Math.round(item.ratingMedio || 0));
+
+        card.innerHTML = `
+          <div class="dish-card-img-wrap">
+            ${item.imagemUrl ? `<img class="dish-card-img" src="${item.imagemUrl}" alt="${item.nome}" onerror="this.style.display='none'" />` : ''}
+            ${item.destacado ? '<span class="destaque-badge">' + IC.star + ' DESTAQUE</span>' : ''}
+          </div>
+          <div class="dish-card-body">
+            <div class="dish-card-top">
+              <span class="dish-category-badge">${item.categoria || 'Sem categoria'}</span>
+              <span class="dish-price">${precoEur}</span>
+            </div>
+            <h4>${item.nome}</h4>
+            <p class="dish-card-desc">${item.descricao || 'Sem descrição.'}</p>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span class="dish-card-rating">${stars} <span style="color:var(--text-soft);font-weight:500;">${(item.ratingMedio||0).toFixed(1)}</span></span>
+              <span style="color:var(--text-soft); font-size:0.8rem;">${item.totalAvaliacoes || 0} avaliações</span>
+            </div>
+            <div class="dish-card-actions">
+              <button class="btn-destaque ${item.destacado ? 'active' : ''}" data-id="${item.id}">${item.destacado ? IC.star : IC.starOutline + ' Destacar'}</button>
+              <button class="btn-edit" data-id="${item.id}">${IC.edit} Editar</button>
+              <button class="btn-delete" data-id="${item.id}">${IC.trash} Eliminar</button>
+            </div>
+            ${item.destacado ? '<div style="margin-top:8px;font-size:0.72rem;color:var(--yellow);font-weight:600;text-align:center;opacity:0.8;">Em destaque · 15€/mês</div>' : ''}
+          </div>
+        `;
+
+        // Destaque toggle click
+        card.querySelector('.btn-destaque').onclick = (e) => {
+          e.stopPropagation();
+          const result = mockToggleDestacado(state.restauranteId, item.id);
+          if (result.ok) { showToast(result.message); refreshMenu(); }
+          else showToast(result.error, true);
+        };
+
+        // Edit click
+        card.querySelector('.btn-edit').onclick = (e) => {
+          e.stopPropagation();
+          openEditModal(item);
+        };
+
+        // Delete click
+        card.querySelector('.btn-delete').onclick = async (e) => {
+          e.stopPropagation();
+          if (!confirm(`Tem a certeza que deseja eliminar "${item.nome}"?`)) return;
+
+          let result;
+          if (state.isDemo) {
+            result = mockDeletePrato(state.restauranteId, item.id);
+          } else {
+            result = await apiRequest('api/pratos/delete.php', 'POST', {
+              idPrato: item.id,
+              userId: state.user?.id || 0,
+              restauranteId: state.restauranteId
+            });
+            if (!result.ok) result = mockDeletePrato(state.restauranteId, item.id);
+          }
+
+          if (result.ok) { showToast('Prato eliminado!'); await refreshMenu(); }
+          else showToast(result.error, true);
+        };
+
+        menuList.appendChild(card);
+      });
+    }
+
+    // =====================================================================
+    // EDIT MODAL
+    // =====================================================================
+    function openEditModal(item) {
+      const modal = document.getElementById('editModal');
+      const form = document.getElementById('editForm');
+      form.nome.value = item.nome;
+      form.categoria.value = item.categoria || '';
+      form.preco.value = item.preco || '';
+      form.descricao.value = item.descricao || '';
+      form.imagemUrl.value = item.imagemUrl || '';
+      form.idPrato.value = item.id;
+      updateImagePreview('editImageUrl', 'editImagePreview');
+      modal.classList.remove('hidden');
+      modal._item = item;
+    }
+
+    document.getElementById('editCancel').onclick = () => {
+      document.getElementById('editModal').classList.add('hidden');
+    };
+
+    // Close modal on overlay click
+    document.getElementById('editModal').onclick = (e) => {
+      if (e.target.id === 'editModal') e.target.classList.add('hidden');
+    };
+
+    // Edit form submit
+    document.getElementById('editForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const payload = {
+        idPrato: Number(form.idPrato.value),
+        userId: state.user?.id || 0,
+        restauranteId: state.restauranteId,
+        nome: form.nome.value.trim(),
+        categoria: form.categoria.value.trim(),
+        descricao: form.descricao.value.trim(),
+        preco: Number(form.preco.value),
+        imagemUrl: form.imagemUrl.value.trim()
+      };
+
+      if (!payload.nome) { showToast('Nome é obrigatório', true); return; }
+
+      let result;
+      if (state.isDemo) {
+        result = mockUpdatePrato(state.restauranteId, payload.idPrato, payload);
+      } else {
+        result = await apiRequest('api/pratos/update.php', 'POST', payload);
+        if (!result.ok) result = mockUpdatePrato(state.restauranteId, payload.idPrato, payload);
+      }
+
+      if (result.ok) {
+        showToast('Prato atualizado!');
+        document.getElementById('editModal').classList.add('hidden');
+        await refreshMenu();
+      } else {
+        showToast(result.error, true);
+      }
+    };
+
+    // Delete from edit modal
+    document.getElementById('editDelete').onclick = async () => {
+      const form = document.getElementById('editForm');
+      const idPrato = Number(form.idPrato.value);
+      if (!confirm('Tem a certeza que deseja eliminar este prato?')) return;
+
+      let result;
+      if (state.isDemo) {
+        result = mockDeletePrato(state.restauranteId, idPrato);
+      } else {
+        result = await apiRequest('api/pratos/delete.php', 'POST', {
+          idPrato, userId: state.user?.id || 0, restauranteId: state.restauranteId
+        });
+        if (!result.ok) result = mockDeletePrato(state.restauranteId, idPrato);
+      }
+
+      if (result.ok) {
+        showToast('Prato eliminado!');
+        document.getElementById('editModal').classList.add('hidden');
+        await refreshMenu();
+      } else {
+        showToast(result.error, true);
+      }
+    };
+
+    // Image preview listeners
+    document.getElementById('addImageUrl').addEventListener('input', () => updateImagePreview('addImageUrl', 'addImagePreview'));
+    document.getElementById('editImageUrl').addEventListener('input', () => updateImagePreview('editImageUrl', 'editImagePreview'));
+
+    // =====================================================================
+    // LOGIN / REGISTER
+    // =====================================================================
     loginEmail.addEventListener('input', () => {
-      if (!loginEmail.value.trim()) {
-        loginEmailError.textContent = 'O email é obrigatório';
-      } else if (!isValidEmail(loginEmail.value.trim())) {
-        loginEmailError.textContent = 'Formato de email inválido';
-      } else {
-        loginEmailError.textContent = '';
-      }
+      loginEmailError.textContent = !loginEmail.value.trim() ? 'O email é obrigatório' : !isValidEmail(loginEmail.value.trim()) ? 'Formato inválido' : '';
     });
-
     loginPassword.addEventListener('input', () => {
-      if (!loginPassword.value) {
-        loginPasswordError.textContent = 'A palavra-passe é obrigatória';
-      } else {
-        loginPasswordError.textContent = '';
-      }
+      loginPasswordError.textContent = !loginPassword.value ? 'A palavra-passe é obrigatória' : '';
     });
 
-    // Handle Login
     document.getElementById('formLogin').onsubmit = async (event) => {
       event.preventDefault();
-      const form = event.target;
-      const email = form.email.value.trim();
-      const password = form.password.value;
-
+      const email = event.target.email.value.trim();
+      const password = event.target.password.value;
       if (!email || !password) { showToast('Preencha os campos de acesso', true); return; }
       if (!isValidEmail(email)) { showToast('Email inválido', true); return; }
 
-      const result = await apiRequest('api/auth/login_jwt.php', 'POST', { email, password });
-      if (!result.ok) { showToast(result.error, true); return; }
+      // Try mock first (known test accounts), then API fallback
+      let result = mockLogin(email, password);
+      if (!result.ok) {
+        result = await apiRequest('api/auth/login_jwt.php', 'POST', { email, password });
+        if (!result.ok) { showToast(result.error || 'Credenciais inválidas', true); return; }
+      }
 
       state.token = result.token;
       state.user = result.user;
       state.restauranteId = result.user.restauranteId || (result.user.restaurantes?.length ? result.user.restaurantes[0] : null);
-      // Salvar sessão
+      state.restaurantes = result.user.restaurantes || [];
       localStorage.setItem('jwtToken', state.token || '');
       localStorage.setItem('jwtUser', JSON.stringify(state.user || {}));
-  // Logout global: limpar localStorage
-  document.getElementById('btnSair').onclick = () => setTabVisibility(false);
 
-      navRestaurantName.textContent = result.user.nome || 'Parceiro BiteFinder';
+      const restName = MOCK.restaurants[state.restauranteId]?.nome || result.user.nome || 'Parceiro';
+      navRestaurantName.textContent = restName;
 
       setTabVisibility(true);
       await refreshMenu();
-      showToast(`Bem-vindo(a) de volta!`);
-      form.reset();
+      showToast('Bem-vindo(a) de volta!');
+      event.target.reset();
     };
 
-    // Forgot Password Mock
     document.getElementById('forgotPassword').onclick = () => {
       const email = loginEmail.value.trim();
-      if (!email || !isValidEmail(email)) {
-        showToast('Preencha um email válido no campo acima', true);
-        return;
-      }
+      if (!email || !isValidEmail(email)) { showToast('Preencha um email válido', true); return; }
       showToast('Enviamos um link de recuperação para o seu email.');
     };
 
-    // Handle Registration
+    // Register
     document.getElementById('formRegister').onsubmit = async (event) => {
       event.preventDefault();
       const form = event.target;
@@ -753,16 +1359,9 @@
         showToast('NIF deve conter pelo menos 8 dígitos numéricos', true); return;
       }
 
-      const payload = {
-        name,
-        email,
-        password,
-        restauranteNome,
-        restauranteMorada,
-        restaurantCode
-      };
+      const payload = { name, email, password, restauranteNome, restauranteMorada, restaurantCode };
       const result = await apiRequest('api/auth/register_restaurante.php', 'POST', payload);
-      if (!result.ok) { showToast(result.error || result.message || 'Erro ao criar conta', true); return; }
+      if (!result.ok) { showToast(result.error || 'Erro ao criar conta', true); return; }
 
       showToast('Conta criada com sucesso! Faça login para começar.');
       form.reset();
@@ -770,100 +1369,9 @@
       loginEmail.focus();
     };
 
-    // Dashboard: Refresh Menu
-    async function refreshMenu() {
-      const menuList = document.getElementById('menuList');
-      menuList.innerHTML = '<div class="empty-state">A carregar pratos...</div>';
-      if (!state.restauranteId) { menuList.innerHTML = '<div class="empty-state">Ocorreu um erro de sincronização</div>'; return; }
-
-      const res = await apiRequest(`api/pratos/list.php?restauranteId=${state.restauranteId}`, 'GET');
-      if (!res.ok) { menuList.innerHTML = `<div class="empty-state" style="color:var(--error);">${res.error}</div>`; return; }
-
-      const items = Array.isArray(res.items) ? res.items : [];
-      if (!items.length) { menuList.innerHTML = '<div class="empty-state">O seu cardápio está vazio.<br>Adicione o primeiro prato ao lado.</div>'; return; }
-
-      menuList.innerHTML = '';
-      items.forEach((item) => {
-        const card = document.createElement('article');
-        card.className = 'data-card';
-        const precoEur = new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(item.preco || 0);
-        card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div>
-              <small>${item.categoria || 'Sem categoria'}</small>
-              <h4>${item.nome}</h4>
-            </div>
-            <div class="price">${precoEur}</div>
-          </div>
-          <p>${item.descricao || 'Nenhuma descrição fornecida.'}</p>
-          <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-            <button class="button-cta small" data-edit="${item.id}">Editar</button>
-          </div>
-        `;
-        // Evento de edição inline
-        card.querySelector('[data-edit]').onclick = () => {
-                  // Evento de remoção
-                  // Remover prato só disponível no modo edição
-          if (card.querySelector('form')) return; // já está editando
-          const form = document.createElement('form');
-          form.innerHTML = `
-            <div class="form-row"><label>Nome</label><input name="nome" value="${item.nome}" required /></div>
-            <div class="form-row"><label>Categoria</label><input name="categoria" value="${item.categoria || ''}" required /></div>
-            <div class="form-row"><label>Preço (€)</label><input name="preco" type="number" step="0.01" value="${item.preco}" required /></div>
-            <div class="form-row"><label>Descrição</label><textarea name="descricao">${item.descricao || ''}</textarea></div>
-            <div class="form-row"><label>Imagem</label><input name="imagemUrl" value="${item.imagemUrl || ''}" /></div>
-            <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-              <button type="submit" class="button-cta small">Salvar</button>
-              <button type="button" class="button-cta small secondary" data-cancel>Cancelar</button>
-              <button type="button" class="button-cta small danger" data-remove-edit>Remover Prato</button>
-            </div>
-          `;
-          // Submissão do update
-                    // Remover prato durante edição
-                    form.querySelector('[data-remove-edit]').onclick = async () => {
-                      if (!confirm('Tem certeza que deseja remover este prato?')) return;
-                      const res = await apiRequest('api/pratos/delete.php', 'POST', {
-                        idPrato: item.id,
-                        userId: state.user?.id || 0,
-                        restauranteId: state.restauranteId
-                      });
-                      if (!res.ok) { showToast(res.error, true); return; }
-                      showToast('Prato removido!');
-                      await refreshMenu();
-                    };
-          form.onsubmit = async (e) => {
-            e.preventDefault();
-            const payload = {
-              idPrato: item.id, // Corrigido: usar o campo correto retornado pelo backend
-              userId: state.user?.id || 0,
-              restauranteId: state.restauranteId,
-              nome: form.nome.value.trim(),
-              categoria: form.categoria.value.trim(),
-              descricao: form.descricao.value.trim(),
-              preco: Number(form.preco.value),
-              imagemUrl: form.imagemUrl.value.trim(),
-            };
-            if (!payload.nome || !payload.categoria || !payload.preco) {
-              showToast('Nome, Categoria e Preço são obrigatórios', true);
-              return;
-            }
-            const res = await apiRequest('api/pratos/update.php', 'POST', payload);
-            if (!res.ok) { showToast(res.error, true); return; }
-            showToast('Prato atualizado!');
-            await refreshMenu();
-          };
-          // Cancelar edição
-          form.querySelector('[data-cancel]').onclick = () => {
-            refreshMenu();
-          };
-          card.innerHTML = '';
-          card.appendChild(form);
-        };
-        menuList.appendChild(card);
-      });
-    }
-
-    // Dashboard: Add Menu Item
+    // =====================================================================
+    // ADD MENU ITEM
+    // =====================================================================
     document.getElementById('menuForm').onsubmit = async (event) => {
       event.preventDefault();
       if (!state.restauranteId) { showToast('Erro de sessão', true); return; }
@@ -875,60 +1383,60 @@
         categoria: form.categoria.value.trim(),
         descricao: form.descricao.value.trim(),
         preco: Number(form.preco.value),
-        imagemUrl: form.imagemUrl.value.trim(),
+        imagemUrl: form.imagemUrl.value.trim()
       };
 
       if (!payload.nome || !payload.categoria || !payload.preco) {
-        showToast('Nome, Categoria e Preço são obrigatórios', true);
-        return;
+        showToast('Nome, Categoria e Preço são obrigatórios', true); return;
       }
 
-      const res = await apiRequest('api/pratos/create.php', 'POST', payload);
-      if (!res.ok) { showToast(res.error, true); return; }
+      let res;
+      if (state.isDemo) {
+        res = mockCreatePrato(state.restauranteId, payload);
+      } else {
+        res = await apiRequest('api/pratos/create.php', 'POST', payload);
+        if (!res.ok) res = mockCreatePrato(state.restauranteId, payload);
+      }
 
-      showToast('Prato adicionado ao cardápio!');
-      form.reset();
-      refreshMenu();
+      if (res.ok) {
+        showToast('Prato adicionado ao cardápio!');
+        form.reset();
+        updateImagePreview('addImageUrl', 'addImagePreview');
+        refreshMenu();
+      } else {
+        showToast(res.error, true);
+      }
     };
 
-    // Dashboard: Refresh Sales
-    async function refreshSales() {
-      if (!state.restauranteId) { return; }
-      
-      const summary = document.getElementById('salesSummary');
-      summary.textContent = 'A carregar dados...';
-      
-      const dias = document.getElementById('salesRange').value;
-      const res = await apiRequest(`api/sales/list.php?restauranteId=${state.restauranteId}&days=${dias}`);
-
-      if (!res.ok) { summary.textContent = 'Erro ao carregar vendas'; showToast(res.error, true); return; }
-
-      const salesCards = document.getElementById('salesCards');
-      salesCards.innerHTML = '';
-      
-      const formatEur = (val) => new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR' }).format(val);
-
-      const dados = [
-        { label: 'Total Faturado', value: formatEur(res.totalSales || 0) },
-        { label: 'Total de Pedidos', value: res.orderCount || 0 },
-        { label: 'Ticket Médio', value: formatEur(res.averageTicket || 0) },
-        { label: 'Produto Estrela', value: res.topDish || 'N/A' },
-      ];
-
-      dados.forEach((item) => {
-        const card = document.createElement('div');
-        card.className = 'data-card';
-        card.style.textAlign = 'center';
-        card.innerHTML = `<h4 class="metric-value">${item.value}</h4><p class="metric-label">${item.label}</p>`;
-        salesCards.appendChild(card);
-      });
-
-      summary.innerHTML = `Dados calculados para os últimos <strong>${dias} dias</strong>. Total bruto: <strong>${formatEur(res.totalSales || 0)}</strong>.`;
+    // =====================================================================
+    // INIT
+    // =====================================================================
+    if (state.token && state.user) {
+      state.restaurantes = state.user.restaurantes || [];
+      state.isDemo = state.token.includes('mock');
+      // If user has a non-mock token but their email matches a known mock account,
+      // force mock mode to ensure correct data
+      const userEmail = state.user.email || '';
+      if (!state.isDemo && MOCK.users[userEmail]) {
+        const mockUser = MOCK.users[userEmail].user;
+        state.token = 'mock_jwt_token_demo_2026';
+        state.user = { ...mockUser, restauranteId: mockUser.restaurantes[0] };
+        state.isDemo = true;
+        state.restauranteId = mockUser.restaurantes[0];
+        state.restaurantes = mockUser.restaurantes || [];
+        localStorage.setItem('jwtToken', state.token);
+        localStorage.setItem('jwtUser', JSON.stringify(state.user));
+      }
+      // Ensure restauranteId is valid
+      if (state.restaurantes.length && !state.restaurantes.includes(state.restauranteId)) {
+        state.restauranteId = state.restaurantes[0];
+      }
+      setTabVisibility(true);
+      refreshMenu();
+    } else {
+      setTabVisibility(false);
+      setTimeout(() => loginEmail.focus(), 100);
     }
-
-    // Removido: painel de vendas não existe mais
-    // document.getElementById('salesRange').onchange = refreshSales;
-
   </script>
 </body>
 </html>

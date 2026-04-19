@@ -100,8 +100,8 @@ class DataRepository(private val api: ApiService) {
 
     // ─── Sugestões de pesquisa ──────────────────────────────────────────
 
-    fun getSearchSuggestions(query: String): List<PratoDto> =
-        MockDataProvider.getSearchSuggestions(query)
+    fun getSearchSuggestions(query: String, cidade: String = "Todas"): List<PratoDto> =
+        MockDataProvider.getSearchSuggestions(query, cidade)
 
     // ─── Detalhe do Prato ───────────────────────────────────────────────
 
@@ -148,13 +148,13 @@ class DataRepository(private val api: ApiService) {
     suspend fun deleteAvaliacao(req: DeleteAvaliacaoRequest): BasicOkResponse =
         withContext(Dispatchers.IO) {
             if (useOnlyMock) {
-                MockDataProvider.deleteAvaliacao(req.avaliacaoId)
+                MockDataProvider.deleteAvaliacao(req.idAvaliacao)
                 return@withContext BasicOkResponse(ok = true, message = "Avaliação eliminada (modo offline)")
             }
             try {
                 api.deleteAvaliacao(req)
             } catch (_: Exception) {
-                MockDataProvider.deleteAvaliacao(req.avaliacaoId)
+                MockDataProvider.deleteAvaliacao(req.idAvaliacao)
                 BasicOkResponse(ok = true, message = "Avaliação eliminada (modo offline)")
             }
         }
@@ -194,6 +194,48 @@ class DataRepository(private val api: ApiService) {
                 BasicOkResponse(ok = true, message = "Prato atualizado (modo offline)")
             }
         }
+
+    // ─── Criar Prato ────────────────────────────────────────────────────
+
+    suspend fun createPrato(req: CreatePratoRequest): BasicOkResponse =
+        withContext(Dispatchers.IO) {
+            if (useOnlyMock) {
+                MockDataProvider.createPrato(req.restauranteId, req.nome, req.descricao, req.categoria, req.preco, req.imagemUrl)
+                return@withContext BasicOkResponse(ok = true, message = "Prato criado (modo offline)")
+            }
+            try {
+                api.createPrato(req)
+            } catch (_: Exception) {
+                MockDataProvider.createPrato(req.restauranteId, req.nome, req.descricao, req.categoria, req.preco, req.imagemUrl)
+                BasicOkResponse(ok = true, message = "Prato criado (modo offline)")
+            }
+        }
+
+    // ─── Eliminar Prato ─────────────────────────────────────────────────
+
+    suspend fun deletePrato(req: DeletePratoRequest): BasicOkResponse =
+        withContext(Dispatchers.IO) {
+            if (useOnlyMock) {
+                MockDataProvider.deletePrato(req.idPrato)
+                return@withContext BasicOkResponse(ok = true, message = "Prato eliminado (modo offline)")
+            }
+            try {
+                api.deletePrato(req)
+            } catch (_: Exception) {
+                MockDataProvider.deletePrato(req.idPrato)
+                BasicOkResponse(ok = true, message = "Prato eliminado (modo offline)")
+            }
+        }
+
+    // ─── Nome do restaurante ────────────────────────────────────────────
+
+    fun getRestauranteNome(id: Int): String = MockDataProvider.getRestauranteNome(id)
+
+    // ─── Pratos em Destaque ─────────────────────────────────────────────
+
+    fun getDestacados(cidade: String = "Todas"): List<PratoDto> = MockDataProvider.getDestacados(cidade)
+
+    fun toggleDestacado(pratoId: Int): Boolean = MockDataProvider.toggleDestacado(pratoId)
 
     // ─── Dados estáticos de filtros ─────────────────────────────────────
 
