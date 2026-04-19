@@ -140,7 +140,7 @@ fun ClayPratoDetailScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClayCream)
+            .claySceneBackground()
     ) {
         if (isLoading) {
             Column(

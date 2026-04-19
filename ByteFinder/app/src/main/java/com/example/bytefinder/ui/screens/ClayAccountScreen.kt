@@ -42,6 +42,7 @@ fun ClayAccountScreen(
     isRestaurantUser: Boolean,
     onOpenBusiness: () -> Unit,
     onOpenMyReviews: () -> Unit,
+    onOpenSettings: () -> Unit,
     onSignOut: () -> Unit
 ) {
     Column(
@@ -106,7 +107,7 @@ fun ClayAccountScreen(
                 }
                 AccountRow(icon = Icons.Filled.Star, label = "As minhas avaliações", onClick = onOpenMyReviews)
                 HorizontalDivider(color = Color.White.copy(alpha = 0.07f))
-                AccountRow(icon = Icons.Filled.Settings, label = "Definições", onClick = {})
+                AccountRow(icon = Icons.Filled.Settings, label = "Definições", onClick = onOpenSettings)
             }
         }
 

@@ -21,10 +21,17 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +57,7 @@ import java.util.Locale
  * - Estatísticas agregadas
  * - Lista de restaurantes ordenados por rating com preço, avaliações e morada
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClayPratoCompareScreen(
     repository: DataRepository,
@@ -60,8 +68,10 @@ fun ClayPratoCompareScreen(
     onPratoDetailClick: (Int) -> Unit,
     onRestauranteClick: (Int) -> Unit
 ) {
-    val tipo = remember(pratoId) { repository.getPratoTipo(pratoId) }
-    val allPratos = remember(tipo, selectedCity) { repository.getPratosByTipo(tipo, selectedCity) }
+    var refreshKey by remember { mutableIntStateOf(0) }
+    var isRefreshing by remember { mutableStateOf(false) }
+    val tipo = remember(pratoId, refreshKey) { repository.getPratoTipo(pratoId) }
+    val allPratos = remember(tipo, selectedCity, refreshKey) { isRefreshing = false; repository.getPratosByTipo(tipo, selectedCity) }
     val bestPrato = allPratos.firstOrNull()
 
     // Stats
@@ -71,10 +81,17 @@ fun ClayPratoCompareScreen(
     val priceMax = allPratos.mapNotNull { it.preco }.maxOrNull()
     val restaurantCount = allPratos.map { it.restauranteId }.distinct().size
 
+    val pullRefreshState = rememberPullToRefreshState()
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = { isRefreshing = true; refreshKey++ },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize()
+    ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClayCream)
+            .claySceneBackground()
     ) {
         if (bestPrato == null) {
             Column(
@@ -226,13 +243,13 @@ fun ClayPratoCompareScreen(
                 text = "Disponível em $restaurantCount ${if (restaurantCount == 1) "restaurante" else "restaurantes"}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = ClayTextDark
+                color = ClayOnDark
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 text = "Ordenado por rating · Toca para ver avaliações",
                 fontSize = 13.sp,
-                color = ClayTextLight
+                color = ClayOnDarkSecond
             )
 
             Spacer(Modifier.height(14.dp))
@@ -256,6 +273,7 @@ fun ClayPratoCompareScreen(
 
             Spacer(Modifier.height(24.dp))
         }
+    }
     }
 }
 

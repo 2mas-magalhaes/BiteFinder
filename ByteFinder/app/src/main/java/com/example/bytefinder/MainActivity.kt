@@ -35,6 +35,7 @@ import com.example.bytefinder.ui.screens.ClayMyReviewsScreen
 import com.example.bytefinder.ui.screens.ClayPratoDetailScreen
 import com.example.bytefinder.ui.screens.ClayPratoCompareScreen
 import com.example.bytefinder.ui.screens.ClayRestaurantDetailScreen
+import com.example.bytefinder.ui.screens.ClaySettingsScreen
 import com.example.bytefinder.ui.screens.HomeScreen
 import com.example.bytefinder.ui.theme.BitefinderClayTheme
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
@@ -47,6 +48,7 @@ private enum class AppScreen {
     ACCOUNT,
     BUSINESS,
     MY_REVIEWS,
+    SETTINGS,
     DETAIL,
     RESTAURANT_DETAIL,
     PRATO_COMPARE
@@ -108,7 +110,7 @@ private fun AppRoot(repository: DataRepository) {
 
     // Ecrãs que mostram a bottom nav
     val showBottomNav = token != null &&
-        currentScreen !in listOf(AppScreen.DETAIL, AppScreen.MY_REVIEWS, AppScreen.RESTAURANT_DETAIL, AppScreen.PRATO_COMPARE) &&
+        currentScreen !in listOf(AppScreen.DETAIL, AppScreen.MY_REVIEWS, AppScreen.SETTINGS, AppScreen.RESTAURANT_DETAIL, AppScreen.PRATO_COMPARE) &&
         !(currentScreen == AppScreen.BUSINESS && !isRestaurantUser)
 
     if (token == null) {
@@ -211,6 +213,9 @@ private fun AppRoot(repository: DataRepository) {
                             onOpenMyReviews = {
                                 currentScreen = AppScreen.MY_REVIEWS
                             },
+                            onOpenSettings = {
+                                currentScreen = AppScreen.SETTINGS
+                            },
                             onSignOut = { signOut() }
                         )
 
@@ -244,6 +249,11 @@ private fun AppRoot(repository: DataRepository) {
                                 detailReturnScreen = AppScreen.MY_REVIEWS
                                 currentScreen = AppScreen.DETAIL
                             },
+                            onGoHome = { goHome() }
+                        )
+
+                        AppScreen.SETTINGS -> ClaySettingsScreen(
+                            onBack = { currentScreen = AppScreen.ACCOUNT; selectedTab = NavTab.ACCOUNT },
                             onGoHome = { goHome() }
                         )
 

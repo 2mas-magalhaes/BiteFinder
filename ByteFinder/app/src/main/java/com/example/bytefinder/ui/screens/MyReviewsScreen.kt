@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,6 +33,7 @@ import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.MyReviewItemDto
 import com.example.bytefinder.ui.components.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Warning
 import com.example.bytefinder.ui.theme.*
 
@@ -66,7 +68,7 @@ fun ClayMyReviewsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ClayCream)
+            .claySceneBackground()
             .statusBarsPadding()
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
@@ -87,7 +89,7 @@ fun ClayMyReviewsScreen(
             text = "As minhas avaliações",
             fontWeight = FontWeight.ExtraBold,
             fontSize = 22.sp,
-            color = ClayTextDark
+            color = ClayOnDark
         )
 
         Spacer(Modifier.height(14.dp))
@@ -116,7 +118,7 @@ fun ClayMyReviewsScreen(
                 ClayCard(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { onPratoClick(item.pratoId) },
-                    backgroundColor = ClayWhite,
+                    backgroundColor = Color(0xFF111E30),
                     cornerRadius = 22.dp,
                     elevation = 6.dp
                 ) {
@@ -138,14 +140,14 @@ fun ClayMyReviewsScreen(
                                 text = item.pratoNome,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
-                                color = ClayTextDark
+                                color = ClayOnDark
                             )
 
                             Spacer(Modifier.height(4.dp))
 
                             Text(
                                 text = item.restauranteNome,
-                                color = ClayTextMedium,
+                                color = ClayOnDarkSecond,
                                 fontSize = 14.sp
                             )
 
@@ -161,7 +163,7 @@ fun ClayMyReviewsScreen(
 
                             Text(
                                 text = item.comentario ?: "",
-                                color = ClayTextMedium,
+                                color = ClayOnDarkSecond,
                                 lineHeight = 20.sp
                             )
 
@@ -169,7 +171,7 @@ fun ClayMyReviewsScreen(
                                 Spacer(Modifier.height(6.dp))
                                 Text(
                                     text = item.createdAt,
-                                    color = ClayTextLight,
+                                    color = ClayOnDarkSecond.copy(alpha = 0.6f),
                                     fontSize = 11.sp
                                 )
                             }
