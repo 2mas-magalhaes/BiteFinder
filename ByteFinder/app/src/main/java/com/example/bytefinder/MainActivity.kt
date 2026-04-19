@@ -33,6 +33,8 @@ import com.example.bytefinder.ui.screens.ClayBusinessScreen
 import com.example.bytefinder.ui.screens.ClayLoginScreen
 import com.example.bytefinder.ui.screens.ClayMyReviewsScreen
 import com.example.bytefinder.ui.screens.ClayPratoDetailScreen
+import com.example.bytefinder.ui.screens.ClayPratoCompareScreen
+import com.example.bytefinder.ui.screens.ClayRestaurantDetailScreen
 import com.example.bytefinder.ui.screens.HomeScreen
 import com.example.bytefinder.ui.theme.BitefinderClayTheme
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
@@ -45,7 +47,9 @@ private enum class AppScreen {
     ACCOUNT,
     BUSINESS,
     MY_REVIEWS,
-    DETAIL
+    DETAIL,
+    RESTAURANT_DETAIL,
+    PRATO_COMPARE
 }
 
 class MainActivity : ComponentActivity() {
@@ -74,6 +78,7 @@ private fun AppRoot(repository: DataRepository) {
     var currentScreen by remember { mutableStateOf(AppScreen.HOME) }
     var detailReturnScreen by remember { mutableStateOf(AppScreen.HOME) }
     var selectedPratoId by remember { mutableStateOf<Int?>(null) }
+    var selectedRestauranteId by remember { mutableStateOf<Int?>(null) }
     var selectedTab by remember { mutableStateOf(NavTab.HOME) }
 
     val homeViewModel: HomeViewModel = viewModel(
@@ -94,13 +99,17 @@ private fun AppRoot(repository: DataRepository) {
         currentUserRole = null
         currentUserRestaurants = emptyList()
         selectedPratoId = null
+        selectedRestauranteId = null
         currentScreen = AppScreen.HOME
         selectedTab = NavTab.HOME
     }
 
+    val isRestaurantUser = currentUserRole == "restaurante"
+
     // Ecrãs que mostram a bottom nav
     val showBottomNav = token != null &&
-        currentScreen !in listOf(AppScreen.DETAIL, AppScreen.BUSINESS, AppScreen.MY_REVIEWS)
+        currentScreen !in listOf(AppScreen.DETAIL, AppScreen.MY_REVIEWS, AppScreen.RESTAURANT_DETAIL, AppScreen.PRATO_COMPARE) &&
+        !(currentScreen == AppScreen.BUSINESS && !isRestaurantUser)
 
     if (token == null) {
         ClayLoginScreen(
@@ -111,8 +120,13 @@ private fun AppRoot(repository: DataRepository) {
                 userName = nome
                 currentUserRole = role
                 currentUserRestaurants = restaurantes
-                currentScreen = AppScreen.HOME
-                selectedTab = NavTab.HOME
+                if (role == "restaurante") {
+                    currentScreen = AppScreen.BUSINESS
+                    selectedTab = NavTab.NEAR
+                } else {
+                    currentScreen = AppScreen.HOME
+                    selectedTab = NavTab.HOME
+                }
             }
         )
     } else {
@@ -123,9 +137,9 @@ private fun AppRoot(repository: DataRepository) {
                     targetState = currentScreen,
                     transitionSpec = {
                         val isTabSwitch = targetState in listOf(
-                            AppScreen.HOME, AppScreen.SEARCH, AppScreen.NEAR, AppScreen.ACCOUNT
+                            AppScreen.HOME, AppScreen.SEARCH, AppScreen.NEAR, AppScreen.ACCOUNT, AppScreen.BUSINESS
                         ) && initialState in listOf(
-                            AppScreen.HOME, AppScreen.SEARCH, AppScreen.NEAR, AppScreen.ACCOUNT
+                            AppScreen.HOME, AppScreen.SEARCH, AppScreen.NEAR, AppScreen.ACCOUNT, AppScreen.BUSINESS
                         )
                         if (isTabSwitch) {
                             fadeIn(tween(220)) togetherWith fadeOut(tween(180))
@@ -153,24 +167,39 @@ private fun AppRoot(repository: DataRepository) {
                             onPratoClick = { pratoId ->
                                 selectedPratoId = pratoId
                                 detailReturnScreen = AppScreen.HOME
-                                currentScreen = AppScreen.DETAIL
+                                currentScreen = AppScreen.PRATO_COMPARE
                             },
                             onGoHome = { goHome() }
                         )
 
-                        AppScreen.NEAR -> HomeScreen(
-                            viewModel = homeViewModel,
-                            repository = repository,
-                            userName = userName ?: "Utilizador",
-                            isRestaurantUser = (currentUserRole == "restaurante"),
-                            nearModeActive = true,
-                            onPratoClick = { pratoId ->
-                                selectedPratoId = pratoId
-                                detailReturnScreen = AppScreen.NEAR
-                                currentScreen = AppScreen.DETAIL
-                            },
-                            onGoHome = { goHome() }
-                        )
+                        AppScreen.NEAR -> if (isRestaurantUser) {
+                            ClayBusinessScreen(
+                                repository = repository,
+                                currentUserId = currentUserId ?: 0,
+                                restauranteIds = currentUserRestaurants,
+                                onBack = { goHome() },
+                                onPratoClick = { pratoId ->
+                                    selectedPratoId = pratoId
+                                    detailReturnScreen = AppScreen.NEAR
+                                    currentScreen = AppScreen.DETAIL
+                                },
+                                onGoHome = { goHome() }
+                            )
+                        } else {
+                            HomeScreen(
+                                viewModel = homeViewModel,
+                                repository = repository,
+                                userName = userName ?: "Utilizador",
+                                isRestaurantUser = false,
+                                nearModeActive = true,
+                                onPratoClick = { pratoId ->
+                                    selectedPratoId = pratoId
+                                    detailReturnScreen = AppScreen.NEAR
+                                    currentScreen = AppScreen.PRATO_COMPARE
+                                },
+                                onGoHome = { goHome() }
+                            )
+                        }
 
                         AppScreen.ACCOUNT -> ClayAccountScreen(
                             userName = userName ?: "Utilizador",
@@ -189,7 +218,15 @@ private fun AppRoot(repository: DataRepository) {
                             repository = repository,
                             currentUserId = currentUserId ?: 0,
                             restauranteIds = currentUserRestaurants,
-                            onBack = { currentScreen = AppScreen.ACCOUNT; selectedTab = NavTab.ACCOUNT },
+                            onBack = {
+                                if (isRestaurantUser) {
+                                    currentScreen = AppScreen.NEAR
+                                    selectedTab = NavTab.NEAR
+                                } else {
+                                    currentScreen = AppScreen.ACCOUNT
+                                    selectedTab = NavTab.ACCOUNT
+                                }
+                            },
                             onPratoClick = { pratoId ->
                                 selectedPratoId = pratoId
                                 detailReturnScreen = AppScreen.BUSINESS
@@ -215,7 +252,7 @@ private fun AppRoot(repository: DataRepository) {
                             onPratoClick = { pratoId ->
                                 selectedPratoId = pratoId
                                 detailReturnScreen = AppScreen.SEARCH
-                                currentScreen = AppScreen.DETAIL
+                                currentScreen = AppScreen.PRATO_COMPARE
                             },
                             onCategorySelected = { category ->
                                 homeViewModel.onCategorySelected(category)
@@ -230,7 +267,41 @@ private fun AppRoot(repository: DataRepository) {
                             currentUserId = currentUserId ?: 0,
                             restaurantIds = currentUserRestaurants,
                             onBack = { currentScreen = detailReturnScreen },
-                            onGoHome = { goHome() }
+                            onGoHome = { goHome() },
+                            onRestauranteClick = { restId ->
+                                selectedRestauranteId = restId
+                                currentScreen = AppScreen.RESTAURANT_DETAIL
+                            }
+                        )
+
+                        AppScreen.RESTAURANT_DETAIL -> ClayRestaurantDetailScreen(
+                            repository = repository,
+                            restauranteId = selectedRestauranteId ?: 0,
+                            onBack = { currentScreen = detailReturnScreen },
+                            onGoHome = { goHome() },
+                            onPratoClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.RESTAURANT_DETAIL
+                                currentScreen = AppScreen.DETAIL
+                            }
+                        )
+
+                        AppScreen.PRATO_COMPARE -> ClayPratoCompareScreen(
+                            repository = repository,
+                            pratoId = selectedPratoId ?: 0,
+                            selectedCity = homeViewModel.state.value.selectedCity,
+                            onBack = { currentScreen = detailReturnScreen },
+                            onGoHome = { goHome() },
+                            onPratoDetailClick = { pratoId ->
+                                selectedPratoId = pratoId
+                                detailReturnScreen = AppScreen.PRATO_COMPARE
+                                currentScreen = AppScreen.DETAIL
+                            },
+                            onRestauranteClick = { restId ->
+                                selectedRestauranteId = restId
+                                detailReturnScreen = AppScreen.PRATO_COMPARE
+                                currentScreen = AppScreen.RESTAURANT_DETAIL
+                            }
                         )
                     }
                 }
@@ -248,11 +319,12 @@ private fun AppRoot(repository: DataRepository) {
                             currentScreen = when (tab) {
                                 NavTab.HOME    -> AppScreen.HOME
                                 NavTab.SEARCH  -> AppScreen.SEARCH
-                                NavTab.NEAR    -> AppScreen.NEAR
+                                NavTab.NEAR    -> if (isRestaurantUser) AppScreen.BUSINESS else AppScreen.NEAR
                                 NavTab.ACCOUNT -> AppScreen.ACCOUNT
                             }
                         }
-                    }
+                    },
+                    isRestaurantUser = isRestaurantUser
                 )
             }
         }

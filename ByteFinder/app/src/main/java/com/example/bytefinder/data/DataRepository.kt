@@ -133,20 +133,28 @@ class DataRepository(private val api: ApiService) {
 
     suspend fun createAvaliacao(req: CreateAvaliacaoRequest): BasicOkResponse =
         withContext(Dispatchers.IO) {
-            if (useOnlyMock) return@withContext BasicOkResponse(ok = true, message = "Avaliação guardada com sucesso (modo offline)")
+            if (useOnlyMock) {
+                MockDataProvider.addAvaliacao(req.pratoId, req.userId, req.classificacao, req.comentario)
+                return@withContext BasicOkResponse(ok = true, message = "Avaliação guardada com sucesso (modo offline)")
+            }
             try {
                 api.createAvaliacao(req)
             } catch (_: Exception) {
+                MockDataProvider.addAvaliacao(req.pratoId, req.userId, req.classificacao, req.comentario)
                 BasicOkResponse(ok = true, message = "Avaliação guardada com sucesso (modo offline)")
             }
         }
 
     suspend fun deleteAvaliacao(req: DeleteAvaliacaoRequest): BasicOkResponse =
         withContext(Dispatchers.IO) {
-            if (useOnlyMock) return@withContext BasicOkResponse(ok = true, message = "Avaliação eliminada (modo offline)")
+            if (useOnlyMock) {
+                MockDataProvider.deleteAvaliacao(req.avaliacaoId)
+                return@withContext BasicOkResponse(ok = true, message = "Avaliação eliminada (modo offline)")
+            }
             try {
                 api.deleteAvaliacao(req)
             } catch (_: Exception) {
+                MockDataProvider.deleteAvaliacao(req.avaliacaoId)
                 BasicOkResponse(ok = true, message = "Avaliação eliminada (modo offline)")
             }
         }
@@ -193,4 +201,10 @@ class DataRepository(private val api: ApiService) {
     fun getZonas(cidade: String) = MockDataProvider.zonasPorCidade[cidade] ?: emptyList()
     fun getPriceRanges() = MockDataProvider.priceRanges
     fun getCategoryImageUrl(name: String) = MockDataProvider.getCategoryImageUrl(name)
+
+    // ─── Agrupamento por tipo de prato ──────────────────────────────────
+
+    fun getPratoTipo(pratoId: Int) = MockDataProvider.getPratoTipo(pratoId)
+    fun getPratosByTipo(tipo: String, cidade: String = "Todas") = MockDataProvider.getPratosByTipo(tipo, cidade)
+    fun deduplicatePratos(source: List<PratoDto>) = MockDataProvider.deduplicatePratos(source)
 }

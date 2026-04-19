@@ -1,5 +1,8 @@
 package com.example.bytefinder.ui.screens
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,24 +25,27 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,10 +59,12 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.Transformation
 import com.example.bytefinder.data.DataRepository
+import com.example.bytefinder.data.LocationService
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
+import kotlinx.coroutines.launch
 
 /** Coil transformation that smoothly removes white/light background pixels. */
 private class RemoveWhiteTransformation : Transformation {
@@ -102,6 +110,7 @@ private class RemoveWhiteTransformation : Transformation {
  * 4. Carrossel de categorias
  * 5. Grelha/lista de pratos filtrados
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -113,12 +122,61 @@ fun HomeScreen(
     onGoHome: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val locationService = remember { LocationService(context) }
 
-    var city by remember { mutableStateOf("Lisboa, Portugal") }
-    var street by remember { mutableStateOf("Avenida de Berna 13A") }
-    var showLocationDialog by remember { mutableStateOf(false) }
-    var tempCity by remember { mutableStateOf(city) }
-    var tempStreet by remember { mutableStateOf(street) }
+    var locationRequested by remember { mutableStateOf(false) }
+
+    // City/street displayed in the top bar (from GPS or manual)
+    val displayCity = if (state.locationLoaded) state.detectedCity else "A detectar..."
+    val displayStreet = if (state.locationLoaded) state.detectedStreet else ""
+
+    // Permission launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            scope.launch {
+                val loc = locationService.getCurrentLocation()
+                if (loc != null) {
+                    val matched = locationService.matchCity(loc.city)
+                    viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street)
+                } else {
+                    viewModel.onLocationDetected("Todas", "Portugal", "Localização indisponível")
+                }
+            }
+        } else {
+            viewModel.onLocationDetected("Todas", "Portugal", "Permissão negada")
+        }
+    }
+
+    // Request location on first launch
+    LaunchedEffect(Unit) {
+        if (!locationRequested) {
+            locationRequested = true
+            if (locationService.hasLocationPermission()) {
+                scope.launch {
+                    val loc = locationService.getCurrentLocation()
+                    if (loc != null) {
+                        val matched = locationService.matchCity(loc.city)
+                        viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street)
+                    } else {
+                        viewModel.onLocationDetected("Todas", "Portugal", "Localização indisponível")
+                    }
+                }
+            } else {
+                permissionLauncher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -130,12 +188,7 @@ fun HomeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp)
-                .clickable {
-                    tempCity = city
-                    tempStreet = street
-                    showLocationDialog = true
-                },
+                .padding(horizontal = 24.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -147,17 +200,51 @@ fun HomeScreen(
             Spacer(Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = city,
+                    text = displayCity,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = ClayOnDark
                 )
-                Text(
-                    text = street,
-                    color = ClayOnDarkSecond,
-                    fontSize = 12.sp
+                if (displayStreet.isNotBlank()) {
+                    Text(
+                        text = displayStreet,
+                        color = ClayOnDarkSecond,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+            // Refresh location button
+            IconButton(
+                onClick = {
+                    if (locationService.hasLocationPermission()) {
+                        scope.launch {
+                            val loc = locationService.getCurrentLocation()
+                            if (loc != null) {
+                                val matched = locationService.matchCity(loc.city)
+                                viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street)
+                            }
+                        }
+                    } else {
+                        permissionLauncher.launch(
+                            arrayOf(
+                                Manifest.permission.ACCESS_FINE_LOCATION,
+                                Manifest.permission.ACCESS_COARSE_LOCATION
+                            )
+                        )
+                    }
+                },
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MyLocation,
+                    contentDescription = "Atualizar localização",
+                    tint = ClayOrangeBolt,
+                    modifier = Modifier.size(20.dp)
                 )
             }
+
+            Spacer(Modifier.width(8.dp))
 
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
@@ -174,11 +261,18 @@ fun HomeScreen(
         }
 
         // ─── CONTEÚDO SCROLLÁVEL ────────────────────────────────────────
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+        val pullRefreshState = rememberPullToRefreshState()
+        PullToRefreshBox(
+            isRefreshing = state.isLoading,
+            onRefresh = { viewModel.refresh() },
+            state = pullRefreshState,
+            modifier = Modifier.fillMaxSize()
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
             Spacer(Modifier.height(8.dp))
 
             // ─── PESQUISA ───────────────────────────────────────────────
@@ -269,7 +363,7 @@ fun HomeScreen(
                     }
                     Spacer(Modifier.width(8.dp))
                     val title = if (state.searchQuery.isNotBlank()) "Resultados da pesquisa"
-                        else "Todos os ${state.viewAllCategory}"
+                        else state.viewAllTitle.ifBlank { state.viewAllCategory ?: "" }
                     Text(title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = ClayOnDark)
                 }
 
@@ -344,7 +438,7 @@ fun HomeScreen(
 
                     SectionHeader(
                         title = sectionTitle,
-                        onViewAll = { viewModel.onViewAll(state.selectedCategory) }
+                        onViewAll = { viewModel.onViewAll(state.selectedCategory, sectionTitle) }
                     )
 
                     Spacer(Modifier.height(14.dp))
@@ -373,7 +467,7 @@ fun HomeScreen(
 
                         SectionHeader(
                             title = sec2Title,
-                            onViewAll = { viewModel.onViewAll(state.selectedCategory) }
+                            onViewAll = { viewModel.onViewAll(state.selectedCategory, sec2Title) }
                         )
 
                         Spacer(Modifier.height(14.dp))
@@ -396,50 +490,6 @@ fun HomeScreen(
                 Spacer(Modifier.height(32.dp))
             }
         }
-
-        // ─── DIALOG DE LOCALIZAÇÃO ──────────────────────────────────────
-        if (showLocationDialog) {
-            AlertDialog(
-                onDismissRequest = { showLocationDialog = false },
-                title = { Text("Alterar Localização", fontWeight = FontWeight.Bold) },
-                containerColor = ClayWhite,
-                text = {
-                    Column {
-                        OutlinedTextField(
-                            value = tempCity,
-                            onValueChange = { tempCity = it },
-                            label = { Text("Cidade") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp)
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = tempStreet,
-                            onValueChange = { tempStreet = it },
-                            label = { Text("Rua") },
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(14.dp)
-                        )
-                    }
-                },
-                confirmButton = {
-                    ClayButton(
-                        text = "Salvar",
-                        onClick = {
-                            city = tempCity
-                            street = tempStreet
-                            showLocationDialog = false
-                        }
-                    )
-                },
-                dismissButton = {
-                    ClayButton(
-                        text = "Cancelar",
-                        onClick = { showLocationDialog = false },
-                        isSecondary = true
-                    )
-                }
-            )
         }
     }
 }

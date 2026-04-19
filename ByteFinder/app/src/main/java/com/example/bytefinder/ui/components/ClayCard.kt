@@ -117,7 +117,7 @@ fun ClayDishCard(
     ClayCard(
         modifier = modifier,
         onClick = onClick,
-        backgroundColor = ClayWhite,
+        backgroundColor = ClayBeigeSoft,
         cornerRadius = 24.dp,
         elevation = 8.dp
     ) {

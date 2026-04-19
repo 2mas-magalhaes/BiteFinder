@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -51,11 +52,14 @@ enum class NavTab(val label: String, val icon: ImageVector) {
  * Tab ativa: pill indicator + ícone aumentado + texto bold branco
  * Tab inativa: ícone + texto a 60% white, sem indicator
  * Squish spring individual por tab ao pressionar
+ *
+ * Para utilizadores restaurante, o tab NEAR mostra "Restaurante" com ícone de loja.
  */
 @Composable
 fun ClayBottomNav(
     selectedTab: NavTab,
     onTabSelected: (NavTab) -> Unit,
+    isRestaurantUser: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -71,10 +75,14 @@ fun ClayBottomNav(
             verticalAlignment = Alignment.CenterVertically
         ) {
             NavTab.entries.forEach { tab ->
+                val overrideLabel = if (tab == NavTab.NEAR && isRestaurantUser) "Restaurante" else tab.label
+                val overrideIcon = if (tab == NavTab.NEAR && isRestaurantUser) Icons.Filled.Storefront else tab.icon
                 ClayNavItem(
                     tab = tab,
                     isSelected = tab == selectedTab,
-                    onClick = { onTabSelected(tab) }
+                    onClick = { onTabSelected(tab) },
+                    labelOverride = overrideLabel,
+                    iconOverride = overrideIcon
                 )
             }
         }
@@ -85,7 +93,9 @@ fun ClayBottomNav(
 private fun ClayNavItem(
     tab: NavTab,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    labelOverride: String = tab.label,
+    iconOverride: ImageVector = tab.icon
 ) {
     val interaction = remember { MutableInteractionSource() }
 
@@ -107,8 +117,8 @@ private fun ClayNavItem(
             .padding(horizontal = 18.dp, vertical = 6.dp)
     ) {
         Icon(
-            imageVector = tab.icon,
-            contentDescription = tab.label,
+            imageVector = iconOverride,
+            contentDescription = labelOverride,
             tint = if (isSelected) ClayBlue else ClayOnDarkSecond,
             modifier = Modifier.size(if (isSelected) 26.dp else 24.dp)
         )
@@ -116,7 +126,7 @@ private fun ClayNavItem(
         Spacer(Modifier.height(4.dp))
 
         Text(
-            text = tab.label,
+            text = labelOverride,
             fontSize = 11.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             color = if (isSelected) ClayOnDark else ClayOnDarkSecond
