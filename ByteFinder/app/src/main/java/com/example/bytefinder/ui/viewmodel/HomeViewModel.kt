@@ -36,7 +36,11 @@ data class HomeState(
     val availableZones: List<String> = emptyList(),
     val isLoading: Boolean = true,
     val isFiltersExpanded: Boolean = false,
-    val viewAllCategory: String? = null
+    val viewAllCategory: String? = null,
+    val viewAllTitle: String = "",
+    val detectedCity: String = "",
+    val detectedStreet: String = "",
+    val locationLoaded: Boolean = false
 )
 
 @OptIn(FlowPreview::class)
@@ -69,10 +73,13 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
                 )
                 applyFilters()
             } catch (_: Exception) {
-                // Fallback para mock já é gerido pelo DataRepository
                 _state.value = _state.value.copy(isLoading = false)
             }
         }
+    }
+
+    fun refresh() {
+        loadInitialData()
     }
 
     // ─── Observa input de pesquisa com debounce ─────────────────────────
@@ -119,6 +126,19 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         applyFilters()
     }
 
+    fun onLocationDetected(matchedCity: String, displayCity: String, displayStreet: String) {
+        val zones = repository.getZonas(matchedCity)
+        _state.value = _state.value.copy(
+            selectedCity = matchedCity,
+            selectedZone = "Todas",
+            availableZones = zones,
+            detectedCity = displayCity,
+            detectedStreet = displayStreet,
+            locationLoaded = true
+        )
+        applyFilters()
+    }
+
     fun onZoneChanged(zone: String) {
         _state.value = _state.value.copy(selectedZone = zone)
         applyFilters()
@@ -133,8 +153,8 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         _state.value = _state.value.copy(isFiltersExpanded = !_state.value.isFiltersExpanded)
     }
 
-    fun onViewAll(category: String) {
-        _state.value = _state.value.copy(viewAllCategory = category)
+    fun onViewAll(category: String, title: String) {
+        _state.value = _state.value.copy(viewAllCategory = category, viewAllTitle = title)
     }
 
     fun onBackFromViewAll() {
@@ -150,7 +170,8 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
             selectedZone = "Todas",
             selectedPriceRange = null,
             isFiltersExpanded = false,
-            viewAllCategory = null
+            viewAllCategory = null,
+            viewAllTitle = ""
         )
         _searchInput.value = ""
         applyFilters()
@@ -181,7 +202,8 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
             priceRange = s.selectedPriceRange,
             searchQuery = s.searchQuery.ifBlank { null }
         )
-        _state.value = s.copy(filteredPratos = filtered)
+        val deduplicated = repository.deduplicatePratos(filtered)
+        _state.value = s.copy(filteredPratos = deduplicated)
     }
 }
 

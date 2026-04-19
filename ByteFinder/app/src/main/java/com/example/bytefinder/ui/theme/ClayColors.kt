@@ -15,6 +15,7 @@ val ClayBlueLight   = Color(0xFFEBF3FF)   // Azul muito claro — backgrounds
 val ClaySurface     = Color(0xFFF4F7FB)   // Fundo off-white (Claymorphism)
 val ClayWhite       = Color(0xFFFFFFFF)   // Branco puro — cards
 val ClayOffWhite    = Color(0xFFF8FAFF)   // Branco tintado — surfaces
+val ClayBeigeSoft   = Color(0xFFF5F0E8)   // Beige suave — fundo cards de pratos
 
 // Compatibilidade (aliases para código existente)
 val ClayCream       = ClaySurface

@@ -22,10 +22,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -78,6 +81,7 @@ import java.util.Locale
  * - Mapa embebido com localização do restaurante
  * - Edição do prato (se é o dono)
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClayPratoDetailScreen(
     repository: DataRepository,
@@ -85,7 +89,8 @@ fun ClayPratoDetailScreen(
     currentUserId: Int,
     restaurantIds: List<Int>,
     onBack: () -> Unit,
-    onGoHome: () -> Unit
+    onGoHome: () -> Unit,
+    onRestauranteClick: (Int) -> Unit = {}
 ) {
     var prato by remember { mutableStateOf<PratoDetailDto?>(null) }
     var avaliacoes by remember { mutableStateOf(listOf<AvaliacaoDto>()) }
@@ -125,6 +130,13 @@ fun ClayPratoDetailScreen(
     val minhaAvaliacao = avaliacoes.firstOrNull { it.userId == currentUserId }
     val isMyRestaurant = prato?.restauranteId?.let { restaurantIds.contains(it) } == true
 
+    val pullRefreshState = rememberPullToRefreshState()
+    PullToRefreshBox(
+        isRefreshing = isLoading,
+        onRefresh = { refreshKey++ },
+        state = pullRefreshState,
+        modifier = Modifier.fillMaxSize()
+    ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -438,12 +450,16 @@ fun ClayPratoDetailScreen(
             // Card do restaurante + mapa
             ClayCard(
                 modifier = Modifier.fillMaxWidth(),
+                onClick = { onRestauranteClick(prato!!.restauranteId) },
                 backgroundColor = ClayWhite,
                 cornerRadius = 24.dp,
                 elevation = 8.dp
             ) {
                 Column(Modifier.padding(20.dp)) {
-                    Text(prato!!.restauranteNome, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ClayTextDark)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(prato!!.restauranteNome, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = ClayTextDark, modifier = Modifier.weight(1f))
+                        Text("Ver página →", fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = ClayBlue)
+                    }
                     Spacer(Modifier.height(10.dp))
                     Text(prato!!.restauranteMorada ?: "Morada indisponível", color = ClayTextMedium, lineHeight = 22.sp)
                     Spacer(Modifier.height(16.dp))
@@ -471,6 +487,7 @@ fun ClayPratoDetailScreen(
 
             Spacer(Modifier.height(24.dp))
         }
+    }
     }
 }
 
