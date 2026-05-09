@@ -41,7 +41,11 @@ data class HomeState(
     val viewAllTitle: String = "",
     val detectedCity: String = "",
     val detectedStreet: String = "",
-    val locationLoaded: Boolean = false
+    val locationLoaded: Boolean = false,
+    val nearbyPratos: List<PratoDto> = emptyList(),
+    val tradicionaisPratos: List<PratoDto> = emptyList(),
+    val userLat: Double? = null,
+    val userLng: Double? = null
 )
 
 @OptIn(FlowPreview::class)
@@ -128,7 +132,7 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         applyFilters()
     }
 
-    fun onLocationDetected(matchedCity: String, displayCity: String, displayStreet: String) {
+    fun onLocationDetected(matchedCity: String, displayCity: String, displayStreet: String, lat: Double? = null, lng: Double? = null) {
         val zones = repository.getZonas(matchedCity)
         _state.value = _state.value.copy(
             selectedCity = matchedCity,
@@ -136,10 +140,23 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
             availableZones = zones,
             detectedCity = displayCity,
             detectedStreet = displayStreet,
-            locationLoaded = true
+            locationLoaded = true,
+            userLat = lat,
+            userLng = lng
         )
         applyFilters()
         refreshFeatured()
+
+        if (lat != null && lng != null) {
+            viewModelScope.launch {
+                val nearby = repository.getNearbyPratos(lat, lng)
+                val trad = repository.getNearbyPratos(lat, lng, categoria = "Pratos Tradicionais")
+                _state.value = _state.value.copy(
+                    nearbyPratos = nearby,
+                    tradicionaisPratos = trad
+                )
+            }
+        }
     }
 
     fun onZoneChanged(zone: String) {

@@ -12,7 +12,7 @@ object MockDataProvider {
 
     // ─── Categorias ─────────────────────────────────────────────────────
     val categorias = listOf(
-        "Pizza", "Marisco", "Francesinha", "Hambúrguer",
+        "Pratos Tradicionais", "Pizza", "Marisco", "Francesinha", "Hambúrguer",
         "Sushi", "Pasta", "Sobremesas", "Bifana", "Bacalhau"
     )
 

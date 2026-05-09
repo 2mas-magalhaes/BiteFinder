@@ -40,6 +40,34 @@ try {
         respond(['ok' => false, 'error' => 'Formato de email inválido.'], 422);
     }
 
+    // --- Integração nif.pt ---
+    require_once __DIR__ . '/../config/env_loader.php';
+    $nifApiKey = env('NIF_API_KEY');
+
+    // Validar apenas se a API Key estiver configurada e o NIF parecer português (9 dígitos)
+    if (!empty($nifApiKey) && preg_match('/^[0-9]{9}$/', $restaurantCode)) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://www.nif.pt/?json=1&q=" . urlencode($restaurantCode) . "&key=" . urlencode($nifApiKey));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 && $response) {
+            $data = json_decode($response, true);
+            if (isset($data['result']) && $data['result'] === 'success') {
+                $nifInfo = $data['records'][$restaurantCode] ?? null;
+                // Se a API indicar que não existe, bloquear o registo.
+                if (!$nifInfo) {
+                     respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
+                }
+            }
+        }
+        // Se a API falhar (timeout/500), ignoramos e seguimos com o registo para não bloquear os utilizadores.
+    }
+    // -------------------------
+
     $pdo = db();
 
     $restColumn = null;
