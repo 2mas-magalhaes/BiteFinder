@@ -72,11 +72,17 @@ try {
 
     $restColumn = null;
     $candidates = ['NIF', 'CNPJ', 'Codigo', 'RestaurantCode'];
-    $stmt = $pdo->prepare("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Restaurante' AND COLUMN_NAME = :col");
+    $placeholders = implode(',', array_fill(0, count($candidates), '?'));
+    $stmt = $pdo->prepare("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Restaurante' AND COLUMN_NAME IN ($placeholders)");
+    $stmt->execute($candidates);
+    $found = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $foundLower = array_map('strtolower', $found);
+
     foreach ($candidates as $cand) {
-        $stmt->execute(['col' => $cand]);
-        if ($stmt->fetch()) {
-            $restColumn = $cand;
+        if (in_array(strtolower($cand), $foundLower)) {
+            // Find the actual column name from the DB result to preserve case if needed by DB
+            $index = array_search(strtolower($cand), $foundLower);
+            $restColumn = $found[$index];
             break;
         }
     }
