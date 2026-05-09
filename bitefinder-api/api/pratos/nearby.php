@@ -45,6 +45,8 @@ try {
     $whereSql = count($where) ? ('WHERE ' . implode(' AND ', $where)) : '';
 
     // Fórmula de Haversine para Sql Server
+    // NOTA: SQL Server PDO não suporta reutilização de named params,
+    // por isso usamos nomes únicos (:lat1, :lat2, etc.)
     $sql = "
         SELECT
             p.IdPrato AS id,
@@ -59,9 +61,9 @@ try {
             COUNT(a.IdAvaliacao) AS totalAvaliacoes,
             -- Cálculo da distância em Km
             (6371 * ACOS(
-                COS(RADIANS(:lat)) * COS(RADIANS(r.Latitude)) *
-                COS(RADIANS(r.Longitude) - RADIANS(:lng)) +
-                SIN(RADIANS(:lat)) * SIN(RADIANS(r.Latitude))
+                COS(RADIANS(:lat1)) * COS(RADIANS(r.Latitude)) *
+                COS(RADIANS(r.Longitude) - RADIANS(:lng1)) +
+                SIN(RADIANS(:lat2)) * SIN(RADIANS(r.Latitude))
             )) AS distanciaKm
         FROM dbo.Prato p
         JOIN dbo.Restaurante r
@@ -82,9 +84,9 @@ try {
             r.Longitude
         -- Filtrar pela distância e evitar Nans
         HAVING (6371 * ACOS(
-                COS(RADIANS(:lat)) * COS(RADIANS(r.Latitude)) *
-                COS(RADIANS(r.Longitude) - RADIANS(:lng)) +
-                SIN(RADIANS(:lat)) * SIN(RADIANS(r.Latitude))
+                COS(RADIANS(:lat3)) * COS(RADIANS(r.Latitude)) *
+                COS(RADIANS(r.Longitude) - RADIANS(:lng2)) +
+                SIN(RADIANS(:lat4)) * SIN(RADIANS(r.Latitude))
             )) <= :radiusKm
         ORDER BY
             distanciaKm ASC,
@@ -95,9 +97,13 @@ try {
 
     $stmt = $pdo->prepare($sql);
 
-    // Bind base params
-    $stmt->bindValue(':lat', $lat);
-    $stmt->bindValue(':lng', $lng);
+    // Bind com nomes únicos para SQL Server
+    $stmt->bindValue(':lat1', $lat);
+    $stmt->bindValue(':lat2', $lat);
+    $stmt->bindValue(':lat3', $lat);
+    $stmt->bindValue(':lat4', $lat);
+    $stmt->bindValue(':lng1', $lng);
+    $stmt->bindValue(':lng2', $lng);
     $stmt->bindValue(':radiusKm', $radiusKm);
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 

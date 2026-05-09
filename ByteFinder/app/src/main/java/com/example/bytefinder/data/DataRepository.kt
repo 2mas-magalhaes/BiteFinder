@@ -48,12 +48,12 @@ class DataRepository(private val api: ApiService) {
 
     suspend fun getNearbyPratos(lat: Double, lng: Double, radius: Double = 5.0, categoria: String? = null): List<PratoDto> =
         withContext(Dispatchers.IO) {
-            if (useOnlyMock) return@withContext MockDataProvider.filterPratos(categoria = categoria).take(10)
+            if (useOnlyMock) return@withContext MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
             try {
                 val res = api.getNearbyPratos(lat, lng, radius, categoria)
-                if (res.ok && res.items.isNotEmpty()) res.items else MockDataProvider.filterPratos(categoria = categoria).take(10)
+                if (res.ok && res.items.isNotEmpty()) res.items else MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
             } catch (_: Exception) {
-                MockDataProvider.filterPratos(categoria = categoria).take(10)
+                MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
             }
         }
 
@@ -101,14 +101,16 @@ class DataRepository(private val api: ApiService) {
         zona: String? = null,
         priceRange: MockDataProvider.PriceRange? = null,
         searchQuery: String? = null,
-        minRating: Double = 0.0
+        minRating: Double = 0.0,
+        source: List<PratoDto>? = null
     ): List<PratoDto> = MockDataProvider.filterPratos(
         categoria = categoria,
         cidade = cidade,
         zona = zona,
         priceRange = priceRange,
         searchQuery = searchQuery,
-        minRating = minRating
+        minRating = minRating,
+        source = source
     )
 
     // ─── Sugestões de pesquisa ──────────────────────────────────────────

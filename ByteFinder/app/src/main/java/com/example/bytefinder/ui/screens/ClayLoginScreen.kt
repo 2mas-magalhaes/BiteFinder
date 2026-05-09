@@ -5,6 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
@@ -316,12 +323,12 @@ fun ClayLoginScreen(
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SocialButton("Google") { /* TODO: connect to AuthViewModel */ }
-                            SocialButton("Apple") { /* TODO: connect to AuthViewModel */ }
-                            SocialButton("Facebook") { /* TODO: connect to AuthViewModel */ }
-                            SocialButton("Microsoft") { /* TODO: connect to AuthViewModel */ }
+                            SocialIconButton("google") { /* TODO: Google Sign-In */ }
+                            SocialIconButton("apple") { /* TODO: Apple Sign-In */ }
+                            SocialIconButton("facebook") { /* TODO: Facebook Login */ }
+                            SocialIconButton("microsoft") { /* TODO: Microsoft Login */ }
                         }
 
                         Spacer(Modifier.height(16.dp))
@@ -595,15 +602,103 @@ fun ClayLoginScreen(
 }
 
 @Composable
-private fun SocialButton(name: String, onClick: () -> Unit) {
+private fun SocialIconButton(provider: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(com.example.bytefinder.ui.theme.ClayBluePale)
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .size(52.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(ClayBluePale)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
     ) {
-        Text(name, fontSize = 12.sp, color = com.example.bytefinder.ui.theme.ClayBlue, fontWeight = FontWeight.Bold)
+        Canvas(modifier = Modifier.size(24.dp)) {
+            when (provider) {
+                "google" -> {
+                    // Google "G" icon
+                    val cx = size.width / 2f
+                    val cy = size.height / 2f
+                    val r = size.width * 0.42f
+                    // Red arc (top)
+                    drawArc(Color(0xFFEA4335), -45f, -135f, false, topLeft = Offset(cx - r, cy - r), size = Size(r * 2, r * 2), style = Stroke(width = r * 0.45f, cap = StrokeCap.Butt))
+                    // Yellow arc (right-bottom)
+                    drawArc(Color(0xFFFBBC05), -180f, -90f, false, topLeft = Offset(cx - r, cy - r), size = Size(r * 2, r * 2), style = Stroke(width = r * 0.45f, cap = StrokeCap.Butt))
+                    // Green arc (bottom)
+                    drawArc(Color(0xFF34A853), -270f, -90f, false, topLeft = Offset(cx - r, cy - r), size = Size(r * 2, r * 2), style = Stroke(width = r * 0.45f, cap = StrokeCap.Butt))
+                    // Blue arc (top-right)
+                    drawArc(Color(0xFF4285F4), -45f, 90f, false, topLeft = Offset(cx - r, cy - r), size = Size(r * 2, r * 2), style = Stroke(width = r * 0.45f, cap = StrokeCap.Butt))
+                    // Horizontal bar
+                    drawLine(Color(0xFF4285F4), Offset(cx, cy), Offset(cx + r + r * 0.15f, cy), strokeWidth = r * 0.45f, cap = StrokeCap.Butt)
+                }
+                "apple" -> {
+                    // Apple logo simplified
+                    val w = size.width
+                    val h = size.height
+                    val path = Path().apply {
+                        // Apple body
+                        moveTo(w * 0.50f, h * 0.22f)
+                        cubicTo(w * 0.62f, h * 0.22f, w * 0.78f, h * 0.32f, w * 0.82f, h * 0.50f)
+                        cubicTo(w * 0.86f, h * 0.68f, w * 0.72f, h * 0.92f, w * 0.60f, h * 0.95f)
+                        cubicTo(w * 0.55f, h * 0.96f, w * 0.52f, h * 0.92f, w * 0.50f, h * 0.92f)
+                        cubicTo(w * 0.48f, h * 0.92f, w * 0.45f, h * 0.96f, w * 0.40f, h * 0.95f)
+                        cubicTo(w * 0.28f, h * 0.92f, w * 0.14f, h * 0.68f, w * 0.18f, h * 0.50f)
+                        cubicTo(w * 0.22f, h * 0.32f, w * 0.38f, h * 0.22f, w * 0.50f, h * 0.22f)
+                        close()
+                    }
+                    drawPath(path, Color(0xFF1A1A1A))
+                    // Leaf
+                    val leaf = Path().apply {
+                        moveTo(w * 0.50f, h * 0.22f)
+                        cubicTo(w * 0.50f, h * 0.12f, w * 0.58f, h * 0.04f, w * 0.65f, h * 0.02f)
+                        cubicTo(w * 0.62f, h * 0.10f, w * 0.55f, h * 0.18f, w * 0.50f, h * 0.22f)
+                        close()
+                    }
+                    drawPath(leaf, Color(0xFF1A1A1A))
+                }
+                "facebook" -> {
+                    // Facebook "f" icon
+                    val w = size.width
+                    val h = size.height
+                    drawRoundRect(
+                        Color(0xFF1877F2),
+                        topLeft = Offset(w * 0.15f, h * 0.05f),
+                        size = Size(w * 0.70f, h * 0.90f),
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(w * 0.15f)
+                    )
+                    // Letter f
+                    val fPath = Path().apply {
+                        moveTo(w * 0.58f, h * 0.95f)
+                        lineTo(w * 0.58f, h * 0.55f)
+                        lineTo(w * 0.70f, h * 0.55f)
+                        lineTo(w * 0.72f, h * 0.42f)
+                        lineTo(w * 0.58f, h * 0.42f)
+                        lineTo(w * 0.58f, h * 0.33f)
+                        cubicTo(w * 0.58f, h * 0.28f, w * 0.60f, h * 0.26f, w * 0.65f, h * 0.26f)
+                        lineTo(w * 0.72f, h * 0.26f)
+                        lineTo(w * 0.72f, h * 0.14f)
+                        lineTo(w * 0.62f, h * 0.14f)
+                        cubicTo(w * 0.48f, h * 0.14f, w * 0.44f, h * 0.22f, w * 0.44f, h * 0.32f)
+                        lineTo(w * 0.44f, h * 0.42f)
+                        lineTo(w * 0.32f, h * 0.42f)
+                        lineTo(w * 0.32f, h * 0.55f)
+                        lineTo(w * 0.44f, h * 0.55f)
+                        lineTo(w * 0.44f, h * 0.95f)
+                        close()
+                    }
+                    drawPath(fPath, Color.White)
+                }
+                "microsoft" -> {
+                    // Microsoft 4-square logo
+                    val s = size.width * 0.42f
+                    val gap = size.width * 0.04f
+                    val ox = (size.width - s * 2 - gap) / 2f
+                    val oy = (size.height - s * 2 - gap) / 2f
+                    drawRect(Color(0xFFF25022), topLeft = Offset(ox, oy), size = Size(s, s))
+                    drawRect(Color(0xFF7FBA00), topLeft = Offset(ox + s + gap, oy), size = Size(s, s))
+                    drawRect(Color(0xFF00A4EF), topLeft = Offset(ox, oy + s + gap), size = Size(s, s))
+                    drawRect(Color(0xFFFFB900), topLeft = Offset(ox + s + gap, oy + s + gap), size = Size(s, s))
+                }
+            }
+        }
     }
 }
 

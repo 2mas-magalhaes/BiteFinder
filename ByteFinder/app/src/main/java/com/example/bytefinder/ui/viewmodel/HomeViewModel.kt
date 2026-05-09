@@ -45,7 +45,8 @@ data class HomeState(
     val nearbyPratos: List<PratoDto> = emptyList(),
     val tradicionaisPratos: List<PratoDto> = emptyList(),
     val userLat: Double? = null,
-    val userLng: Double? = null
+    val userLng: Double? = null,
+    val radiusKm: Double = 5.0
 )
 
 @OptIn(FlowPreview::class)
@@ -148,14 +149,27 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         refreshFeatured()
 
         if (lat != null && lng != null) {
-            viewModelScope.launch {
-                val nearby = repository.getNearbyPratos(lat, lng)
-                val trad = repository.getNearbyPratos(lat, lng, categoria = "Pratos Tradicionais")
-                _state.value = _state.value.copy(
-                    nearbyPratos = nearby,
-                    tradicionaisPratos = trad
-                )
-            }
+            fetchNearbyPratos(lat, lng, _state.value.radiusKm)
+        }
+    }
+
+    private fun fetchNearbyPratos(lat: Double, lng: Double, radius: Double) {
+        viewModelScope.launch {
+            val nearby = repository.getNearbyPratos(lat, lng, radius)
+            val trad = repository.getNearbyPratos(lat, lng, radius, categoria = "Pratos Tradicionais")
+            _state.value = _state.value.copy(
+                nearbyPratos = nearby,
+                tradicionaisPratos = trad
+            )
+        }
+    }
+
+    fun onRadiusChanged(newRadius: Double) {
+        _state.value = _state.value.copy(radiusKm = newRadius)
+        val lat = _state.value.userLat
+        val lng = _state.value.userLng
+        if (lat != null && lng != null) {
+            fetchNearbyPratos(lat, lng, newRadius)
         }
     }
 
@@ -215,22 +229,37 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
      */
     private fun applyFilters() {
         val s = _state.value
+        // Usa os pratos reais da API quando disponíveis; fallback para mock se vazio
+        val source = s.allPratos.ifEmpty { null }
         val filtered = repository.filterPratosLocal(
             categoria = s.selectedCategory,
             cidade = s.selectedCity,
             zona = s.selectedZone,
             priceRange = s.selectedPriceRange,
-            searchQuery = s.searchQuery.ifBlank { null }
+            searchQuery = s.searchQuery.ifBlank { null },
+            source = source
         )
         val deduplicated = repository.deduplicatePratos(filtered)
         _state.value = s.copy(filteredPratos = deduplicated)
     }
 
     private fun refreshFeatured() {
-        val city = _state.value.selectedCity
-        _state.value = _state.value.copy(
-            featuredPratos = repository.getDestacados(city)
-        )
+        val s = _state.value
+        val city = s.selectedCity
+        // Destacados: usa pratos reais da API se disponíveis, senão mock
+        val featured = if (s.allPratos.isNotEmpty()) {
+            s.allPratos.filter { it.destacado }
+                .let { list ->
+                    if (city == "Todas" || city.isBlank()) list
+                    else list.filter { p ->
+                        val rest = com.example.bytefinder.data.MockDataProvider.restaurantes.find { it.id == p.restauranteId }
+                        rest?.cidade.equals(city, ignoreCase = true) == true || rest == null
+                    }
+                }
+        } else {
+            repository.getDestacados(city)
+        }
+        _state.value = s.copy(featuredPratos = featured)
     }
 }
 

@@ -67,6 +67,19 @@ import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.foundation.border
+import androidx.compose.ui.text.style.TextAlign
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Circle
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MarkerComposable
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 /** Coil transformation that smoothly removes white/light background pixels. */
 private class RemoveWhiteTransformation : Transformation {
@@ -476,48 +489,144 @@ fun HomeScreen(
                 }
 
                 // ─── NA ZONA & PRATOS TRADICIONAIS ──────────────────────
-                if (state.locationLoaded && state.userLat != null && state.userLng != null) {
-                    if (state.nearbyPratos.isNotEmpty()) {
-                        SectionHeader(
-                            title = "Na Zona",
-                            onViewAll = { viewModel.onViewAll("Todas", "Na Zona") }
+                val lat = state.userLat
+                val lng = state.userLng
+                if (state.locationLoaded && lat != null && lng != null) {
+                    SectionHeader(
+                        title = "Na Zona",
+                        onViewAll = { viewModel.onViewAll("Todas", "Na Zona") }
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    
+                    // Controlo do Raio
+                    Column(modifier = Modifier.padding(horizontal = 24.dp).fillMaxWidth()) {
+                        Text(
+                            text = "Raio de pesquisa: ${state.radiusKm.toInt()} km",
+                            style = androidx.compose.ui.text.TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ClayTextDark)
                         )
-                        Spacer(Modifier.height(14.dp))
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 24.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            items(state.nearbyPratos) { prato ->
-                                ClayDishCard(
-                                    prato = prato,
-                                    modifier = Modifier.width(200.dp),
-                                    onClick = { onPratoClick(prato.id) }
-                                )
-                            }
-                        }
-                        Spacer(Modifier.height(28.dp))
+                        Slider(
+                            value = state.radiusKm.toFloat(),
+                            onValueChange = { viewModel.onRadiusChanged(it.toDouble()) },
+                            valueRange = 1f..20f,
+                            steps = 18,
+                            colors = SliderDefaults.colors(
+                                thumbColor = ClayOrangeBolt,
+                                activeTrackColor = ClayOrangeBolt
+                            )
+                        )
                     }
 
-                    if (state.tradicionaisPratos.isNotEmpty()) {
-                        SectionHeader(
-                            title = "Pratos Tradicionais na Zona",
-                            onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais") }
-                        )
-                        Spacer(Modifier.height(14.dp))
-                        LazyRow(
-                            contentPadding = PaddingValues(horizontal = 24.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    Spacer(Modifier.height(14.dp))
+
+                    val userLocation = LatLng(lat, lng)
+                    val cameraPositionState = rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(userLocation, 12f)
+                    }
+
+                    // Map UI
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .padding(horizontal = 24.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+                    ) {
+                        GoogleMap(
+                            modifier = Modifier.fillMaxSize(),
+                            cameraPositionState = cameraPositionState,
+                            properties = MapProperties(isMyLocationEnabled = false), // simulado via custom marker
+                            uiSettings = MapUiSettings(zoomControlsEnabled = false, compassEnabled = false)
                         ) {
-                            items(state.tradicionaisPratos) { prato ->
-                                ClayDishCard(
-                                    prato = prato,
-                                    modifier = Modifier.width(200.dp),
-                                    onClick = { onPratoClick(prato.id) }
+                            // User Location
+                            MarkerComposable(
+                                state = MarkerState(position = userLocation),
+                                title = "A tua localização"
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.Blue)
+                                        .border(2.dp, Color.White, CircleShape)
                                 )
                             }
+                            
+                            // Radius Circle
+                            Circle(
+                                center = userLocation,
+                                radius = state.radiusKm * 1000,
+                                fillColor = ClayOrangeBolt.copy(alpha = 0.15f),
+                                strokeColor = ClayOrangeBolt,
+                                strokeWidth = 2f
+                            )
+
+                            // Restaurantes & pratos
+                            val pratosByRestaurante = state.nearbyPratos.groupBy { it.restauranteId }
+                            pratosByRestaurante.forEach { (restId, pratos) ->
+                                val rest = com.example.bytefinder.data.MockDataProvider.restaurantes.find { it.id == restId }
+                                if (rest != null) {
+                                    val topPrato = pratos.maxByOrNull { it.totalAvaliacoes } ?: pratos.first()
+                                    MarkerComposable(
+                                        keys = arrayOf(rest.id),
+                                        state = MarkerState(position = LatLng(rest.latitude, rest.longitude)),
+                                        onClick = { 
+                                            onPratoClick(topPrato.id)
+                                            true
+                                        }
+                                    ) {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            modifier = Modifier.padding(4.dp)
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(60.dp)
+                                                    .clip(CircleShape)
+                                                    .background(Color.White)
+                                                    .border(2.dp, ClayOrangeBolt, CircleShape),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                AsyncImage(
+                                                    model = ImageRequest.Builder(LocalContext.current)
+                                                        .data(topPrato.imagemUrl)
+                                                        .crossfade(true)
+                                                        .build(),
+                                                    contentDescription = topPrato.nome,
+                                                    contentScale = ContentScale.Crop,
+                                                    modifier = Modifier.fillMaxSize().clip(CircleShape)
+                                                )
+                                                Box(
+                                                    modifier = Modifier
+                                                        .align(Alignment.BottomEnd)
+                                                        .clip(CircleShape)
+                                                        .background(ClayOrangeBolt)
+                                                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                                                ) {
+                                                    Text(
+                                                        text = "★ ${topPrato.ratingMedio}",
+                                                        color = Color.White,
+                                                        fontSize = 10.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = rest.nome,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color = ClayTextDark,
+                                                modifier = Modifier
+                                                    .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(4.dp))
+                                                    .padding(horizontal = 4.dp)
+                                            )
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        Spacer(Modifier.height(28.dp))
                     }
+                    Spacer(Modifier.height(28.dp))
                 }
 
                 // ─── SECÇÃO 1: Melhores da categoria ────────────────────
