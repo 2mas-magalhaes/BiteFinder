@@ -84,7 +84,7 @@ try {
         'nome' => $userNome
     ];
 
-    $tokenJwt = jwt_sign($payload);
+    $tokenJwt = jwt_encode($payload);
 
     respond([
         'ok' => true,
