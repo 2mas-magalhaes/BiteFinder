@@ -44,6 +44,19 @@ class DataRepository(private val api: ApiService) {
             }
         }
 
+    // ─── Na Zona ────────────────────────────────────────────────────────
+
+    suspend fun getNearbyPratos(lat: Double, lng: Double, radius: Double = 5.0, categoria: String? = null): List<PratoDto> =
+        withContext(Dispatchers.IO) {
+            if (useOnlyMock) return@withContext MockDataProvider.filterPratos(categoria = categoria).take(10)
+            try {
+                val res = api.getNearbyPratos(lat, lng, radius, categoria)
+                if (res.ok && res.items.isNotEmpty()) res.items else MockDataProvider.filterPratos(categoria = categoria).take(10)
+            } catch (_: Exception) {
+                MockDataProvider.filterPratos(categoria = categoria).take(10)
+            }
+        }
+
     // ─── Listagem de Pratos ─────────────────────────────────────────────
 
     suspend fun listPratos(
