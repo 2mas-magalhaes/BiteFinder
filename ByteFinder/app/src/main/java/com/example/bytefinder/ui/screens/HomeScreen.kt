@@ -145,9 +145,9 @@ fun HomeScreen(
                 val loc = locationService.getCurrentLocation()
                 if (loc != null) {
                     val matched = locationService.matchCity(loc.city)
-                    viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street)
+                    viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street, loc.latitude, loc.longitude)
                 } else {
-                    viewModel.onLocationDetected("Todas", "Portugal", "Localização indisponível")
+                    viewModel.onLocationDetected("Todas", "Portugal", "Localização indisponível", null, null)
                 }
             }
         } else {
@@ -164,9 +164,9 @@ fun HomeScreen(
                     val loc = locationService.getCurrentLocation()
                     if (loc != null) {
                         val matched = locationService.matchCity(loc.city)
-                        viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street)
+                        viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street, loc.latitude, loc.longitude)
                     } else {
-                        viewModel.onLocationDetected("Todas", "Portugal", "Localização indisponível")
+                        viewModel.onLocationDetected("Todas", "Portugal", "Localização indisponível", null, null)
                     }
                 }
             } else {
@@ -224,7 +224,7 @@ fun HomeScreen(
                             val loc = locationService.getCurrentLocation()
                             if (loc != null) {
                                 val matched = locationService.matchCity(loc.city)
-                                viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street)
+                                viewModel.onLocationDetected(matched, "${loc.city}, Portugal", loc.street, loc.latitude, loc.longitude)
                             }
                         }
                     } else {
@@ -475,6 +475,51 @@ fun HomeScreen(
                     Spacer(Modifier.height(28.dp))
                 }
 
+                // ─── NA ZONA & PRATOS TRADICIONAIS ──────────────────────
+                if (state.locationLoaded && state.userLat != null && state.userLng != null) {
+                    if (state.nearbyPratos.isNotEmpty()) {
+                        SectionHeader(
+                            title = "Na Zona",
+                            onViewAll = { viewModel.onViewAll("Todas", "Na Zona") }
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(state.nearbyPratos) { prato ->
+                                ClayDishCard(
+                                    prato = prato,
+                                    modifier = Modifier.width(200.dp),
+                                    onClick = { onPratoClick(prato.id) }
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(28.dp))
+                    }
+
+                    if (state.tradicionaisPratos.isNotEmpty()) {
+                        SectionHeader(
+                            title = "Pratos Tradicionais na Zona",
+                            onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais") }
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(state.tradicionaisPratos) { prato ->
+                                ClayDishCard(
+                                    prato = prato,
+                                    modifier = Modifier.width(200.dp),
+                                    onClick = { onPratoClick(prato.id) }
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(28.dp))
+                    }
+                }
+
                 // ─── SECÇÃO 1: Melhores da categoria ────────────────────
                 if (state.isLoading) {
                     Column(Modifier.padding(horizontal = 24.dp)) {
@@ -536,9 +581,28 @@ fun HomeScreen(
                 }
 
                 Spacer(Modifier.height(32.dp))
+
+                // AdMob Banner No Fundo
+                AdMobBanner()
+                Spacer(Modifier.height(16.dp))
             }
         }
         }
+    }
+}
+
+// ─── AdMob Banner Dummy ──────────────────────────────────────────────────────
+
+@Composable
+fun AdMobBanner() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(Color.LightGray),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("AdMob Banner Ad (Test Mode)", fontSize = 12.sp, color = Color.DarkGray, fontWeight = FontWeight.Bold)
     }
 }
 
