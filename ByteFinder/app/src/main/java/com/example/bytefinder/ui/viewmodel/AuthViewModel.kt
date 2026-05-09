@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bytefinder.data.ApiService
 import com.example.bytefinder.data.LoginRequest
+import com.example.bytefinder.data.SocialLoginRequest
 import com.example.bytefinder.data.UserDto
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -95,6 +96,39 @@ class AuthViewModel(private val api: ApiService) : ViewModel() {
                         is java.net.UnknownHostException -> "Sem internet"
                         else -> e.message ?: "Erro de rede"
                     }
+                )
+            }
+        }
+    }
+
+    /**
+     * Attempt social login
+     *
+     * @param provider e.g. "google", "facebook", "apple", "microsoft"
+     * @param token Provider token
+     */
+    fun socialLogin(provider: String, token: String) {
+        viewModelScope.launch {
+            try {
+                _authState.value = _authState.value.copy(isLoading = true, errorMessage = null)
+                val response = api.socialLogin(SocialLoginRequest(provider, token))
+                if (response.ok && response.token != null && response.user != null) {
+                    _authState.value = _authState.value.copy(
+                        token = response.token,
+                        user = response.user,
+                        isLoading = false,
+                        errorMessage = null
+                    )
+                } else {
+                    _authState.value = _authState.value.copy(
+                        isLoading = false,
+                        errorMessage = response.error ?: response.message ?: "Falha no login social"
+                    )
+                }
+            } catch (e: Exception) {
+                _authState.value = _authState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Erro de rede no login social"
                 )
             }
         }

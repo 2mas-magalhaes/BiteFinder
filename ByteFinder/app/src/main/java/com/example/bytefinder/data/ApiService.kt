@@ -13,6 +13,13 @@ data class LoginRequest(
     val _csrf: String? = null  // CSRF token for cross-site attack protection
 )
 
+data class SocialLoginRequest(
+    val provider: String,
+    val token: String,
+    val email: String? = null,
+    val name: String? = null
+)
+
 data class UserDto(
     val id: Int,
     val nome: String,
@@ -195,8 +202,20 @@ interface ApiService {
     @POST("api/auth/login_jwt.php")
     suspend fun login(@Body req: LoginRequest): LoginResponse
 
+    @POST("api/auth/social_login.php")
+    suspend fun socialLogin(@Body req: SocialLoginRequest): LoginResponse
+
     @GET("api/categorias/list.php")
     suspend fun listCategorias(): CategoriasResponse
+
+    @GET("api/pratos/nearby.php")
+    suspend fun getNearbyPratos(
+        @Query("lat") lat: Double,
+        @Query("lng") lng: Double,
+        @Query("radius") radius: Double = 5.0,
+        @Query("categoria") categoria: String? = null,
+        @Query("limit") limit: Int = 30
+    ): PratosListResponse
 
     @GET("api/pratos/list.php")
     suspend fun listPratos(

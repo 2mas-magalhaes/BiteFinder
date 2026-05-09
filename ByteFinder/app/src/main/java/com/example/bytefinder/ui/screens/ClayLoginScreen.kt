@@ -299,7 +299,7 @@ fun ClayLoginScreen(
                                     .background(ClayBluePale)
                             )
                             Text(
-                                text = "  ou  ",
+                                text = "  ou entrar com  ",
                                 color = ClayTextLight,
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.Medium
@@ -310,6 +310,18 @@ fun ClayLoginScreen(
                                     .height(1.dp)
                                     .background(ClayBluePale)
                             )
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            SocialButton("Google") { /* TODO: connect to AuthViewModel */ }
+                            SocialButton("Apple") { /* TODO: connect to AuthViewModel */ }
+                            SocialButton("Facebook") { /* TODO: connect to AuthViewModel */ }
+                            SocialButton("Microsoft") { /* TODO: connect to AuthViewModel */ }
                         }
 
                         Spacer(Modifier.height(16.dp))
@@ -579,6 +591,19 @@ fun ClayLoginScreen(
             containerColor = ClayWhite,
             shape = RoundedCornerShape(24.dp)
         )
+    }
+}
+
+@Composable
+private fun SocialButton(name: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(com.example.bytefinder.ui.theme.ClayBluePale)
+            .clickable { onClick() }
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(name, fontSize = 12.sp, color = com.example.bytefinder.ui.theme.ClayBlue, fontWeight = FontWeight.Bold)
     }
 }
 
