@@ -61,6 +61,15 @@ try {
                 // Se a API indicar que não existe, bloquear o registo.
                 if (!$nifInfo) {
                      respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
+                } else {
+                    // Auto-fill nome se existir na resposta e for valido
+                    if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
+                        $title = trim($nifInfo['title']);
+                        // Ignorar os erros standard da API para free tiers
+                        if (strpos($title, 'Key necessary') === false) {
+                            $restauranteNome = $title;
+                        }
+                    }
                 }
             }
         }

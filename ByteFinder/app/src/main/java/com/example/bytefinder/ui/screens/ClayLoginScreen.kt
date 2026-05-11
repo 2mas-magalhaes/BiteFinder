@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.bytefinder.data.DataRepository
+import com.example.bytefinder.ui.viewmodel.AuthViewModel
 import com.example.bytefinder.ui.components.ClayButton
 import com.example.bytefinder.ui.components.ClayCard
 import com.example.bytefinder.ui.components.claySceneBackground
@@ -84,6 +85,31 @@ fun ClayLoginScreen(
     var email by remember { mutableStateOf("goncalo@teste.com") }
     var password by remember { mutableStateOf("123456") }
     var errorMsg by remember { mutableStateOf("") }
+
+    // Observers para AuthViewModel
+
+
+    val authState by authViewModel.authState.collectAsState()
+
+    LaunchedEffect(authState.user, authState.token) {
+        if (authState.token != null && authState.user != null) {
+            onLoggedIn(
+                authState.token!!,
+                authState.user!!.id,
+                authState.user!!.nome,
+                authState.user!!.role,
+                emptyList() // social login typically doesnt return restaurants out of the box in this mock
+            )
+        }
+    }
+
+    LaunchedEffect(authState.errorMessage) {
+        if (authState.errorMessage != null) {
+            errorMsg = authState.errorMessage ?: "Erro desconhecido"
+            authViewModel.clearError()
+        }
+    }
+
     var successMsg by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var isRegisterMode by remember { mutableStateOf(false) }
@@ -325,10 +351,10 @@ fun ClayLoginScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SocialIconButton("google") { /* TODO: Google Sign-In */ }
-                            SocialIconButton("apple") { /* TODO: Apple Sign-In */ }
-                            SocialIconButton("facebook") { /* TODO: Facebook Login */ }
-                            SocialIconButton("microsoft") { /* TODO: Microsoft Login */ }
+                            SocialIconButton("google") { authViewModel.socialLogin("google", "dummy_token_google") }
+                            SocialIconButton("apple") { authViewModel.socialLogin("apple", "dummy_token_apple") }
+                            SocialIconButton("facebook") { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
+                            SocialIconButton("microsoft") { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
                         }
 
                         Spacer(Modifier.height(16.dp))
