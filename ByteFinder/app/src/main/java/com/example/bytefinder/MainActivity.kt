@@ -40,6 +40,9 @@ import com.example.bytefinder.ui.screens.HomeScreen
 import com.example.bytefinder.ui.theme.BitefinderClayTheme
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
 import com.example.bytefinder.ui.viewmodel.HomeViewModelFactory
+import com.example.bytefinder.ui.viewmodel.AuthViewModel
+import com.example.bytefinder.ui.viewmodel.AuthViewModelFactory
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 private enum class AppScreen {
     HOME,
@@ -63,14 +66,14 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BitefinderClayTheme {
-                AppRoot(repository = repository)
+                AppRoot(repository = repository, api = api)
             }
         }
     }
 }
 
 @Composable
-private fun AppRoot(repository: DataRepository) {
+private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data.ApiService) {
     var token by remember { mutableStateOf<String?>(null) }
     var userName by remember { mutableStateOf<String?>(null) }
     var currentUserId by remember { mutableStateOf<Int?>(null) }
@@ -85,6 +88,9 @@ private fun AppRoot(repository: DataRepository) {
 
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(repository)
+    )
+    val authViewModel: AuthViewModel = viewModel(
+        factory = AuthViewModelFactory(api) // assuming DataRepository exposes api or factory accepts api
     )
 
     fun goHome() {
@@ -116,6 +122,7 @@ private fun AppRoot(repository: DataRepository) {
     if (token == null) {
         ClayLoginScreen(
             repository = repository,
+            authViewModel = authViewModel,
             onLoggedIn = { t, userId, nome, role, restaurantes ->
                 token = t
                 currentUserId = userId
