@@ -3,9 +3,15 @@ package com.example.bytefinder
 import android.app.Application
 import coil.ImageLoader
 import coil.ImageLoaderFactory
+import com.google.android.gms.ads.MobileAds
 import okhttp3.OkHttpClient
 
 class BitefinderApp : Application(), ImageLoaderFactory {
+    override fun onCreate() {
+        super.onCreate()
+        MobileAds.initialize(this) {}
+    }
+
     override fun newImageLoader(): ImageLoader {
         val client = OkHttpClient.Builder()
             .addInterceptor { chain ->
