@@ -4,49 +4,53 @@ require_once __DIR__ . '/../config/db.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
-function respond($arr, int $code = 200): void {
+function respond(array $payload, int $code = 200): void {
     if (ob_get_length()) {
         ob_clean();
     }
     http_response_code($code);
-    echo json_encode($arr, JSON_UNESCAPED_UNICODE);
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE);
     exit;
+}
+
+function readFloat(string $key): ?float {
+    $value = $_GET[$key] ?? null;
+    return is_numeric($value) ? (float)$value : null;
 }
 
 try {
     $pdo = db();
 
-    $lat = isset($_GET['lat']) ? (float)$_GET['lat'] : null;
-    $lng = isset($_GET['lng']) ? (float)$_GET['lng'] : null;
-    $radiusKm = isset($_GET['radius']) ? (float)$_GET['radius'] : 5.0; // Default 5km
+    $lat = readFloat('lat');
+    $lng = readFloat('lng');
+    $radiusKm = readFloat('radius') ?? 5.0;
     $categoria = trim((string)($_GET['categoria'] ?? ''));
 
-    if ($lat === null || $lng === null) {
-        respond(['ok' => false, 'error' => 'Latitude e Longitude são obrigatórios.'], 400);
+    if ($lat === null || $lng === null || $lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+        respond(['ok' => false, 'error' => 'Latitude e longitude validas sao obrigatorias.'], 400);
     }
+
+    if ($radiusKm <= 0) $radiusKm = 5.0;
+    if ($radiusKm > 50) $radiusKm = 50.0;
 
     $limit = (int)($_GET['limit'] ?? 30);
     if ($limit < 1) $limit = 1;
     if ($limit > 100) $limit = 100;
 
-    $where = [];
+    $where = [
+        'p.Disponivel = 1',
+        'r.Latitude BETWEEN -90 AND 90',
+        'r.Longitude BETWEEN -180 AND 180',
+    ];
     $params = [];
 
-    // Filtro por categoria (ex: "Pratos Tradicionais")
     if ($categoria !== '') {
-        $where[] = "p.Categoria = :categoria";
-        $params['categoria'] = $categoria;
+        $where[] = 'p.Categoria = :categoria';
+        $params[':categoria'] = $categoria;
     }
 
-    $where[] = "p.Disponivel = 1";
-    // Garantir que temos coordenadas válidas no restaurante
-    $where[] = "r.Latitude IS NOT NULL AND r.Longitude IS NOT NULL";
+    $whereSql = 'WHERE ' . implode(' AND ', $where);
 
-    $whereSql = count($where) ? ('WHERE ' . implode(' AND ', $where)) : '';
-
-    // Fórmula de Haversine para Sql Server
-    // NOTA: SQL Server PDO não suporta reutilização de named params,
-    // por isso usamos nomes únicos (:lat1, :lat2, etc.)
     $sql = "
         SELECT
             p.IdPrato AS id,
@@ -57,20 +61,22 @@ try {
             p.ImagemUrl AS imagemUrl,
             r.IdRestaurante AS restauranteId,
             r.Nome AS restauranteNome,
+            CAST(r.Latitude AS FLOAT) AS restauranteLatitude,
+            CAST(r.Longitude AS FLOAT) AS restauranteLongitude,
             CAST(ISNULL(AVG(CAST(a.Classificacao AS FLOAT)), 0) AS FLOAT) AS ratingMedio,
             COUNT(a.IdAvaliacao) AS totalAvaliacoes,
-            -- Cálculo da distância em Km
-            (6371 * ACOS(
-                COS(RADIANS(:lat1)) * COS(RADIANS(r.Latitude)) *
-                COS(RADIANS(r.Longitude) - RADIANS(:lng1)) +
-                SIN(RADIANS(:lat2)) * SIN(RADIANS(r.Latitude))
-            )) AS distanciaKm
+            CAST(d.distanciaKm AS FLOAT) AS distanciaKm
         FROM dbo.Prato p
         JOIN dbo.Restaurante r
             ON r.IdRestaurante = p.RestauranteId
         LEFT JOIN dbo.AvaliacaoPrato a
             ON a.PratoId = p.IdPrato
+        CROSS APPLY (
+            SELECT geography::Point(:lat, :lng, 4326)
+                .STDistance(geography::Point(r.Latitude, r.Longitude, 4326)) / 1000.0 AS distanciaKm
+        ) d
         $whereSql
+          AND d.distanciaKm <= :radiusKm
         GROUP BY
             p.IdPrato,
             p.NomePrato,
@@ -81,59 +87,46 @@ try {
             r.IdRestaurante,
             r.Nome,
             r.Latitude,
-            r.Longitude
-        -- Filtrar pela distância e evitar Nans
-        HAVING (6371 * ACOS(
-                COS(RADIANS(:lat3)) * COS(RADIANS(r.Latitude)) *
-                COS(RADIANS(r.Longitude) - RADIANS(:lng2)) +
-                SIN(RADIANS(:lat4)) * SIN(RADIANS(r.Latitude))
-            )) <= :radiusKm
+            r.Longitude,
+            d.distanciaKm
         ORDER BY
             distanciaKm ASC,
-            ratingMedio DESC
+            ratingMedio DESC,
+            totalAvaliacoes DESC
         OFFSET 0 ROWS
         FETCH NEXT :limit ROWS ONLY;
     ";
 
     $stmt = $pdo->prepare($sql);
-
-    // Bind com nomes únicos para SQL Server
-    $stmt->bindValue(':lat1', $lat);
-    $stmt->bindValue(':lat2', $lat);
-    $stmt->bindValue(':lat3', $lat);
-    $stmt->bindValue(':lat4', $lat);
-    $stmt->bindValue(':lng1', $lng);
-    $stmt->bindValue(':lng2', $lng);
+    $stmt->bindValue(':lat', $lat);
+    $stmt->bindValue(':lng', $lng);
     $stmt->bindValue(':radiusKm', $radiusKm);
     $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
 
-    foreach ($params as $k => $v) {
-        $stmt->bindValue(':' . $k, $v);
+    foreach ($params as $name => $value) {
+        $stmt->bindValue($name, $value);
     }
 
     $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($rows as &$r) {
-        $r['id'] = (int)$r['id'];
-        $r['restauranteId'] = (int)$r['restauranteId'];
-        $r['preco'] = $r['preco'] !== null ? (float)$r['preco'] : null;
-        $r['ratingMedio'] = $r['ratingMedio'] !== null ? (float)$r['ratingMedio'] : 0.0;
-        $r['totalAvaliacoes'] = (int)$r['totalAvaliacoes'];
-        $r['distanciaKm'] = (float)$r['distanciaKm'];
+    foreach ($rows as &$row) {
+        $row['id'] = (int)$row['id'];
+        $row['restauranteId'] = (int)$row['restauranteId'];
+        $row['preco'] = $row['preco'] !== null ? (float)$row['preco'] : null;
+        $row['ratingMedio'] = $row['ratingMedio'] !== null ? (float)$row['ratingMedio'] : 0.0;
+        $row['totalAvaliacoes'] = (int)$row['totalAvaliacoes'];
+        $row['restauranteLatitude'] = $row['restauranteLatitude'] !== null ? (float)$row['restauranteLatitude'] : null;
+        $row['restauranteLongitude'] = $row['restauranteLongitude'] !== null ? (float)$row['restauranteLongitude'] : null;
+        $row['distanciaKm'] = round((float)$row['distanciaKm'], 2);
     }
-    unset($r);
+    unset($row);
 
     respond([
         'ok' => true,
         'count' => count($rows),
-        'items' => $rows
+        'items' => $rows,
     ]);
-
 } catch (Throwable $e) {
-    respond([
-        'ok' => false,
-        'error' => 'Erro interno',
-        'message' => $e->getMessage()
-    ], 500);
+    respond(['ok' => false, 'error' => 'Erro interno'], 500);
 }

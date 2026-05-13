@@ -22,7 +22,22 @@ android {
         val localProps = Properties()
         val localPropsFile = rootProject.file("local.properties")
         if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
-        manifestPlaceholders["MAPS_API_KEY"] = localProps.getProperty("MAPS_API_KEY", "")
+
+        fun configValue(name: String, default: String = ""): String =
+            localProps.getProperty(name)
+                ?: providers.environmentVariable(name).orNull
+                ?: default
+
+        val mapsApiKey = configValue("MAPS_API_KEY")
+        val admobAppId = configValue("ADMOB_APP_ID", "ca-app-pub-3940256099942544~3347511713")
+        val apiBaseUrl = configValue("API_BASE_URL", "http://10.0.2.2:8000/")
+
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+        manifestPlaceholders["ADMOB_APP_ID"] = admobAppId
+
+        buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
     }
 
     buildTypes {
@@ -43,6 +58,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

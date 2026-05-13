@@ -1,0 +1,23 @@
+# Android SDK path. Android Studio normally creates this automatically.
+sdk.dir=C\:\\Users\\YOUR_USER\\AppData\\Local\\Android\\Sdk
+
+# Backend REST API base URL.
+# Android emulator -> http://10.0.2.2:8000/
+# Physical phone on same Wi-Fi -> http://YOUR_PC_LAN_IP:8000/
+# Production -> https://your-api-domain.example/
+API_BASE_URL=http://10.0.2.2:8000/
+
+# Google Maps Platform key for Maps SDK for Android.
+# Required APIs in Google Cloud: Maps SDK for Android.
+# If restricted, allow package com.example.bytefinder and your debug/release SHA-1 fingerprints.
+MAPS_API_KEY=YOUR_GOOGLE_MAPS_ANDROID_KEY
+
+# AdMob app id.
+# Test app id is safe for debug; replace in production.
+ADMOB_APP_ID=ca-app-pub-3940256099942544~3347511713
+
+# Later tasks/social login configs:
+GOOGLE_WEB_CLIENT_ID=YOUR_GOOGLE_WEB_CLIENT_ID
+FACEBOOK_APP_ID=YOUR_FACEBOOK_APP_ID
+MICROSOFT_CLIENT_ID=YOUR_MICROSOFT_ENTRA_CLIENT_ID
+APPLE_SERVICE_ID=YOUR_APPLE_SERVICE_ID

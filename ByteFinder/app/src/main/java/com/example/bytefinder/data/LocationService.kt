@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
 import android.os.Build
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.LocationServices
@@ -49,28 +50,24 @@ class LocationService(private val context: Context) {
 
     @Suppress("MissingPermission")
     private suspend fun getLastOrCurrentLocation(): Pair<Double, Double>? {
-        // Try last known location first
-        val lastLocation = suspendCancellableCoroutine<Pair<Double, Double>?> { cont ->
+        val lastLocation = suspendCancellableCoroutine<Location?> { cont ->
             fusedClient.lastLocation
                 .addOnSuccessListener { loc ->
-                    if (loc != null) {
-                        cont.resume(Pair(loc.latitude, loc.longitude))
-                    } else {
-                        cont.resume(null)
-                    }
+                    cont.resume(loc)
                 }
                 .addOnFailureListener {
                     cont.resume(null)
                 }
         }
-        if (lastLocation != null) return lastLocation
+        if (lastLocation?.isFreshEnough() == true) {
+            return Pair(lastLocation.latitude, lastLocation.longitude)
+        }
 
-        // Request fresh location
         return suspendCancellableCoroutine { cont ->
             val cts = CancellationTokenSource()
             cont.invokeOnCancellation { cts.cancel() }
 
-            fusedClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, cts.token)
+            fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token)
                 .addOnSuccessListener { loc ->
                     if (loc != null) {
                         cont.resume(Pair(loc.latitude, loc.longitude))
@@ -82,6 +79,13 @@ class LocationService(private val context: Context) {
                     cont.resume(null)
                 }
         }
+    }
+
+    private fun Location.isFreshEnough(): Boolean {
+        val maxAgeMs = 10 * 60 * 1000L
+        val isRecent = System.currentTimeMillis() - time <= maxAgeMs
+        val isAccurate = !hasAccuracy() || accuracy <= 1000f
+        return isRecent && isAccurate
     }
 
     private fun reverseGeocode(lat: Double, lng: Double): Pair<String, String> {

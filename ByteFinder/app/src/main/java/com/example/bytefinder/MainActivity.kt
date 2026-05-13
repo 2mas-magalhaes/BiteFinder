@@ -37,6 +37,7 @@ import com.example.bytefinder.ui.screens.ClayPratoCompareScreen
 import com.example.bytefinder.ui.screens.ClayRestaurantDetailScreen
 import com.example.bytefinder.ui.screens.ClaySettingsScreen
 import com.example.bytefinder.ui.screens.HomeScreen
+import com.example.bytefinder.ui.screens.NearZoneScreen
 import com.example.bytefinder.ui.theme.BitefinderClayTheme
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
 import com.example.bytefinder.ui.viewmodel.HomeViewModelFactory
@@ -188,18 +189,13 @@ private fun AppRoot(repository: DataRepository) {
                                 onGoHome = { goHome() }
                             )
                         } else {
-                            HomeScreen(
+                            NearZoneScreen(
                                 viewModel = homeViewModel,
-                                repository = repository,
-                                userName = userName ?: "Utilizador",
-                                isRestaurantUser = false,
-                                nearModeActive = true,
                                 onPratoClick = { pratoId ->
                                     selectedPratoId = pratoId
                                     detailReturnScreen = AppScreen.NEAR
                                     currentScreen = AppScreen.PRATO_COMPARE
-                                },
-                                onGoHome = { goHome() }
+                                }
                             )
                         }
 

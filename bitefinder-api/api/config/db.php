@@ -1,13 +1,12 @@
 <?php
+require_once __DIR__ . '/env_loader.php';
 
 function db(): PDO {
-    // Para dev local, credenciais fixas para Azure SQL.
-    $DB_HOST = 'bitefinderapp.database.windows.net';
-    $DB_NAME = 'free-sql-db-6399592';
-    $DB_USER = 'borges';
-    $DB_PASS = '***REMOVED***';
+    $DB_HOST = env('DB_HOST', 'bitefinderapp.database.windows.net');
+    $DB_NAME = env('DB_NAME', 'free-sql-db-6399592');
+    $DB_USER = env('DB_USER', 'borges');
+    $DB_PASS = env('DB_PASS', '***REMOVED***');
 
-    // Azure SQL requer encriptacao.
     $dsn = "sqlsrv:Server=$DB_HOST;Database=$DB_NAME;Encrypt=yes;TrustServerCertificate=no";
 
     return new PDO($dsn, $DB_USER, $DB_PASS, [

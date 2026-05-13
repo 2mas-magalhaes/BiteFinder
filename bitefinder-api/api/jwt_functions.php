@@ -1,19 +1,19 @@
 <?php
+require_once __DIR__ . '/config/env_loader.php';
 /**
  * JWT Authentication Functions for BiteFinder
  * 
- * Security: JWT secret configured directly in source for university project
+ * Security: JWT secret loaded from environment when configured.
  * Algorithm: HS256 (HMAC SHA-256)
  * Expiry: Configurable, defaults to 1 hour (3600 seconds)
  */
 
-// University project setup: keep JWT settings in source.
-$JWT_SECRET = '***REMOVED***';
-$JWT_EXPIRY = 3600;
+$JWT_SECRET = env('JWT_SECRET', '***REMOVED***');
+$JWT_EXPIRY = (int)env('JWT_EXPIRY', 3600);
 
 // Validate JWT_SECRET length (min 32 chars for security)
 if (strlen($JWT_SECRET) < 32) {
-    error_log("WARNING: JWT_SECRET is too short (< 32 chars). Update jwt_functions.php for production!");
+    error_log("WARNING: JWT_SECRET is too short (< 32 chars). Configure JWT_SECRET in .env for production.");
 }
 
 function base64url_encode($data) {

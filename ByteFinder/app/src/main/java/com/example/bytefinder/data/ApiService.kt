@@ -58,6 +58,9 @@ data class PratoDto(
     val restauranteNome: String,
     val ratingMedio: Double,
     val totalAvaliacoes: Int,
+    val restauranteLatitude: Double? = null,
+    val restauranteLongitude: Double? = null,
+    val distanciaKm: Double? = null,
     val destacado: Boolean = false
 )
 
