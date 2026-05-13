@@ -1,8 +1,15 @@
 package com.example.bytefinder.ui.screens
 
+
 import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationServices
+import android.annotation.SuppressLint
+
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -71,6 +78,10 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.foundation.border
 import androidx.compose.ui.text.style.TextAlign
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdSize
+import com.google.android.gms.ads.AdView
+import androidx.compose.ui.viewinterop.AndroidView
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Circle
@@ -138,6 +149,54 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val fineGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+        val coarseGranted = permissions[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+        if (fineGranted || coarseGranted) {
+            @SuppressLint("MissingPermission")
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    // For dummy purposes, we simulate matched city logic
+                    viewModel.onLocationDetected(
+                        matchedCity = "Todas",
+                        displayCity = "Localização Atual",
+                        displayStreet = "Minha Rua",
+                        lat = it.latitude,
+                        lng = it.longitude
+                    )
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        if (!hasFine && !hasCoarse) {
+            locationPermissionLauncher.launch(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ))
+        } else {
+            @SuppressLint("MissingPermission")
+            fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+                location?.let {
+                    viewModel.onLocationDetected(
+                        matchedCity = "Todas",
+                        displayCity = "Localização Atual",
+                        displayStreet = "Minha Rua",
+                        lat = it.latitude,
+                        lng = it.longitude
+                    )
+                }
+            }
+        }
+    }
+
     val scope = rememberCoroutineScope()
     val locationService = remember { LocationService(context) }
 
@@ -675,6 +734,29 @@ fun HomeScreen(
                         }
                     }
                     Spacer(Modifier.height(28.dp))
+
+                    // --- Pratos Tradicionais Section ---
+                    if (state.tradicionaisPratos.isNotEmpty()) {
+                        SectionHeader(
+                            title = "Pratos Tradicionais na Zona",
+                            onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
+                        )
+                        Spacer(Modifier.height(14.dp))
+
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 24.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            items(state.tradicionaisPratos) { prato ->
+                                ClayDishCard(
+                                    prato = prato,
+                                    modifier = Modifier.width(200.dp),
+                                    onClick = { onPratoClick(prato.id) }
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(32.dp))
+                    }
                 }
 
                 // ─── SECÇÃO 1: Melhores da categoria ────────────────────
@@ -753,13 +835,19 @@ fun HomeScreen(
 @Composable
 fun AdMobBanner() {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(Color.LightGray),
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        Text("AdMob Banner Ad (Test Mode)", fontSize = 12.sp, color = Color.DarkGray, fontWeight = FontWeight.Bold)
+        AndroidView(
+            factory = { context ->
+                AdView(context).apply {
+                    setAdSize(AdSize.BANNER)
+                    // Google's test ad unit ID for Banners
+                    adUnitId = "ca-app-pub-3940256099942544/6300978111"
+                    loadAd(AdRequest.Builder().build())
+                }
+            }
+        )
     }
 }
 
