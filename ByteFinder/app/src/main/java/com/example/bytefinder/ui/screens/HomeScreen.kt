@@ -491,7 +491,7 @@ fun HomeScreen(
                 // ─── NA ZONA & PRATOS TRADICIONAIS ──────────────────────
                 val lat = state.userLat
                 val lng = state.userLng
-                if (state.locationLoaded && lat != null && lng != null) {
+                if (nearModeActive && state.locationLoaded && lat != null && lng != null) {
                     SectionHeader(
                         title = "Na Zona",
                         onViewAll = { viewModel.onViewAll("Todas", "Na Zona") }
@@ -507,6 +507,7 @@ fun HomeScreen(
                         Slider(
                             value = state.radiusKm.toFloat(),
                             onValueChange = { viewModel.onRadiusChanged(it.toDouble()) },
+                            onValueChangeFinished = { viewModel.refreshNearbyPratos() },
                             valueRange = 1f..20f,
                             steps = 18,
                             colors = SliderDefaults.colors(
@@ -561,14 +562,21 @@ fun HomeScreen(
                             )
 
                             // Restaurantes & pratos
-                            val pratosByRestaurante = state.nearbyPratos.groupBy { it.restauranteId }
+                            val pratosByRestaurante = state.nearbyPratos
+                                .filter { it.restauranteLatitude != null && it.restauranteLongitude != null }
+                                .groupBy { it.restauranteId }
                             pratosByRestaurante.forEach { (restId, pratos) ->
-                                val rest = com.example.bytefinder.data.MockDataProvider.restaurantes.find { it.id == restId }
-                                if (rest != null) {
-                                    val topPrato = pratos.maxByOrNull { it.totalAvaliacoes } ?: pratos.first()
+                                val topPrato = pratos.minWithOrNull(
+                                    compareBy<com.example.bytefinder.data.PratoDto> { it.distanciaKm ?: Double.MAX_VALUE }
+                                        .thenByDescending { it.ratingMedio }
+                                        .thenByDescending { it.totalAvaliacoes }
+                                ) ?: pratos.first()
+                                val restLat = topPrato.restauranteLatitude
+                                val restLng = topPrato.restauranteLongitude
+                                if (restLat != null && restLng != null) {
                                     MarkerComposable(
-                                        keys = arrayOf(rest.id),
-                                        state = MarkerState(position = LatLng(rest.latitude, rest.longitude)),
+                                        keys = arrayOf(restId, topPrato.id),
+                                        state = MarkerState(position = LatLng(restLat, restLng)),
                                         onClick = { 
                                             onPratoClick(topPrato.id)
                                             true
@@ -612,7 +620,7 @@ fun HomeScreen(
                                             }
                                             Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = rest.nome,
+                                                text = topPrato.restauranteNome,
                                                 fontSize = 12.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = ClayTextDark,
@@ -622,6 +630,46 @@ fun HomeScreen(
                                             )
                                         }
                                     }
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
+                    when {
+                        state.isNearbyLoading -> {
+                            Column(Modifier.padding(horizontal = 24.dp)) {
+                                SkeletonRow()
+                            }
+                        }
+                        state.nearbyError != null -> {
+                            Text(
+                                text = state.nearbyError ?: "",
+                                color = ClayOnDarkSecond,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                        }
+                        state.nearbyPratos.isEmpty() -> {
+                            Text(
+                                text = "Ainda nao encontramos pratos num raio de ${state.radiusKm.toInt()} km.",
+                                color = ClayOnDarkSecond,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                        }
+                        else -> {
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 24.dp),
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                items(state.nearbyPratos.take(10)) { prato ->
+                                    NearbyDishCard(
+                                        prato = prato,
+                                        modifier = Modifier.width(220.dp),
+                                        onClick = { onPratoClick(prato.id) }
+                                    )
                                 }
                             }
                         }
@@ -778,6 +826,87 @@ private fun PratosGrid(
 }
 
 // ─── Featured Dish Card (destaque patrocinado) ──────────────────────────────
+
+@Composable
+private fun NearbyDishCard(
+    prato: com.example.bytefinder.data.PratoDto,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    ClayCard(
+        modifier = modifier.clickable(onClick = onClick),
+        backgroundColor = ClayWhite,
+        cornerRadius = 18.dp,
+        elevation = 6.dp
+    ) {
+        Column {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(prato.imagemUrl)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = prato.nome,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
+            )
+            Column(modifier = Modifier.padding(12.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = prato.nome,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp,
+                        color = ClayTextDark,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    prato.distanciaKm?.let { distance ->
+                        Text(
+                            text = String.format(java.util.Locale.US, "%.1f km", distance),
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = ClayOrangeBolt
+                        )
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = prato.restauranteNome,
+                    fontSize = 12.sp,
+                    color = ClayTextMedium,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = prato.preco?.let { String.format(java.util.Locale.US, "%.2f EUR", it) } ?: "",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp,
+                        color = ClayTextDark
+                    )
+                    Text(
+                        text = String.format(java.util.Locale.US, "%.1f", prato.ratingMedio),
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 13.sp,
+                        color = ClayTextMedium
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 private fun FeaturedDishCard(

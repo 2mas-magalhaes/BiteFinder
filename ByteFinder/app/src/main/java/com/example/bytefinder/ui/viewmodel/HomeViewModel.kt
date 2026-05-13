@@ -44,6 +44,8 @@ data class HomeState(
     val locationLoaded: Boolean = false,
     val nearbyPratos: List<PratoDto> = emptyList(),
     val tradicionaisPratos: List<PratoDto> = emptyList(),
+    val isNearbyLoading: Boolean = false,
+    val nearbyError: String? = null,
     val userLat: Double? = null,
     val userLng: Double? = null,
     val radiusKm: Double = 5.0
@@ -155,21 +157,34 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
 
     private fun fetchNearbyPratos(lat: Double, lng: Double, radius: Double) {
         viewModelScope.launch {
-            val nearby = repository.getNearbyPratos(lat, lng, radius)
-            val trad = repository.getNearbyPratos(lat, lng, radius, categoria = "Pratos Tradicionais")
-            _state.value = _state.value.copy(
-                nearbyPratos = nearby,
-                tradicionaisPratos = trad
-            )
+            _state.value = _state.value.copy(isNearbyLoading = true, nearbyError = null)
+            try {
+                val nearby = repository.getNearbyPratos(lat, lng, radius)
+                _state.value = _state.value.copy(
+                    nearbyPratos = nearby,
+                    tradicionaisPratos = nearby.filter {
+                        it.categoria.equals("Pratos Tradicionais", ignoreCase = true)
+                    },
+                    isNearbyLoading = false
+                )
+            } catch (_: Exception) {
+                _state.value = _state.value.copy(
+                    isNearbyLoading = false,
+                    nearbyError = "Nao foi possivel carregar restaurantes perto de ti."
+                )
+            }
         }
     }
 
     fun onRadiusChanged(newRadius: Double) {
         _state.value = _state.value.copy(radiusKm = newRadius)
+    }
+
+    fun refreshNearbyPratos() {
         val lat = _state.value.userLat
         val lng = _state.value.userLng
         if (lat != null && lng != null) {
-            fetchNearbyPratos(lat, lng, newRadius)
+            fetchNearbyPratos(lat, lng, _state.value.radiusKm)
         }
     }
 
