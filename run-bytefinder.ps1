@@ -280,7 +280,7 @@ function Build-And-InstallApp {
     Write-Step "A compilar e instalar o APK debug"
     Push-Location $ProjectDir
     try {
-        & ".\gradlew.bat" installDebug
+        & ".\gradlew.bat" --rerun-tasks installDebug
     }
     finally {
         Pop-Location
