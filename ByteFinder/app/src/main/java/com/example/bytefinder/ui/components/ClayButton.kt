@@ -1,7 +1,8 @@
 package com.example.bytefinder.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -29,7 +30,7 @@ import com.example.bytefinder.ui.theme.*
  *
  * Sem inset shadows — cor sólida saturada sobre fundo escuro
  * já cria o contraste visual do Claymorphism.
- * Squish via scale Spring (1 animação, hardware layer).
+ * Press state uses a short, restrained motion for a premium product feel.
  */
 @Composable
 fun ClayButton(
@@ -57,10 +58,10 @@ fun ClayButton(
     }
     val shape = RoundedCornerShape(cornerRadius)
 
-    // 1 animação: scale com spring bounce
+    val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.94f else 1f,
-        animationSpec = spring(dampingRatio = 0.42f, stiffness = 420f),
+        targetValue = if (pressed) 0.97f else 1f,
+        animationSpec = tween(durationMillis = 150, easing = biteEase),
         label = "btn-scale"
     )
 

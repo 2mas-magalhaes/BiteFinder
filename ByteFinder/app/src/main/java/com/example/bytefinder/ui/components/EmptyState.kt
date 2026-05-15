@@ -1,7 +1,8 @@
 package com.example.bytefinder.ui.components
 
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -46,14 +47,15 @@ fun EmptyState(
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
 
+    val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
     val scale by animateFloatAsState(
-        targetValue = if (visible) 1f else 0.7f,
-        animationSpec = spring(dampingRatio = 0.5f, stiffness = 200f),
+        targetValue = if (visible) 1f else 0.96f,
+        animationSpec = tween(durationMillis = 220, easing = biteEase),
         label = "empty-scale"
     )
     val alpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
-        animationSpec = spring(dampingRatio = 0.8f, stiffness = 300f),
+        animationSpec = tween(durationMillis = 220, easing = biteEase),
         label = "empty-alpha"
     )
 
@@ -72,8 +74,8 @@ fun EmptyState(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = ClayTextLight,
-            modifier = Modifier.size(72.dp)
+            tint = ClayBlue.copy(alpha = 0.86f),
+            modifier = Modifier.size(64.dp)
         )
 
         Spacer(Modifier.height(20.dp))

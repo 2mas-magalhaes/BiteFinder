@@ -20,11 +20,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
@@ -179,7 +179,7 @@ fun ClayBusinessScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                BusinessStatCard("Pratos", pratos.size.toString(), Icons.Filled.MenuBook, Modifier.weight(1f))
+                BusinessStatCard("Pratos", pratos.size.toString(), Icons.AutoMirrored.Filled.MenuBook, Modifier.weight(1f))
                 BusinessStatCard("Rating", String.format(Locale.US, "%.1f", mediaRating), Icons.Filled.Star, Modifier.weight(1f))
                 BusinessStatCard("Reviews", totalAvaliacoes.toString(), Icons.Filled.ChatBubbleOutline, Modifier.weight(1f))
             }
@@ -214,13 +214,13 @@ fun ClayBusinessScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF111E30))
+                    .background(ClayDarkNavy.copy(alpha = 0.82f))
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 TabButton(
                     label = "Cardápio",
-                    icon = Icons.Filled.MenuBook,
+                    icon = Icons.AutoMirrored.Filled.MenuBook,
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     modifier = Modifier.weight(1f)
@@ -362,7 +362,7 @@ fun ClayBusinessScreen(
 
 @Composable
 private fun BusinessStatCard(label: String, value: String, icon: ImageVector, modifier: Modifier = Modifier) {
-    ClayCard(modifier = modifier, backgroundColor = Color(0xFF111E30), cornerRadius = 18.dp, elevation = 4.dp) {
+    ClayCard(modifier = modifier, backgroundColor = ClayDarkNavy.copy(alpha = 0.86f), cornerRadius = 18.dp, elevation = 4.dp) {
         Column(Modifier.padding(14.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(icon, contentDescription = label, tint = ClayBlue, modifier = Modifier.size(22.dp))
             Spacer(Modifier.height(4.dp))
@@ -413,7 +413,7 @@ private fun CardapioTab(
     // Add button
     ClayCard(
         modifier = Modifier.fillMaxWidth().clickable(onClick = onAddClick),
-        backgroundColor = Color(0xFF111E30),
+        backgroundColor = ClayDarkNavy.copy(alpha = 0.86f),
         cornerRadius = 16.dp,
         elevation = 3.dp
     ) {
@@ -489,7 +489,7 @@ private fun PratoManagementCard(
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
                             color = ClayBlue,
-                            letterSpacing = 0.5.sp,
+                            letterSpacing = 0.sp,
                             modifier = Modifier
                                 .background(ClayBlue.copy(alpha = 0.1f), RoundedCornerShape(6.dp))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
@@ -509,7 +509,7 @@ private fun PratoManagementCard(
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = Color(0xFF1A1A00),
-                                letterSpacing = 0.3.sp
+                                letterSpacing = 0.sp
                             )
                         }
                     }

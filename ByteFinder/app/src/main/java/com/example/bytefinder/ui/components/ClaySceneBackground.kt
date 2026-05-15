@@ -2,6 +2,8 @@ package com.example.bytefinder.ui.components
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 /**
@@ -13,6 +15,14 @@ import androidx.compose.ui.graphics.Color
  */
 fun Modifier.claySceneBackground(): Modifier = this
     .drawWithCache {
-        val bg = Color(0xFF0D1B2A)  // Dark navy sólido
+        val bg = Brush.linearGradient(
+            colors = listOf(
+                Color(0xFF061121),
+                Color(0xFF0A1628),
+                Color(0xFF102844)
+            ),
+            start = Offset(0f, 0f),
+            end = Offset(size.width, size.height)
+        )
         onDrawBehind { drawRect(bg) }
     }

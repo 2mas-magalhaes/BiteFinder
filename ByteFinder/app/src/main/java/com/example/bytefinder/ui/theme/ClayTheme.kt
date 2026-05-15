@@ -48,9 +48,9 @@ private val ClayColorScheme = lightColorScheme(
 
 private fun clayEmbossed(style: TextStyle): TextStyle = style.copy(
     shadow = Shadow(
-        color = ClayShadowDark.copy(alpha = 0.32f),
-        offset = Offset(0f, 1.35f),
-        blurRadius = 0.6f
+        color = ClayShadowDark.copy(alpha = 0.14f),
+        offset = Offset(0f, 0.8f),
+        blurRadius = 0.8f
     )
 )
 
@@ -62,7 +62,7 @@ private val ClayTypography = Typography(
         fontWeight = FontWeight.ExtraBold,
         fontSize = 30.sp,
         lineHeight = 36.sp,
-        letterSpacing = (-0.5).sp,
+        letterSpacing = 0.sp,
         color = ClayTextDark
     )),
     headlineMedium = clayEmbossed(TextStyle(
@@ -70,7 +70,7 @@ private val ClayTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 24.sp,
         lineHeight = 30.sp,
-        letterSpacing = (-0.3).sp
+        letterSpacing = 0.sp
     )),
     titleLarge = clayEmbossed(TextStyle(
         fontFamily = FontFamily.SansSerif,
@@ -107,7 +107,7 @@ private val ClayTypography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
-        letterSpacing = 0.3.sp
+        letterSpacing = 0.sp
     ))
 )
 

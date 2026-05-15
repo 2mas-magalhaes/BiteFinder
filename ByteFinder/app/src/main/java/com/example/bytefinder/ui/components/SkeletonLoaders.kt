@@ -28,8 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.bytefinder.ui.theme.*
 
 /**
- * SkeletonBlock — Bloco individual de skeleton loading com shimmer Claymorphism.
- * Usa gradiente animado sobre tons pastel quentes.
+ * SkeletonBlock - premium blue shimmer matching BiteFinder surfaces.
  */
 @Composable
 fun SkeletonBlock(
@@ -49,9 +48,9 @@ fun SkeletonBlock(
 
     val brush = Brush.linearGradient(
         colors = listOf(
-            ClayBeige.copy(alpha = 0.6f),
-            ClayCream.copy(alpha = 0.95f),
-            ClayBeige.copy(alpha = 0.6f)
+            ClayBluePale.copy(alpha = 0.42f),
+            ClayWhite.copy(alpha = 0.92f),
+            ClayBlueLight.copy(alpha = 0.56f)
         ),
         start = Offset(shift, 0f),
         end = Offset(shift + 250f, 250f)
