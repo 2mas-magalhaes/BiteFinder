@@ -1,8 +1,9 @@
 package com.example.bytefinder.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -201,9 +202,10 @@ private fun FilterChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.05f else 1f,
-        animationSpec = spring(dampingRatio = 0.5f, stiffness = 400f),
+        targetValue = if (isSelected) 1.02f else 1f,
+        animationSpec = tween(durationMillis = 160, easing = biteEase),
         label = "chip-scale"
     )
 

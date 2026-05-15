@@ -1,7 +1,8 @@
 package com.example.bytefinder.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,8 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.example.bytefinder.ui.theme.*
 
 /**
- * ClayRatingSelector — Seletor de estrelas douradas com animação spring bounce.
- * Cada estrela tem animação de scale ao ser selecionada.
+ * ClayRatingSelector - restrained premium star feedback.
  */
 @Composable
 fun ClayRatingSelector(
@@ -33,9 +33,10 @@ fun ClayRatingSelector(
     ) {
         (1..5).forEach { star ->
             val selected = star <= rating
+            val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
             val scale by animateFloatAsState(
-                targetValue = if (selected) 1.2f else 1f,
-                animationSpec = spring(dampingRatio = 0.4f, stiffness = 300f),
+                targetValue = if (selected) 1.08f else 1f,
+                animationSpec = tween(durationMillis = 160, easing = biteEase),
                 label = "star-$star"
             )
 

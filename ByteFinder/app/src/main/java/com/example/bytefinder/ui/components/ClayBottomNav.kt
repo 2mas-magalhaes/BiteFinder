@@ -1,7 +1,8 @@
 package com.example.bytefinder.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bytefinder.ui.theme.ClayBlue
+import com.example.bytefinder.ui.theme.ClayDarkNavy
 import com.example.bytefinder.ui.theme.ClayOnDark
 import com.example.bytefinder.ui.theme.ClayOnDarkSecond
 
@@ -65,7 +68,7 @@ fun ClayBottomNav(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(0xFF111E30))
+            .background(ClayDarkNavy.copy(alpha = 0.96f))
             .navigationBarsPadding()
             .padding(horizontal = 8.dp, vertical = 10.dp)
     ) {
@@ -99,9 +102,10 @@ private fun ClayNavItem(
 ) {
     val interaction = remember { MutableInteractionSource() }
 
+    val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
     val scale by animateFloatAsState(
-        targetValue = if (isSelected) 1.08f else 1f,
-        animationSpec = spring(dampingRatio = 0.55f, stiffness = 380f),
+        targetValue = if (isSelected) 1.03f else 1f,
+        animationSpec = tween(durationMillis = 180, easing = biteEase),
         label = "nav-scale-${tab.name}"
     )
 
@@ -109,6 +113,8 @@ private fun ClayNavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .graphicsLayer { scaleX = scale; scaleY = scale }
+            .clip(RoundedCornerShape(18.dp))
+            .background(if (isSelected) ClayBlue.copy(alpha = 0.16f) else Color.Transparent)
             .clickable(
                 interactionSource = interaction,
                 indication = null,

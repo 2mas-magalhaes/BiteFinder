@@ -139,7 +139,7 @@ fun ClaySearchScreen(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF1A2840))
+                    .background(ClayDarkNavy.copy(alpha = 0.76f))
                     .padding(horizontal = 14.dp, vertical = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -236,7 +236,7 @@ fun ClaySearchScreen(
                         .clip(RoundedCornerShape(20.dp))
                         .background(
                             if (isActive) ClayBlue.copy(alpha = 0.25f)
-                            else Color(0xFF1A2840)
+                            else ClayDarkNavy.copy(alpha = 0.76f)
                         )
                         .clickable { activeChip = if (isActive) null else chip.label }
                         .padding(horizontal = 14.dp, vertical = 8.dp),
@@ -400,7 +400,7 @@ private fun SearchResultRow(prato: PratoDto, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFF1A2840)),
+                    .background(ClayDarkNavy.copy(alpha = 0.76f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

@@ -118,7 +118,7 @@ fun ClayMyReviewsScreen(
                 ClayCard(
                     modifier = Modifier.fillMaxWidth(),
                     onClick = { onPratoClick(item.pratoId) },
-                    backgroundColor = Color(0xFF111E30),
+                    backgroundColor = ClayDarkNavy.copy(alpha = 0.88f),
                     cornerRadius = 22.dp,
                     elevation = 6.dp
                 ) {

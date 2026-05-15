@@ -1004,7 +1004,7 @@ private fun FeaturedDishCard(
 ) {
     ClayCard(
         modifier = modifier.clickable(onClick = onClick),
-        backgroundColor = Color(0xFF111E30),
+        backgroundColor = ClayDarkNavy.copy(alpha = 0.9f),
         cornerRadius = 20.dp,
         elevation = 8.dp
     ) {
@@ -1035,7 +1035,7 @@ private fun FeaturedDishCard(
                         fontSize = 10.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color(0xFF1A1A00),
-                        letterSpacing = 0.5.sp
+                        letterSpacing = 0.sp
                     )
                 }
             }
@@ -1046,7 +1046,7 @@ private fun FeaturedDishCard(
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFFFB800),
-                        letterSpacing = 0.5.sp
+                        letterSpacing = 0.sp
                     )
                     Spacer(Modifier.height(2.dp))
                 }

@@ -1,0 +1,40 @@
+{
+  "brand": {
+    "direction": "Sapphire Food-Tech",
+    "principles": [
+      "dish-first imagery",
+      "deep blue atmosphere",
+      "clear decision data",
+      "restrained premium motion",
+      "shared app and web tokens"
+    ]
+  },
+  "color": {
+    "blue": "#1B6EC2",
+    "blueDeep": "#103E7D",
+    "blueBright": "#5AA7F2",
+    "bluePale": "#D6E8F8",
+    "blueLight": "#EBF3FF",
+    "navy900": "#061121",
+    "navy800": "#0A1628",
+    "navy700": "#102844",
+    "surface": "#F4F7FB",
+    "surfaceRaised": "#FFFFFF",
+    "text": "#12213D",
+    "textMuted": "#5F7190",
+    "rating": "#FFC107",
+    "success": "#34C67A",
+    "danger": "#E85C5C"
+  },
+  "radius": {
+    "control": 16,
+    "card": 24,
+    "sheet": 32
+  },
+  "motion": {
+    "fast": 150,
+    "standard": 220,
+    "page": 360,
+    "ease": "cubic-bezier(.2,.8,.2,1)"
+  }
+}
