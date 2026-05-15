@@ -1,0 +1,7 @@
+[Fri May 15 07:02:17 2026] PHP 8.3.6 Development Server (http://127.0.0.1:8000) started
+[Fri May 15 07:02:19 2026] 127.0.0.1:53500 Accepted
+[Fri May 15 07:02:19 2026] 127.0.0.1:53500 [500]: POST /api/auth/login_jwt.php
+[Fri May 15 07:02:19 2026] 127.0.0.1:53500 Closing
+[Fri May 15 07:02:47 2026] 127.0.0.1:38534 Accepted
+[Fri May 15 07:02:47 2026] 127.0.0.1:38534 [500]: POST /api/auth/login_jwt.php
+[Fri May 15 07:02:47 2026] 127.0.0.1:38534 Closing

@@ -50,6 +50,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -551,6 +552,15 @@ fun HomeScreen(
                 val lat = state.userLat
                 val lng = state.userLng
                 if (nearModeActive && state.locationLoaded && lat != null && lng != null) {
+                    // Optimized recomposition derived states - keyed only by variables that are completely replaced to avoid unnecessary updates
+                    val nearbyPratosDerived by remember(state) {
+                        derivedStateOf { state.nearbyPratos.take(10) }
+                    }
+
+                    val isNearbyLoadingDerived by remember(state) {
+                        derivedStateOf { state.isNearbyLoading }
+                    }
+
                     SectionHeader(
                         title = "Na Zona",
                         onViewAll = { viewModel.onViewAll("Todas", "Na Zona") }
@@ -697,7 +707,7 @@ fun HomeScreen(
                     Spacer(Modifier.height(16.dp))
 
                     when {
-                        state.isNearbyLoading -> {
+                        isNearbyLoadingDerived -> {
                             Column(Modifier.padding(horizontal = 24.dp)) {
                                 SkeletonRow()
                             }
@@ -710,7 +720,7 @@ fun HomeScreen(
                                 modifier = Modifier.padding(horizontal = 24.dp)
                             )
                         }
-                        state.nearbyPratos.isEmpty() -> {
+                        nearbyPratosDerived.isEmpty() -> {
                             Text(
                                 text = "Ainda nao encontramos pratos num raio de ${state.radiusKm.toInt()} km.",
                                 color = ClayOnDarkSecond,
@@ -723,7 +733,7 @@ fun HomeScreen(
                                 contentPadding = PaddingValues(horizontal = 24.dp),
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                items(state.nearbyPratos.take(10)) { prato ->
+                                items(nearbyPratosDerived) { prato ->
                                     NearbyDishCard(
                                         prato = prato,
                                         modifier = Modifier.width(220.dp),
@@ -736,7 +746,16 @@ fun HomeScreen(
                     Spacer(Modifier.height(28.dp))
 
                     // --- Pratos Tradicionais Section ---
-                    if (state.tradicionaisPratos.isNotEmpty()) {
+                    val tradicionaisPratosDerived by remember(state) {
+                        derivedStateOf { state.tradicionaisPratos }
+                    }
+
+                    if (isNearbyLoadingDerived) {
+                         Column(Modifier.padding(horizontal = 24.dp)) {
+                             SkeletonRow()
+                         }
+                         Spacer(Modifier.height(32.dp))
+                    } else if (tradicionaisPratosDerived.isNotEmpty()) {
                         SectionHeader(
                             title = "Pratos Tradicionais na Zona",
                             onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
@@ -747,7 +766,7 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 24.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            items(state.tradicionaisPratos) { prato ->
+                            items(tradicionaisPratosDerived) { prato ->
                                 ClayDishCard(
                                     prato = prato,
                                     modifier = Modifier.width(200.dp),
@@ -760,11 +779,20 @@ fun HomeScreen(
                 }
 
                 // ─── SECÇÃO 1: Melhores da categoria ────────────────────
-                if (state.isLoading) {
+                val isLoadingDerived by remember(state) { derivedStateOf { state.isLoading } }
+
+                if (isLoadingDerived) {
                     Column(Modifier.padding(horizontal = 24.dp)) {
                         SkeletonRow()
                     }
                 } else {
+                    val filteredPratosDerived by remember(state) {
+                        derivedStateOf { state.filteredPratos.take(10) }
+                    }
+                    val reversedFilteredPratosDerived by remember(state) {
+                        derivedStateOf { state.filteredPratos.take(10).reversed() }
+                    }
+
                     val sectionTitle = if (state.selectedCategory == "Todos")
                         "As melhores opções perto de ti" else "As melhores ${state.selectedCategory} perto de ti"
 
@@ -775,14 +803,14 @@ fun HomeScreen(
 
                     Spacer(Modifier.height(14.dp))
 
-                    if (state.filteredPratos.isEmpty()) {
+                    if (filteredPratosDerived.isEmpty()) {
                         EmptyCategoryState(category = state.selectedCategory)
                     } else {
                         LazyRow(
                             contentPadding = PaddingValues(horizontal = 24.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            items(state.filteredPratos.take(10)) { prato ->
+                            items(filteredPratosDerived) { prato ->
                                 ClayDishCard(
                                     prato = prato,
                                     modifier = Modifier.width(200.dp),
@@ -808,7 +836,7 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 24.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            items(state.filteredPratos.take(10).reversed()) { prato ->
+                                items(reversedFilteredPratosDerived) { prato ->
                                 ClayDishCard(
                                     prato = prato,
                                     modifier = Modifier.width(200.dp),

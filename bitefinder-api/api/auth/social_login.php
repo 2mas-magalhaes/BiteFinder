@@ -37,16 +37,68 @@ try {
         respond(['ok' => false, 'error' => 'Provider não suportado'], 400);
     }
 
-    // AQUI OCORRERIA A VALIDAÇÃO DO TOKEN NO LADO DO SERVIDOR USANDO AS APIS DOS PROVIDERS.
-    // Por exemplo, no Google: chamar "https://oauth2.googleapis.com/tokeninfo?id_token=" . $token
-    // Neste momento do projeto, usaremos o env_loader para simular chaves/validação:
+    // --- Integração Real de Validação de Tokens Sociais ---
     $clientIdEnvVar = strtoupper($provider) . '_CLIENT_ID';
     $clientId = env($clientIdEnvVar);
 
-    // Simulação: se o token contiver algo, extraímos um email dummy (ou real caso fosse implementado)
-    // Assumimos que o frontend envia o email ou obtemos da API externa.
-    $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : $provider . '_user@example.com';
-    $nome = isset($body['name']) ? trim((string)$body['name']) : 'User ' . ucfirst($provider);
+    $email = null;
+    $nome = null;
+
+    // Bypass para tokens "dummy" (usados para testes/UI preview)
+    if (strpos($token, 'dummy_token_') === 0) {
+        $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : $provider . '_user@example.com';
+        $nome = isset($body['name']) ? trim((string)$body['name']) : 'User ' . ucfirst($provider);
+    } else {
+        if ($provider === 'google') {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://oauth2.googleapis.com/tokeninfo?id_token=" . urlencode($token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if (isset($data['email'])) {
+                    $email = strtolower(trim($data['email']));
+                    $nome = isset($data['name']) ? trim($data['name']) : 'Google User';
+                } else {
+                    respond(['ok' => false, 'error' => 'Token Google inválido.'], 401);
+                }
+            } else {
+                respond(['ok' => false, 'error' => 'Falha ao validar token com o Google.'], 401);
+            }
+        } elseif ($provider === 'facebook') {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/me?fields=id,name,email&access_token=" . urlencode($token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if (isset($data['email'])) {
+                    $email = strtolower(trim($data['email']));
+                    $nome = isset($data['name']) ? trim($data['name']) : 'Facebook User';
+                } else {
+                    respond(['ok' => false, 'error' => 'O token do Facebook não possui email ou é inválido.'], 401);
+                }
+            } else {
+                respond(['ok' => false, 'error' => 'Falha ao validar token com o Facebook.'], 401);
+            }
+        } else {
+            // Para Apple/Microsoft ou fallback, usa o que vem no body (se estivéssemos a implementar totalmente, faríamos requisições semelhantes)
+            $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : $provider . '_user@example.com';
+            $nome = isset($body['name']) ? trim((string)$body['name']) : 'User ' . ucfirst($provider);
+        }
+    }
+
+    if (!$email) {
+        respond(['ok' => false, 'error' => 'Não foi possível obter o email da plataforma social.'], 400);
+    }
 
     $pdo = db();
 
