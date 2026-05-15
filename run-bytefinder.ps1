@@ -60,21 +60,62 @@ function Ensure-LocalProperties {
     )
 
     $sdkEscaped = $SdkDir.Replace("\", "\\")
-    $content = @(
-        "sdk.dir=$sdkEscaped"
-        "API_BASE_URL=http://10.0.2.2:8000/"
-        "MAPS_API_KEY="
-        "ADMOB_APP_ID=ca-app-pub-3940256099942544~3347511713"
-    )
+    $defaults = [ordered]@{
+        "sdk.dir" = $sdkEscaped
+        "API_BASE_URL" = "http://10.0.2.2:8000/"
+        "MAPS_API_KEY" = ""
+        "ADMOB_APP_ID" = "ca-app-pub-3940256099942544~3347511713"
+    }
+
+    $lines = @()
 
     if (Test-Path $Path) {
-        $existing = Get-Content $Path -ErrorAction SilentlyContinue
-        if ($null -ne $existing -and (@($existing) -join "`n") -eq ($content -join "`n")) {
-            return
+        $lines = @(Get-Content $Path -ErrorAction Stop)
+    }
+
+    $seen = @{}
+    $updated = foreach ($line in $lines) {
+        if ($line -match "^\s*([^#][^=]+?)\s*=(.*)$") {
+            $key = $matches[1].Trim()
+            $value = $matches[2]
+            $seen[$key] = $true
+
+            if ($key -eq "sdk.dir") {
+                "sdk.dir=$sdkEscaped"
+                continue
+            }
+
+            if ($key -eq "API_BASE_URL" -and [string]::IsNullOrWhiteSpace($value)) {
+                "API_BASE_URL=$($defaults["API_BASE_URL"])"
+                continue
+            }
+
+            if ($key -eq "ADMOB_APP_ID" -and [string]::IsNullOrWhiteSpace($value)) {
+                "ADMOB_APP_ID=$($defaults["ADMOB_APP_ID"])"
+                continue
+            }
+        }
+
+        $line
+    }
+
+    foreach ($key in $defaults.Keys) {
+        if (-not $seen.ContainsKey($key)) {
+            $updated += "$key=$($defaults[$key])"
         }
     }
 
-    Set-Content -Path $Path -Value $content -Encoding ASCII
+    if ((@($lines) -join "`n") -eq (@($updated) -join "`n")) {
+        return
+    }
+
+    try {
+        Set-Content -Path $Path -Value $updated -Encoding ASCII
+    }
+    catch {
+        Write-Host "Aviso: nao consegui atualizar $Path porque esta em uso por outro processo. Feche o editor/bloqueio se faltar alguma chave." -ForegroundColor Yellow
+        Write-Host "Detalhe: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    }
 }
 
 function Get-SystemImagePackage {
@@ -149,7 +190,8 @@ function Start-PhpServer {
 
     $serverDir = Join-Path $RepoRoot "bitefinder-api"
     $logDir = Join-Path $RepoRoot ".logs"
-    $logPath = Join-Path $logDir "php-server.log"
+    $stdoutLogPath = Join-Path $logDir "php-server.out.log"
+    $stderrLogPath = Join-Path $logDir "php-server.err.log"
 
     if (-not (Test-Path $logDir)) {
         New-Item -ItemType Directory -Path $logDir | Out-Null
@@ -168,8 +210,8 @@ function Start-PhpServer {
     Start-Process -FilePath $PhpExe `
         -ArgumentList "-S", "127.0.0.1:8000", "-t", $serverDir `
         -WorkingDirectory $RepoRoot `
-        -RedirectStandardOutput $logPath `
-        -RedirectStandardError $logPath `
+        -RedirectStandardOutput $stdoutLogPath `
+        -RedirectStandardError $stderrLogPath `
         -WindowStyle Hidden
 }
 

@@ -690,6 +690,7 @@ private fun BusinessReviewCard(
     onDraftChange: (String) -> Unit,
     onSubmit: () -> Unit
 ) {
+    val sentiment = reviewSentiment(avaliacao.classificacao)
     ClayCard(modifier = Modifier.fillMaxWidth(), backgroundColor = ClayWhite, cornerRadius = 18.dp, elevation = 5.dp) {
         Column(Modifier.padding(14.dp)) {
             Row(
@@ -713,6 +714,20 @@ private fun BusinessReviewCard(
                 }
             }
 
+            Spacer(Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(sentiment.second.copy(alpha = 0.16f))
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
+            ) {
+                Text(
+                    sentiment.first,
+                    color = sentiment.second,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
+                )
+            }
             Spacer(Modifier.height(8.dp))
             Text(avaliacao.comentario ?: "Sem comentário", color = ClayTextMedium, fontSize = 14.sp)
             Spacer(Modifier.height(10.dp))
@@ -742,6 +757,13 @@ private fun BusinessReviewCard(
             )
         }
     }
+}
+
+private fun reviewSentiment(rating: Int): Pair<String, Color> = when {
+    rating >= 5 -> "Excelente" to ClayGreenDeep
+    rating >= 4 -> "Consistente" to ClayBlue
+    rating >= 3 -> "Neutro" to ClayYellowDeep
+    else -> "Precisa atenção" to ClayRedDeep
 }
 
 // ─── Create Prato Dialog ────────────────────────────────────────────────

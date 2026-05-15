@@ -1,0 +1,8 @@
+{
+  "fast": 150,
+  "standard": 220,
+  "page": 360,
+  "ease": "cubic-bezier(.2,.8,.2,1)",
+  "pressedScale": 0.97,
+  "cardPressedScale": 0.985
+}

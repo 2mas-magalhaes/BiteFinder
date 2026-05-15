@@ -110,6 +110,7 @@ fun ClaySearchScreen(
         FilterChip("Filtros", Icons.Filled.FilterList),
     )
     var activeChip by remember { mutableStateOf<String?>(null) }
+    var resultMode by remember { mutableStateOf("Lista") }
 
     // Histórico (mock local — sem persistência por enquanto)
     val searchHistory = remember { mutableStateOf(listOf("pizza", "sushi", "burger")) }
@@ -259,23 +260,63 @@ fun ClaySearchScreen(
             }
         }
 
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 2.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(ClayDarkNavy.copy(alpha = 0.72f))
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            listOf("Lista", "Mapa").forEach { mode ->
+                val selected = resultMode == mode
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (selected) ClayBlue else Color.Transparent)
+                        .clickable { resultMode = mode }
+                        .padding(vertical = 9.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        mode,
+                        color = if (selected) ClayOnDark else ClayOnDarkSecond,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+        }
+
         // ─── CONTEÚDO PRINCIPAL ─────────────────────────────────────────
         if (hasQuery && hasSuggestions) {
-            // Resultados de pesquisa
-            LazyColumn(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
-            ) {
-                items(state.searchSuggestions) { prato ->
-                    SearchResultRow(
-                        prato = prato,
-                        onClick = {
-                            viewModel.onSearchQueryChange(prato.nome)
-                            focusManager.clearFocus()
-                            onPratoClick(prato.id)
-                        }
-                    )
-                    HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
+            if (resultMode == "Mapa") {
+                DiscoveryMapPreview(
+                    pratos = state.searchSuggestions,
+                    onPratoClick = {
+                        viewModel.onSearchQueryChange(it.nome)
+                        focusManager.clearFocus()
+                        onPratoClick(it.id)
+                    }
+                )
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(0.dp)
+                ) {
+                    items(state.searchSuggestions) { prato ->
+                        SearchResultRow(
+                            prato = prato,
+                            onClick = {
+                                viewModel.onSearchQueryChange(prato.nome)
+                                focusManager.clearFocus()
+                                onPratoClick(prato.id)
+                            }
+                        )
+                        HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
+                    }
                 }
             }
         } else {
@@ -366,6 +407,70 @@ fun ClaySearchScreen(
                 }
 
                 Spacer(Modifier.height(16.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun DiscoveryMapPreview(
+    pratos: List<PratoDto>,
+    onPratoClick: (PratoDto) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(ClayBlueLight.copy(alpha = 0.18f))
+        ) {
+            Text(
+                "Mapa de descoberta",
+                color = ClayOnDark,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 20.sp,
+                modifier = Modifier.align(Alignment.TopStart).padding(18.dp)
+            )
+            pratos.take(5).forEachIndexed { index, prato ->
+                Box(
+                    modifier = Modifier
+                        .align(
+                            when (index % 5) {
+                                0 -> Alignment.Center
+                                1 -> Alignment.TopEnd
+                                2 -> Alignment.BottomStart
+                                3 -> Alignment.CenterEnd
+                                else -> Alignment.BottomEnd
+                            }
+                        )
+                        .padding(24.dp)
+                        .size(42.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(ClayBlue)
+                        .clickable { onPratoClick(prato) },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("★", color = ClayOnDark, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+
+        Spacer(Modifier.height(14.dp))
+        Text(
+            "Pratos próximos no mapa",
+            color = ClayOnDark,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp
+        )
+        Spacer(Modifier.height(8.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            pratos.take(3).forEach { prato ->
+                SearchResultRow(prato = prato, onClick = { onPratoClick(prato) })
             }
         }
     }

@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -36,10 +38,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -102,6 +106,7 @@ fun ClayPratoDetailScreen(
     var refreshKey by remember { mutableIntStateOf(0) }
     var editingMyReview by remember { mutableStateOf(false) }
     var showEditDialog by remember { mutableStateOf(false) }
+    var isSaved by rememberSaveable(pratoId) { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -272,7 +277,36 @@ fun ClayPratoDetailScreen(
                             text = "${prato!!.categoria ?: "Prato"} · ${prato!!.restauranteNome}",
                             color = ClayTextMedium
                         )
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(14.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            DetailSignalChip(
+                                label = "Rating",
+                                value = "★ ${String.format(Locale.US, "%.1f", prato!!.ratingMedio)}",
+                                backgroundColor = ClayYellow.copy(alpha = 0.28f),
+                                contentColor = ClayTextDark,
+                                modifier = Modifier.weight(1f)
+                            )
+                            DetailSignalChip(
+                                label = "Reviews",
+                                value = "${prato!!.totalAvaliacoes}",
+                                backgroundColor = ClayBluePale,
+                                contentColor = ClayBlueDeep,
+                                modifier = Modifier.weight(1f)
+                            )
+                            DetailSignalChip(
+                                label = "Preço",
+                                value = if (prato!!.preco == null) "-" else String.format(Locale.US, "%.2f€", prato!!.preco),
+                                backgroundColor = ClayBlueLight,
+                                contentColor = ClayBlue,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Spacer(Modifier.height(14.dp))
 
                         // Rating badge
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -303,13 +337,13 @@ fun ClayPratoDetailScreen(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(999.dp))
-                                .background(ClayPeach.copy(alpha = 0.3f))
+                                .background(ClayBluePale)
                                 .padding(horizontal = 14.dp, vertical = 10.dp)
                         ) {
                             Text(
                                 text = "Preço: ${if (prato!!.preco == null) "-" else String.format(Locale.US, "%.2f €", prato!!.preco)}",
                                 fontWeight = FontWeight.Bold,
-                                color = ClayOrangeDeep,
+                                color = ClayBlueDeep,
                                 fontSize = 16.sp
                             )
                         }
@@ -323,6 +357,88 @@ fun ClayPratoDetailScreen(
                             color = ClayTextMedium,
                             lineHeight = 22.sp
                         )
+
+                        Spacer(Modifier.height(16.dp))
+
+                        ClayCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            backgroundColor = ClayBlueLight,
+                            cornerRadius = 18.dp,
+                            elevation = 2.dp
+                        ) {
+                            Column(Modifier.padding(14.dp)) {
+                                Text(
+                                    "Porque vale a pena provar",
+                                    color = ClayBlueDeep,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = buildDishInsight(prato!!.ratingMedio, prato!!.totalAvaliacoes, prato!!.preco),
+                                    color = ClayTextMedium,
+                                    fontSize = 13.sp,
+                                    lineHeight = 19.sp
+                                )
+                            }
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            ClayButton(
+                                text = if (isSaved) "Guardado" else "Guardar",
+                                onClick = { isSaved = !isSaved },
+                                modifier = Modifier.weight(1f),
+                                containerColor = if (isSaved) ClayBlueDeep else ClayBlue,
+                                contentColor = ClayWhite
+                            )
+                            ClayButton(
+                                text = "Rota",
+                                onClick = {
+                                    val lat = prato!!.restauranteLatitude
+                                    val lng = prato!!.restauranteLongitude
+                                    if (lat != null && lng != null) {
+                                        val label = Uri.encode(prato!!.restauranteNome)
+                                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("geo:$lat,$lng?q=$lat,$lng($label)")))
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                isSecondary = true,
+                                enabled = prato!!.restauranteLatitude != null && prato!!.restauranteLongitude != null
+                            )
+                        }
+
+                        AnimatedVisibility(visible = isSaved, enter = fadeIn(), exit = fadeOut()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 10.dp)
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(ClayBluePale)
+                                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Favorite,
+                                    contentDescription = null,
+                                    tint = ClayBlue,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .scale(1.02f)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Guardado para provar mais tarde.",
+                                    color = ClayBlueDeep,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            }
+                        }
 
                         Spacer(Modifier.height(24.dp))
 
@@ -352,10 +468,10 @@ fun ClayPratoDetailScreen(
                                 maxLines = 5,
                                 shape = RoundedCornerShape(16.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = ClayOrange,
+                                    focusedBorderColor = ClayBlue,
                                     unfocusedBorderColor = ClayBeigeDeep,
-                                    focusedLabelColor = ClayOrange,
-                                    cursorColor = ClayOrange
+                                    focusedLabelColor = ClayBlue,
+                                    cursorColor = ClayBlue
                                 )
                             )
 
@@ -515,7 +631,7 @@ private fun ClayAvaliacaoItem(
             }
             if (isMine) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Editar", color = ClayOrange, modifier = Modifier.clickable { onEdit() }, fontWeight = FontWeight.Medium)
+                    Text("Editar", color = ClayBlue, modifier = Modifier.clickable { onEdit() }, fontWeight = FontWeight.Medium)
                     Text("Eliminar", color = ClayRedDeep, modifier = Modifier.clickable { onDelete() }, fontWeight = FontWeight.Medium)
                 }
             }
@@ -531,6 +647,39 @@ private fun ClayAvaliacaoItem(
             }
         }
     }
+}
+
+@Composable
+private fun DetailSignalChip(
+    label: String,
+    value: String,
+    backgroundColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(backgroundColor)
+            .padding(horizontal = 10.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(value, color = contentColor, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+        Spacer(Modifier.height(2.dp))
+        Text(label, color = ClayTextMedium, fontSize = 11.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+private fun buildDishInsight(rating: Double, reviews: Int, price: Double?): String {
+    val ratingText = when {
+        rating >= 4.6 -> "Muito forte em satisfação"
+        rating >= 4.0 -> "Boa escolha validada por clientes"
+        reviews > 0 -> "Ainda a ganhar tração"
+        else -> "Novo no BiteFinder"
+    }
+    val reviewText = if (reviews > 0) "com $reviews avaliações" else "à espera das primeiras avaliações"
+    val priceText = price?.let { " e preço de ${String.format(Locale.US, "%.2f€", it)}" } ?: ""
+    return "$ratingText, $reviewText$priceText."
 }
 
 @Composable

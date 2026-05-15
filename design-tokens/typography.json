@@ -1,0 +1,17 @@
+{
+  "displayFamily": "Sora, Manrope, system-ui, sans-serif",
+  "uiFamily": "Manrope, system-ui, sans-serif",
+  "letterSpacing": 0,
+  "mobile": {
+    "hero": 32,
+    "sectionTitle": 22,
+    "cardTitle": 16,
+    "metadata": 12
+  },
+  "web": {
+    "hero": 64,
+    "dashboardTitle": 36,
+    "cardTitle": 18,
+    "metadata": 13
+  }
+}

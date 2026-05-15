@@ -1,0 +1,10 @@
+[Fri May 15 16:15:03 2026] PHP 8.3.31 Development Server (http://127.0.0.1:8000) started
+[Fri May 15 17:04:58 2026] 127.0.0.1:62396 Accepted
+[Fri May 15 17:04:58 2026] 127.0.0.1:62396 [500]: GET /api/categorias/list.php
+[Fri May 15 17:04:58 2026] 127.0.0.1:62396 Closing
+[Fri May 15 17:08:39 2026] 127.0.0.1:64997 Accepted
+[Fri May 15 17:08:39 2026] 127.0.0.1:64997 [500]: GET /api/categorias/list.php
+[Fri May 15 17:08:39 2026] 127.0.0.1:64997 Closing
+[Fri May 15 17:11:20 2026] 127.0.0.1:54869 Accepted
+[Fri May 15 17:11:20 2026] 127.0.0.1:54869 [500]: GET /api/categorias/list.php
+[Fri May 15 17:11:20 2026] 127.0.0.1:54869 Closing
