@@ -1,0 +1,9 @@
+{
+  "base": 4,
+  "mobilePadding": 20,
+  "mobileWidePadding": 24,
+  "webContentMin": 1180,
+  "webContentMax": 1280,
+  "sectionGap": 32,
+  "componentGap": 16
+}

@@ -1,0 +1,25 @@
+:root {
+  --bf-blue: #1B6EC2;
+  --bf-blue-deep: #103E7D;
+  --bf-blue-soft: #4A90D9;
+  --bf-blue-bright: #5AA7F2;
+  --bf-blue-pale: #D6E8F8;
+  --bf-blue-light: #EBF3FF;
+  --bf-navy-900: #061121;
+  --bf-navy-800: #0A1628;
+  --bf-navy-700: #102844;
+  --bf-surface: #F4F7FB;
+  --bf-surface-raised: #FFFFFF;
+  --bf-text: #12213D;
+  --bf-text-muted: #5F7190;
+  --bf-rating: #FFC107;
+  --bf-success: #34C67A;
+  --bf-danger: #E85C5C;
+  --bf-radius-control: 16px;
+  --bf-radius-card: 24px;
+  --bf-radius-modal: 28px;
+  --bf-ease: cubic-bezier(.2,.8,.2,1);
+  --bf-motion-fast: 150ms;
+  --bf-motion-standard: 220ms;
+  --bf-motion-page: 360ms;
+}
