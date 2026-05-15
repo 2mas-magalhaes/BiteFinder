@@ -43,7 +43,6 @@ import com.example.bytefinder.ui.viewmodel.HomeViewModel
 import com.example.bytefinder.ui.viewmodel.HomeViewModelFactory
 import com.example.bytefinder.ui.viewmodel.AuthViewModel
 import com.example.bytefinder.ui.viewmodel.AuthViewModelFactory
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 private enum class AppScreen {
     HOME,

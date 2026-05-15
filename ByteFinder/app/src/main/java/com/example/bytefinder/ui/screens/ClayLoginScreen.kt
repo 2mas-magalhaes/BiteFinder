@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,14 +79,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun ClayLoginScreen(
     repository: DataRepository,
+    authViewModel: AuthViewModel,
     onLoggedIn: (token: String, userId: Int, nome: String, role: String, restaurantes: List<Int>) -> Unit
 ) {
     var email by remember { mutableStateOf("goncalo@teste.com") }
     var password by remember { mutableStateOf("123456") }
     var errorMsg by remember { mutableStateOf("") }
-
-    // Observers para AuthViewModel
-
 
     val authState by authViewModel.authState.collectAsState()
 
