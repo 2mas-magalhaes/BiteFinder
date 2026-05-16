@@ -142,5 +142,6 @@ try {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    respond(['ok' => false, 'error' => 'Erro interno do servidor. Tente novamente mais tarde.', 'message' => $e->getMessage()], 500);
+    error_log("Register Restaurante Error: " . $e->getMessage());
+    respond(['ok' => false, 'error' => 'Erro interno do servidor. Tente novamente mais tarde.'], 500);
 }
