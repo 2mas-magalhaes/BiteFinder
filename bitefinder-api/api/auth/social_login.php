@@ -98,5 +98,6 @@ try {
     ]);
 
 } catch (Throwable $e) {
-    respond(['ok' => false, 'error' => 'Erro interno do servidor', 'message' => $e->getMessage()], 500);
+    error_log("Social Login Error: " . $e->getMessage());
+    respond(['ok' => false, 'error' => 'Erro interno do servidor'], 500);
 }
