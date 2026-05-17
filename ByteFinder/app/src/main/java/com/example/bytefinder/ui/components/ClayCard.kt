@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import com.example.bytefinder.data.PratoDto
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.theme.*
 import java.util.Locale
 
@@ -130,9 +131,10 @@ fun ClayDishCard(
                     .fillMaxWidth()
                     .height(140.dp)
             ) {
-                if (!prato.imagemUrl.isNullOrBlank()) {
+                val imageUrl = prato.displayImageUrl()
+                if (!imageUrl.isNullOrBlank()) {
                     SubcomposeAsyncImage(
-                        model = prato.imagemUrl,
+                        model = imageUrl,
                         contentDescription = prato.nome,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

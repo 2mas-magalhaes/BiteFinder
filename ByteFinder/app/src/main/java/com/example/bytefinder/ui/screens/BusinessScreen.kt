@@ -74,6 +74,7 @@ import com.example.bytefinder.data.DeletePratoRequest
 import com.example.bytefinder.data.MockDataProvider
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.data.UpdatePratoRequest
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.theme.*
 import androidx.core.content.ContextCompat
@@ -481,7 +482,7 @@ private fun PratoManagementCard(
         Row(modifier = Modifier.padding(12.dp)) {
             // Image
             AsyncImage(
-                model = prato.imagemUrl,
+                model = prato.displayImageUrl(),
                 contentDescription = prato.nome,
                 modifier = Modifier
                     .size(90.dp)

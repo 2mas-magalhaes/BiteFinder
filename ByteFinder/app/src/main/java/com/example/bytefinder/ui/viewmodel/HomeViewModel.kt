@@ -7,6 +7,8 @@ import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.MockDataProvider
 import com.example.bytefinder.data.PratoDto
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,7 +50,7 @@ data class HomeState(
     val nearbyError: String? = null,
     val userLat: Double? = null,
     val userLng: Double? = null,
-    val radiusKm: Double = 5.0
+    val radiusKm: Double = 2.0
 )
 
 @OptIn(FlowPreview::class)
@@ -71,8 +73,11 @@ class HomeViewModel(private val repository: DataRepository) : ViewModel() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             try {
-                val categorias = repository.listCategorias()
-                val pratos = repository.listPratos(limit = 100)
+                val (categorias, pratos) = coroutineScope {
+                    val categoriasDeferred = async { repository.listCategorias() }
+                    val pratosDeferred = async { repository.listPratos(limit = 100) }
+                    categoriasDeferred.await() to pratosDeferred.await()
+                }
 
                 _state.value = _state.value.copy(
                     categorias = categorias,

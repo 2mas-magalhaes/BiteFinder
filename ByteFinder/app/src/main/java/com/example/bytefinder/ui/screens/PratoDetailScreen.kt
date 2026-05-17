@@ -68,6 +68,7 @@ import com.example.bytefinder.data.DeleteAvaliacaoRequest
 import com.example.bytefinder.data.PratoDetailDto
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.data.UpdatePratoRequest
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
@@ -253,9 +254,10 @@ fun ClayPratoDetailScreen(
                 elevation = 8.dp
             ) {
                 Column {
-                    if (!prato!!.imagemUrl.isNullOrBlank()) {
+                    val imageUrl = prato!!.displayImageUrl()
+                    if (!imageUrl.isNullOrBlank()) {
                         AsyncImage(
-                            model = prato!!.imagemUrl,
+                            model = imageUrl,
                             contentDescription = prato!!.nome,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier

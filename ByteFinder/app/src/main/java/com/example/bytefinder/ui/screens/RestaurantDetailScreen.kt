@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.MockDataProvider
 import com.example.bytefinder.data.PratoDto
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.theme.*
 import com.google.android.gms.maps.model.CameraPosition
@@ -456,9 +457,10 @@ private fun PratoListItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Imagem pequena
-            if (!prato.imagemUrl.isNullOrBlank()) {
+            val imageUrl = prato.displayImageUrl()
+            if (!imageUrl.isNullOrBlank()) {
                 coil.compose.AsyncImage(
-                    model = prato.imagemUrl,
+                    model = imageUrl,
                     contentDescription = prato.nome,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier
