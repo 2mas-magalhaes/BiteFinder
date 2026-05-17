@@ -27,7 +27,7 @@ object MockDataProvider {
         "Pasta" to "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Espaguetis_carbonara.jpg/330px-Espaguetis_carbonara.jpg",
         "Sobremesas" to "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Pastel_de_nata_%2818616473070%29.jpg/330px-Pastel_de_nata_%2818616473070%29.jpg",
         "Bifana" to "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Bifana_on_a_plate.jpg/330px-Bifana_on_a_plate.jpg",
-        "Pratos Tradicionais" to "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cozido%20a%20portuguesa%201.JPG",
+        "Pratos Tradicionais" to "https://commons.wikimedia.org/wiki/Special:FilePath/Cozido%20a%20portuguesa%201.JPG",
         "Bacalhau" to "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Bacalhau_a_Bras.jpg/330px-Bacalhau_a_Bras.jpg"
     )
 
@@ -300,7 +300,7 @@ object MockDataProvider {
 
         // Solar dos Presuntos (Lisboa)
         PratoDto(89, "Cozido à Portuguesa", "Pratos Tradicionais", "Cozido tradicional com enchidos, carnes, couves e legumes frescos da época", 22.50, "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cozido%20a%20portuguesa%201.JPG", 27, "Solar dos Presuntos", 4.9, 412),
-        PratoDto(90, "Arroz de Pato", "Pratos Tradicionais", "Arroz de pato no forno com chouriço, presunto e hortelã", 18.50, "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Arroz_de_pato_no_forno.jpg/500px-Arroz_de_pato_no_forno.jpg", 27, "Solar dos Presuntos", 4.8, 345),
+        PratoDto(90, "Arroz de Pato", "Pratos Tradicionais", "Arroz de pato no forno com chouriço, presunto e hortelã", 18.50, "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=700", 27, "Solar dos Presuntos", 4.8, 345),
         // Tasca do Chico (Lisboa)
         PratoDto(91, "Açorda Alentejana", "Pratos Tradicionais", "Açorda de coentros com ovo escalfado, azeite e alho", 14.00, "https://commons.wikimedia.org/wiki/Special:Redirect/file/A%C3%A7orda%20%C3%A0%20Alentejana.jpg", 20, "Tasca do Chico", 4.6, 198),
         PratoDto(92, "Secretos de Porco Preto", "Pratos Tradicionais", "Secretos de porco preto ibérico com batata-doce assada e grelos salteados", 17.50, "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&q=80&w=400", 20, "Tasca do Chico", 4.7, 267),
@@ -440,6 +440,31 @@ object MockDataProvider {
             ratingMedio = prato.ratingMedio,
             totalAvaliacoes = prato.totalAvaliacoes
         )
+    }
+
+    fun enrichWithRestaurantLocation(prato: PratoDto, userLat: Double? = null, userLng: Double? = null): PratoDto {
+        if (prato.restauranteLatitude != null && prato.restauranteLongitude != null) return prato
+        val rest = restaurantes.find { it.id == prato.restauranteId } ?: return prato
+        val distance = if (userLat != null && userLng != null) {
+            distanceKm(userLat, userLng, rest.latitude, rest.longitude)
+        } else {
+            prato.distanciaKm
+        }
+        return prato.copy(
+            restauranteLatitude = rest.latitude,
+            restauranteLongitude = rest.longitude,
+            distanciaKm = distance ?: prato.distanciaKm
+        )
+    }
+
+    private fun distanceKm(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Double {
+        val dLat = Math.toRadians(lat2 - lat1)
+        val dLng = Math.toRadians(lng2 - lng1)
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+        return Math.round(6371 * c * 100.0) / 100.0
     }
 
     // ─── Avaliações Mock ────────────────────────────────────────────────
@@ -658,18 +683,13 @@ object MockDataProvider {
             val rest = restaurantes.find { it.id == prato.restauranteId } ?: return@filter false
             
             // Haversine distance
-            val dLat = Math.toRadians(rest.latitude - lat)
-            val dLng = Math.toRadians(rest.longitude - lng)
-            val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                    Math.cos(Math.toRadians(lat)) * Math.cos(Math.toRadians(rest.latitude)) *
-                    Math.sin(dLng / 2) * Math.sin(dLng / 2)
-            val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-            val distKm = 6371 * c
+            val distKm = distanceKm(lat, lng, rest.latitude, rest.longitude)
             
             val matchCategoria = categoria == null || prato.categoria.equals(categoria, ignoreCase = true)
             
             distKm <= radiusKm && matchCategoria
-        }.sortedByDescending { it.ratingMedio }
+        }.map { enrichWithRestaurantLocation(it, lat, lng) }
+            .sortedByDescending { it.ratingMedio }
     }
 
     // ─── Sugestões de pesquisa ──────────────────────────────────────────

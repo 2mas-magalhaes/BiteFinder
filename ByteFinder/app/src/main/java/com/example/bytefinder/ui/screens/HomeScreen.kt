@@ -69,6 +69,7 @@ import coil.request.ImageRequest
 import coil.transform.Transformation
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.LocationService
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
@@ -655,7 +656,8 @@ fun HomeScreen(
                                             ) {
                                                 AsyncImage(
                                                     model = ImageRequest.Builder(LocalContext.current)
-                                                        .data(topPrato.imagemUrl)
+                                                        .data(topPrato.displayImageUrl())
+                                                        .allowHardware(false)
                                                         .crossfade(true)
                                                         .build(),
                                                     contentDescription = topPrato.nome,
@@ -930,7 +932,7 @@ private fun NearbyDishCard(
         Column {
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(prato.imagemUrl)
+                    .data(prato.displayImageUrl())
                     .crossfade(true)
                     .build(),
                 contentDescription = prato.nome,
@@ -1011,7 +1013,7 @@ private fun FeaturedDishCard(
         Column {
             Box {
                 AsyncImage(
-                    model = prato.imagemUrl,
+                    model = prato.displayImageUrl(),
                     contentDescription = prato.nome,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier

@@ -45,6 +45,7 @@ import coil.compose.AsyncImage
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.MockDataProvider
 import com.example.bytefinder.data.PratoDto
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.theme.*
 import java.util.Locale
@@ -146,9 +147,10 @@ fun ClayPratoCompareScreen(
             ) {
                 Column {
                     // Imagem
-                    if (!bestPrato.imagemUrl.isNullOrBlank()) {
+                    val imageUrl = bestPrato.displayImageUrl()
+                    if (!imageUrl.isNullOrBlank()) {
                         AsyncImage(
-                            model = bestPrato.imagemUrl,
+                            model = imageUrl,
                             contentDescription = tipo,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
