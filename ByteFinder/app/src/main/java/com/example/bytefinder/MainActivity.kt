@@ -20,7 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bytefinder.data.ApiClient
 import com.example.bytefinder.data.ApiService
@@ -38,6 +40,7 @@ import com.example.bytefinder.ui.screens.ClayRestaurantDetailScreen
 import com.example.bytefinder.ui.screens.ClaySettingsScreen
 import com.example.bytefinder.ui.screens.HomeScreen
 import com.example.bytefinder.ui.screens.NearZoneScreen
+import com.example.bytefinder.ui.screens.BiteOnboardingScreen
 import com.example.bytefinder.ui.theme.BitefinderClayTheme
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
 import com.example.bytefinder.ui.viewmodel.HomeViewModelFactory
@@ -74,6 +77,10 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data.ApiService) {
+    val context = LocalContext.current
+    val onboardingPrefs = remember {
+        context.getSharedPreferences("bitefinder_prefs", android.content.Context.MODE_PRIVATE)
+    }
     var token by remember { mutableStateOf<String?>(null) }
     var userName by remember { mutableStateOf<String?>(null) }
     var currentUserId by remember { mutableStateOf<Int?>(null) }
@@ -85,6 +92,9 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
     var selectedPratoId by remember { mutableStateOf<Int?>(null) }
     var selectedRestauranteId by remember { mutableStateOf<Int?>(null) }
     var selectedTab by remember { mutableStateOf(NavTab.HOME) }
+    var onboardingDone by rememberSaveable {
+        mutableStateOf(onboardingPrefs.getBoolean("onboarding_done", false))
+    }
 
     val homeViewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(repository)
@@ -119,7 +129,12 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
         currentScreen !in listOf(AppScreen.DETAIL, AppScreen.MY_REVIEWS, AppScreen.SETTINGS, AppScreen.RESTAURANT_DETAIL, AppScreen.PRATO_COMPARE) &&
         !(currentScreen == AppScreen.BUSINESS && !isRestaurantUser)
 
-    if (token == null) {
+    if (token == null && !onboardingDone) {
+        BiteOnboardingScreen(onFinish = {
+            onboardingDone = true
+            onboardingPrefs.edit().putBoolean("onboarding_done", true).apply()
+        })
+    } else if (token == null) {
         ClayLoginScreen(
             repository = repository,
             authViewModel = authViewModel,

@@ -318,11 +318,28 @@ private fun RestaurantCompareCard(
     ClayCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
-        backgroundColor = if (isFirst) ClayWhite else ClayWhite,
+        backgroundColor = if (isFirst) ClayWhite else ClayBlueLight,
         cornerRadius = 20.dp,
-        elevation = if (isFirst) 8.dp else 5.dp
+        elevation = if (isFirst) 10.dp else 4.dp
     ) {
         Column(Modifier.padding(16.dp)) {
+            if (isFirst) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(999.dp))
+                        .background(ClayBlue.copy(alpha = 0.22f))
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                ) {
+                    Text(
+                        "TOP",
+                        color = ClayBlue,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.Top
@@ -358,13 +375,13 @@ private fun RestaurantCompareCard(
                         text = prato.restauranteNome,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-                        color = ClayTextDark
+                        color = if (isFirst) ClayOnDark else ClayTextDark
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
                         text = prato.nome,
                         fontSize = 13.sp,
-                        color = ClayTextMedium,
+                        color = if (isFirst) ClayOnDarkSecond else ClayTextMedium,
                         fontWeight = FontWeight.Medium
                     )
                     if (restaurante != null) {
@@ -373,14 +390,14 @@ private fun RestaurantCompareCard(
                             Icon(
                                 imageVector = Icons.Filled.LocationOn,
                                 contentDescription = null,
-                                tint = ClayTextLight,
+                                tint = if (isFirst) ClayOnDarkSecond else ClayTextLight,
                                 modifier = Modifier.size(14.dp)
                             )
                             Spacer(Modifier.width(4.dp))
                             Text(
                                 text = "${restaurante.morada}, ${restaurante.cidade}",
                                 fontSize = 12.sp,
-                                color = ClayTextLight,
+                                color = if (isFirst) ClayOnDarkSecond else ClayTextLight,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -396,7 +413,7 @@ private fun RestaurantCompareCard(
                         else "-",
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 18.sp,
-                        color = ClayBlue
+                        color = if (isFirst) ClayBlueSoft else ClayBlue
                     )
                 }
             }
@@ -426,14 +443,14 @@ private fun RestaurantCompareCard(
                 Text(
                     text = "${prato.totalAvaliacoes} avaliações",
                     fontSize = 12.sp,
-                    color = ClayTextLight
+                    color = if (isFirst) ClayOnDarkSecond else ClayTextLight
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
                     text = "Ver restaurante →",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = ClayBlue,
+                    color = if (isFirst) ClayBlueSoft else ClayBlue,
                     modifier = Modifier.clickable { onRestauranteClick() }
                 )
             }

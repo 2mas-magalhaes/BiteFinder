@@ -1,8 +1,9 @@
 package com.example.bytefinder.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -123,9 +124,10 @@ fun ClayLoginScreen(
     // Animação de entrada
     var visible by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { visible = true }
+    val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
     val scale by animateFloatAsState(
-        targetValue = if (visible) 1f else 0.85f,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = 200f),
+        targetValue = if (visible) 1f else 0.96f,
+        animationSpec = tween(durationMillis = 280, easing = biteEase),
         label = "login-scale"
     )
 

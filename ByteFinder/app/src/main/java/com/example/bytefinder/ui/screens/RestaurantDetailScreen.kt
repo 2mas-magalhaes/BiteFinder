@@ -156,7 +156,7 @@ fun ClayRestaurantDetailScreen(
             // ─── Card principal do restaurante ──────────────────────────
             ClayCard(
                 modifier = Modifier.fillMaxWidth(),
-                backgroundColor = ClayWhite,
+                backgroundColor = ClayDarkNavy.copy(alpha = 0.9f),
                 cornerRadius = 24.dp,
                 elevation = 8.dp
             ) {
@@ -166,7 +166,7 @@ fun ClayRestaurantDetailScreen(
                         Icon(
                             imageVector = Icons.Filled.Restaurant,
                             contentDescription = null,
-                            tint = ClayBlue,
+                            tint = ClayBlueSoft,
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(Modifier.width(10.dp))
@@ -174,7 +174,7 @@ fun ClayRestaurantDetailScreen(
                             text = restaurante.nome,
                             fontSize = 24.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = ClayTextDark
+                            color = ClayOnDark
                         )
                     }
 
@@ -185,13 +185,13 @@ fun ClayRestaurantDetailScreen(
                         Icon(
                             imageVector = Icons.Filled.LocationOn,
                             contentDescription = null,
-                            tint = ClayTextMedium,
+                            tint = ClayOnDarkSecond,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(6.dp))
                         Text(
                             text = "${restaurante.morada}, ${restaurante.cidade}",
-                            color = ClayTextMedium,
+                            color = ClayOnDarkSecond,
                             fontSize = 14.sp
                         )
                     }
@@ -201,7 +201,7 @@ fun ClayRestaurantDetailScreen(
                     // Zona
                     Text(
                         text = "Zona: ${restaurante.zona}",
-                        color = ClayTextLight,
+                        color = ClayOnDarkSecond,
                         fontSize = 13.sp,
                         modifier = Modifier.padding(start = 24.dp)
                     )
@@ -433,11 +433,7 @@ private fun StatBadge(
             )
         }
         Spacer(Modifier.height(4.dp))
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            color = ClayOnDarkSecond
-        )
+        Text(text = label, fontSize = 11.sp, color = ClayTextLight)
     }
 }
 

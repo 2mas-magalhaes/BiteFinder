@@ -2,7 +2,8 @@ package com.example.bytefinder.ui.components
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.ui.theme.*
 import java.util.Locale
@@ -49,15 +51,15 @@ import java.util.Locale
  * - Inset shadows: drawWithCache em claySurface() — zero allocs/frame
  * - Animações: 2 (era 6) — scale + elevation
  *
- * SQUISH EFFECT:
- * - scale: 1.0 → 0.97 com Spring (subtil, não agressivo)
- * - elevation: baseElevation → 2dp (card "afunda")
+ * PRESS EFFECT:
+ * - scale: 1.0 -> 0.985 with a short premium easing
+ * - elevation: baseElevation -> 4dp while pressed
  */
 @Composable
 fun ClayCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    backgroundColor: Color = ClayWhite,
+    backgroundColor: Color = ClayBlueLight,
     cornerRadius: Dp = 24.dp,
     elevation: Dp = 8.dp,
     content: @Composable () -> Unit
@@ -66,15 +68,15 @@ fun ClayCard(
     val pressed by interaction.collectIsPressedAsState()
     val shape = RoundedCornerShape(cornerRadius)
 
-    // ── 2 animações (era 6) ─────────────────────────────────────
+    val biteEase = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
     val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.97f else 1f,
-        animationSpec = spring(dampingRatio = 0.50f, stiffness = 380f),
+        targetValue = if (pressed) 0.985f else 1f,
+        animationSpec = tween(durationMillis = 160, easing = biteEase),
         label = "card-scale"
     )
     val animatedElevation by animateDpAsState(
-        targetValue = if (pressed) 2.dp else elevation,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = 500f),
+        targetValue = if (pressed) 4.dp else elevation,
+        animationSpec = tween(durationMillis = 180, easing = biteEase),
         label = "card-elev"
     )
 
@@ -87,8 +89,8 @@ fun ClayCard(
                 elevation = animatedElevation,
                 shape = shape,
                 clip = false,
-                ambientColor = Color(0xFF0E223F).copy(alpha = 0.06f),
-                spotColor = Color(0xFF0E223F).copy(alpha = 0.10f)
+                ambientColor = Color(0xFF0E223F).copy(alpha = 0.08f),
+                spotColor = Color(0xFF0E223F).copy(alpha = 0.14f)
             )
             // 2 + 3. INSET SHADOWS — drawWithCache, zero allocs/frame
             .claySurface(
@@ -117,7 +119,7 @@ fun ClayDishCard(
     ClayCard(
         modifier = modifier,
         onClick = onClick,
-        backgroundColor = ClayBeigeSoft,
+        backgroundColor = ClayBlueLight,
         cornerRadius = 24.dp,
         elevation = 8.dp
     ) {
@@ -129,28 +131,18 @@ fun ClayDishCard(
                     .height(140.dp)
             ) {
                 if (!prato.imagemUrl.isNullOrBlank()) {
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model = prato.imagemUrl,
                         contentDescription = prato.nome,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+                        loading = { DishImageFallback(prato.nome) },
+                        error = { DishImageFallback(prato.nome) }
                     )
                 } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(ClayBlueLight),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Restaurant,
-                            contentDescription = null,
-                            tint = ClayTextLight,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
+                    DishImageFallback(prato.nome)
                 }
 
                 // Badge de rating
@@ -215,6 +207,33 @@ fun ClayDishCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DishImageFallback(label: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ClayBluePale.copy(alpha = 0.65f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Filled.Restaurant,
+                contentDescription = null,
+                tint = ClayBlue,
+                modifier = Modifier.padding(8.dp)
+            )
+            Text(
+                text = label.take(18),
+                color = ClayTextMedium,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

@@ -96,7 +96,7 @@ fun ClayAccountScreen(
         // ─── Opções ──────────────────────────────────────────────────────
         ClayCard(
             modifier = Modifier.fillMaxWidth(),
-            backgroundColor = Color(0xFF111E30),
+            backgroundColor = ClayDarkNavy.copy(alpha = 0.88f),
             cornerRadius = 24.dp,
             elevation = 0.dp
         ) {
@@ -118,7 +118,7 @@ fun ClayAccountScreen(
             text = "Terminar sessão",
             onClick = onSignOut,
             modifier = Modifier.fillMaxWidth(),
-            containerColor = Color(0xFF1E2D42),
+            containerColor = ClayDarkNavy.copy(alpha = 0.92f),
             contentColor = ClayOnDark
         )
     }

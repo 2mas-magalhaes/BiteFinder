@@ -9,28 +9,33 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="tokens.css" />
   <style>
     :root {
       --brand: #1B6EC2;
-      --brand-hover: #1453A0;
+      --brand-hover: #103E7D;
+      --brand-bright: #5AA7F2;
       --accent: #1B6EC2;
-      --accent-hover: #1453A0;
-      --accent-soft: rgba(27,110,194,0.15);
-      --bg: #0C1829;
-      --bg-elevated: #111F33;
-      --surface: #162033;
-      --surface-light: #1A2740;
-      --border: rgba(255,255,255,0.08);
-      --text: #F0F4FA;
-      --text-soft: #8FA3BF;
+      --accent-hover: #103E7D;
+      --accent-soft: rgba(74,144,217,0.16);
+      --bg: #071224;
+      --bg-elevated: #0B1B31;
+      --surface: #10233D;
+      --surface-light: #152B49;
+      --surface-frost: rgba(16,35,61,0.78);
+      --border: rgba(214,232,248,0.13);
+      --text: #F4F8FF;
+      --text-soft: #9FB2CC;
       --success: #34C67A;
       --error: #E85C5C;
       --yellow: #FFC107;
+      --porcelain: #F7FAFF;
       --radius: 24px;
-      --shadow-sm: 0 4px 12px 0 rgba(0,0,0,0.25);
-      --shadow: 0 16px 48px -12px rgba(0,0,0,0.4);
-      --shadow-lg: 0 24px 64px -16px rgba(0,0,0,0.5);
-      --ring: rgba(27,110,194,0.4);
+      --shadow-sm: 0 8px 20px -14px rgba(0,0,0,0.38);
+      --shadow: 0 22px 58px -28px rgba(0,0,0,0.58);
+      --shadow-lg: 0 34px 90px -40px rgba(0,0,0,0.7);
+      --ring: rgba(90,167,242,0.34);
+      --ease: cubic-bezier(.2,.8,.2,1);
       font-family: 'Manrope', 'Segoe UI', sans-serif;
     }
 
@@ -38,13 +43,13 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: var(--bg);
+      background: linear-gradient(140deg, #061121 0%, #071224 46%, #102844 100%);
       color: var(--text);
     }
 
     h1, h2, h3, h4 {
       font-family: 'Sora', 'Manrope', sans-serif;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
     }
     
     .hidden { display: none !important; }
@@ -55,7 +60,7 @@
     .auth-banner {
       display: none;
       width: 47%;
-      background: linear-gradient(165deg, rgba(12, 24, 41, 0.5), rgba(12, 24, 41, 0.92)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+      background: linear-gradient(165deg, rgba(6, 17, 33, 0.26), rgba(6, 17, 33, 0.94)), url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
       color: white;
       padding: 3.6rem;
       flex-direction: column;
@@ -66,13 +71,7 @@
 
     .auth-banner::before {
       content: '';
-      position: absolute;
-      width: 260px;
-      height: 260px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(27,110,194,0.5) 0%, rgba(27,110,194,0) 70%);
-      top: -50px;
-      right: -50px;
+      display: none;
     }
     
     @media (min-width: 1024px) {
@@ -83,7 +82,7 @@
       font-size: clamp(3rem, 5vw, 4.5rem);
       font-weight: 800;
       line-height: 1.05;
-      letter-spacing: -0.04em;
+      letter-spacing: 0;
       margin-bottom: 24px;
       max-width: 600px;
       position: relative;
@@ -109,7 +108,7 @@
 
     .kpi-pill {
       background: rgba(27,110,194,0.2);
-      border: 1px solid rgba(27,110,194,0.35);
+      border: 1px solid rgba(214,232,248,0.22);
       border-radius: 999px;
       padding: 0.5rem 0.9rem;
       font-size: 0.82rem;
@@ -124,18 +123,19 @@
       flex-direction: column;
       justify-content: center;
       padding: 2rem 1.3rem;
-      background: var(--bg);
+      background: linear-gradient(140deg, #071224 0%, #0A1A2F 100%);
     }
     
     .auth-card {
       width: 100%;
       max-width: 520px;
       margin: 0 auto;
-      background: var(--surface);
+      background: var(--surface-frost);
       border: 1px solid var(--border);
       border-radius: 32px;
       box-shadow: var(--shadow-lg);
       padding: 48px;
+      backdrop-filter: blur(18px);
     }
     
     .auth-card.register-mode { max-width: 720px; }
@@ -149,7 +149,7 @@
       box-shadow: var(--shadow);
       border: 1px solid var(--border);
     }
-    .auth-header h2 { font-size: 2.25rem; font-weight: 800; margin: 0 0 8px; color: var(--text); letter-spacing: -0.03em; }
+    .auth-header h2 { font-size: 2.25rem; font-weight: 800; margin: 0 0 8px; color: var(--text); letter-spacing: 0; }
     .auth-header p { color: var(--text-soft); font-size: 1.1rem; margin: 0; }
     
     .auth-tabs {
@@ -172,16 +172,16 @@
       transition: all 0.2s ease;
     }
     .auth-tabs button.active {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--brand-bright), var(--brand));
       color: #fff;
-      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.5);
+      box-shadow: 0 12px 28px -16px rgba(90,167,242,0.85);
     }
     
     /* ---- DASHBOARD LAYOUT ---- */
-    .dashboard-layout { min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+    .dashboard-layout { min-height: 100vh; display: flex; flex-direction: column; background: linear-gradient(140deg, #061121 0%, #071224 48%, #102844 100%); }
     
     .dash-nav {
-      background: rgba(17, 31, 51, 0.92);
+      background: rgba(7, 18, 36, 0.86);
       border-bottom: 1px solid var(--border);
       padding: 0 1.6rem;
       display: flex;
@@ -217,7 +217,7 @@
       align-items: center;
       gap: 6px;
     }
-    .dash-menu button:hover { background: rgba(27,110,194,0.12); color: var(--text); }
+    .dash-menu button:hover { background: rgba(74,144,217,0.12); color: var(--text); }
     .dash-menu button.active { background: var(--accent-soft); color: var(--accent); }
     
     .dash-logout {
@@ -265,18 +265,18 @@
       font-weight: 700;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.22s var(--ease);
     }
-    .restaurant-chip:hover { border-color: var(--accent); color: var(--text); background: rgba(27,110,194,0.08); }
+    .restaurant-chip:hover { border-color: var(--accent); color: var(--text); background: rgba(74,144,217,0.10); }
     .restaurant-chip.active {
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--brand-bright), var(--brand));
       border-color: var(--accent);
       color: white;
       box-shadow: 0 4px 16px -4px rgba(27,110,194,0.5);
     }
 
     /* ---- COMMON COMPONENTS ---- */
-    .panel { display: none; animation: fadeIn 0.3s ease; }
+    .panel { display: none; animation: fadeIn 0.32s var(--ease); }
     .panel.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
@@ -287,12 +287,13 @@
       padding: 32px;
       box-shadow: var(--shadow);
       margin-bottom: 24px;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+      transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s var(--ease);
     }
     
     .card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(214,232,248,0.22);
     }
     
     .form-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
@@ -302,7 +303,7 @@
     .form-row label { font-size: 0.85rem; font-weight: 600; color: var(--text-soft); }
     .form-row input, .form-row select, .form-row textarea { 
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       background: var(--bg-elevated);
       color: var(--text);
       padding: 12px 14px;
@@ -326,13 +327,13 @@
       font-size: 1.05rem;
       font-weight: 800;
       color: white;
-      background: var(--brand);
+      background: linear-gradient(135deg, var(--brand-bright), var(--brand));
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), background 0.18s var(--ease);
       display: flex; justify-content: center; align-items: center; gap: 12px;
-      box-shadow: 0 4px 16px -4px rgba(27,110,194,0.4);
+      box-shadow: 0 18px 34px -24px rgba(90,167,242,0.9);
     }
-    .button-cta:hover { transform: scale(1.01); box-shadow: 0 8px 24px -4px rgba(27,110,194,0.5); background: var(--brand-hover); }
+    .button-cta:hover { transform: translateY(-1px); box-shadow: 0 22px 42px -24px rgba(90,167,242,0.95); background: var(--brand-hover); }
     .button-cta.secondary { background: var(--accent); color: white; }
     .button-cta.secondary:hover { background: var(--accent-hover); }
     .button-cta.danger { background: var(--error); color: white; }
@@ -349,7 +350,7 @@
     }
     
     .page-header { margin-bottom: 32px; }
-    .page-header h2 { font-size: 2.2rem; font-weight: 800; color: var(--text); margin: 0 0 8px; letter-spacing: -0.03em; }
+    .page-header h2 { font-size: 2.2rem; font-weight: 800; color: var(--text); margin: 0 0 8px; letter-spacing: 0; }
     .page-header p { color: var(--text-soft); font-size: 1.1rem; margin: 0; }
 
     .section-eyebrow {
@@ -381,9 +382,9 @@
       padding: 18px;
       text-align: center;
       box-shadow: var(--shadow-sm);
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease), border-color 0.22s var(--ease);
     }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: rgba(214,232,248,0.2); }
     .stat-emoji { margin-bottom: 6px; display: flex; justify-content: center; color: var(--accent); }
     .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--text); margin: 0; }
     .stat-label { color: var(--text-soft); font-size: 0.82rem; font-weight: 500; margin: 2px 0 0; }
@@ -395,15 +396,19 @@
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     }
 
+    .dish-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+
     .dish-card {
       background: var(--surface-light);
       border: 1px solid var(--border);
       border-radius: 20px;
       overflow: hidden;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transition: transform 0.24s var(--ease), box-shadow 0.24s var(--ease), border-color 0.24s var(--ease);
       box-shadow: var(--shadow-sm);
     }
-    .dish-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .dish-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: rgba(214,232,248,0.22); }
     .dish-card.is-destaque {
       border-color: rgba(255,184,0,0.35);
       box-shadow: 0 4px 16px -4px rgba(255,184,0,0.15);
@@ -415,6 +420,7 @@
       object-fit: cover;
       background: var(--bg-elevated);
       display: block;
+      filter: saturate(1.06) contrast(1.03);
     }
 
     .dish-card-body { padding: 16px; }
@@ -484,7 +490,7 @@
       font-weight: 700;
       font-size: 0.82rem;
       cursor: pointer;
-      transition: all 0.25s ease;
+      transition: all 0.2s var(--ease);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -535,6 +541,191 @@
 
     .dish-card-img-wrap {
       position: relative;
+    }
+
+    .dish-grid.list-view .dish-card {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px) 1fr;
+      min-height: 210px;
+    }
+
+    .dish-grid.list-view .dish-card-img-wrap {
+      min-height: 100%;
+    }
+
+    .dish-grid.list-view .dish-card-img {
+      height: 100%;
+      min-height: 210px;
+    }
+
+    .insights-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .insight-stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .insight-row {
+      display: grid;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-light);
+      border-radius: 18px;
+      transition: transform .22s var(--ease), border-color .22s var(--ease), background .22s var(--ease);
+    }
+
+    .insight-row:hover {
+      transform: translateY(-2px);
+      border-color: rgba(90,167,242,0.28);
+      background: rgba(21,43,73,0.92);
+    }
+
+    .insight-rank {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      color: var(--brand-bright);
+      font-weight: 900;
+    }
+
+    .insight-row h4 {
+      margin: 0 0 4px;
+      color: var(--text);
+      font-size: 0.98rem;
+    }
+
+    .insight-row p {
+      margin: 0;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+      line-height: 1.4;
+    }
+
+    .sentiment-badge {
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.72rem;
+      font-weight: 900;
+      border: 1px solid transparent;
+    }
+
+    .sentiment-badge.excellent { color: #9FF3C7; background: rgba(52,198,122,0.14); border-color: rgba(52,198,122,0.24); }
+    .sentiment-badge.steady { color: #D6E8F8; background: rgba(90,167,242,0.15); border-color: rgba(90,167,242,0.24); }
+    .sentiment-badge.watch { color: #FFD76A; background: rgba(255,193,7,0.13); border-color: rgba(255,193,7,0.24); }
+
+    .review-callout {
+      border-radius: 24px;
+      padding: 22px;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(90,167,242,0.24), transparent 38%),
+        linear-gradient(145deg, rgba(16,35,61,0.96), rgba(7,18,36,0.96));
+      border: 1px solid rgba(214,232,248,0.16);
+      box-shadow: var(--shadow);
+    }
+
+    .review-callout h3 {
+      margin: 0 0 8px;
+      color: var(--text);
+      font-size: 1.15rem;
+    }
+
+    .review-callout p {
+      margin: 0 0 16px;
+      color: var(--text-soft);
+      line-height: 1.55;
+    }
+
+    .response-template {
+      border-radius: 18px;
+      background: rgba(7,18,36,0.72);
+      border: 1px solid var(--border);
+      padding: 14px;
+      color: var(--text-soft);
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+
+    .portal-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .view-toggle {
+      display: inline-flex;
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--surface-light);
+      gap: 4px;
+    }
+
+    .view-toggle button {
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-soft);
+      font: inherit;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 8px 12px;
+      cursor: pointer;
+      transition: background .18s var(--ease), color .18s var(--ease);
+    }
+
+    .view-toggle button.active {
+      background: linear-gradient(135deg, var(--brand-bright), var(--brand));
+      color: #fff;
+    }
+
+    .menu-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .menu-controls input,
+    .menu-controls select {
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text);
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color .18s var(--ease), box-shadow .18s var(--ease);
+    }
+
+    .menu-controls input {
+      flex: 1 1 220px;
+    }
+
+    .menu-controls select {
+      flex: 0 1 180px;
+    }
+
+    .menu-controls input:focus,
+    .menu-controls select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--ring);
     }
 
     /* ---- Image Preview ---- */
@@ -595,7 +786,7 @@
       box-shadow: var(--shadow-lg);
       opacity: 0;
       transform: translateY(12px);
-      transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: 0.3s var(--ease);
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -615,7 +806,12 @@
 
     @media (max-width: 640px) {
       .dish-grid { grid-template-columns: 1fr; }
+      .dish-grid.list-view .dish-card { grid-template-columns: 1fr; }
+      .dish-grid.list-view .dish-card-img { height: 200px; min-height: 0; }
       .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .insights-grid { grid-template-columns: 1fr; }
+      .insight-row { grid-template-columns: 42px minmax(0, 1fr); }
+      .sentiment-badge { grid-column: 2; justify-self: start; }
     }
   </style>
 </head>
@@ -720,6 +916,7 @@
       </div>
       <div class="dash-menu">
         <button id="tabMenu" type="button" class="active"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Cardápio</button>
+        <button id="tabInsights" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg> Intelligence</button>
       </div>
       <button id="btnSair" class="dash-logout">Terminar Sessão</button>
     </nav>
@@ -780,10 +977,62 @@
           
           <!-- Lista de Pratos -->
           <div>
+            <div class="portal-toolbar">
+              <div>
+                <h3 style="margin:0;color:var(--text);font-size:1.15rem;">Pratos publicados</h3>
+                <p style="margin:4px 0 0;color:var(--text-soft);font-size:.86rem;">Compare performance, preço e destaque sem sair do fluxo.</p>
+              </div>
+              <div class="view-toggle" aria-label="Alternar vista">
+                <button id="viewGrid" type="button" class="active">Grelha</button>
+                <button id="viewList" type="button">Lista</button>
+              </div>
+            </div>
+            <div class="menu-controls">
+              <input id="menuSearch" type="search" placeholder="Pesquisar prato, categoria ou descrição" />
+              <select id="menuSort" aria-label="Ordenar pratos">
+                <option value="signal">Melhor sinal</option>
+                <option value="rating">Rating</option>
+                <option value="reviews">Avaliações</option>
+                <option value="priceAsc">Preço baixo</option>
+                <option value="priceDesc">Preço alto</option>
+              </select>
+            </div>
             <div id="menuList" class="dish-grid">
               <div class="empty-state">A carregar pratos...</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- PAINEL INTELLIGENCE / REVIEWS -->
+      <section id="panelInsights" class="panel">
+        <div class="page-header">
+          <span class="section-eyebrow">Review Intelligence</span>
+          <h2>Performance e reputação</h2>
+          <p>Veja quais pratos estão a criar desejo, consistência e oportunidades de melhoria.</p>
+        </div>
+
+        <div class="insights-grid">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:18px;">
+              <div>
+                <h3 style="margin:0 0 6px;color:var(--text);font-size:1.15rem;">Pratos com mais sinal</h3>
+                <p style="margin:0;color:var(--text-soft);font-size:.88rem;">Ordenado por rating, volume de reviews e destaque.</p>
+              </div>
+              <button class="button-cta small secondary" type="button" id="refreshInsights">Atualizar</button>
+            </div>
+            <div id="insightsList" class="insight-stack">
+              <div class="empty-state">A carregar inteligência...</div>
+            </div>
+          </div>
+
+          <aside class="review-callout">
+            <h3>Tom de resposta recomendado</h3>
+            <p>Responda com precisão, gratidão e contexto. Mantenha o tom curto, premium e humano.</p>
+            <div class="response-template" id="responseTemplate">
+              Obrigado pela visita. Ficamos contentes por saber que o prato correspondeu às expectativas. A equipa vai continuar a afinar cada detalhe para manter esta experiência consistente.
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -876,13 +1125,19 @@
     const tabLogin = document.getElementById('tabLogin');
     const tabRegister = document.getElementById('tabRegister');
     const tabMenu = document.getElementById('tabMenu');
+    const tabInsights = document.getElementById('tabInsights');
     const panelLogin = document.getElementById('panelLogin');
     const panelRegister = document.getElementById('panelRegister');
     const panelMenu = document.getElementById('panelMenu');
+    const panelInsights = document.getElementById('panelInsights');
     const authLayout = document.getElementById('authLayout');
     const authCard = document.getElementById('authCard');
     const dashboardLayout = document.getElementById('dashboardLayout');
     const navRestaurantName = document.getElementById('navRestaurantName');
+    const viewGrid = document.getElementById('viewGrid');
+    const viewList = document.getElementById('viewList');
+    const menuSearch = document.getElementById('menuSearch');
+    const menuSort = document.getElementById('menuSort');
 
     const toast = document.getElementById('toast');
     const loginEmail = document.getElementById('loginEmail');
@@ -1035,16 +1290,18 @@
     }
 
     function switchTab(panel) {
-      [tabLogin, tabRegister, tabMenu].forEach(b => b.classList.remove('active'));
-      [panelLogin, panelRegister, panelMenu].forEach(p => p.classList.remove('active'));
+      [tabLogin, tabRegister, tabMenu, tabInsights].forEach(b => b.classList.remove('active'));
+      [panelLogin, panelRegister, panelMenu, panelInsights].forEach(p => p.classList.remove('active'));
       if (panel === 'login') { tabLogin.classList.add('active'); panelLogin.classList.add('active'); authCard.classList.remove('register-mode'); }
       if (panel === 'register') { tabRegister.classList.add('active'); panelRegister.classList.add('active'); authCard.classList.add('register-mode'); }
       if (panel === 'menu' && state.token) { tabMenu.classList.add('active'); panelMenu.classList.add('active'); }
+      if (panel === 'insights' && state.token) { tabInsights.classList.add('active'); panelInsights.classList.add('active'); renderInsights(MOCK.pratos[state.restauranteId] || []); }
     }
 
     tabLogin.onclick = () => { switchTab('login'); loginEmail.focus(); };
     tabRegister.onclick = () => switchTab('register');
     tabMenu.onclick = () => switchTab('menu');
+    tabInsights.onclick = () => switchTab('insights');
     document.getElementById('btnSair').onclick = () => setTabVisibility(false);
 
     // =====================================================================
@@ -1093,6 +1350,81 @@
       `;
     }
 
+    function dishSentiment(item) {
+      const rating = Number(item.ratingMedio || 0);
+      const reviews = Number(item.totalAvaliacoes || 0);
+      if (rating >= 4.7 && reviews >= 100) return { label: 'Excelente', cls: 'excellent' };
+      if (rating >= 4.3) return { label: 'Consistente', cls: 'steady' };
+      return { label: 'Precisa atenção', cls: 'watch' };
+    }
+
+    function renderInsights(items) {
+      const container = document.getElementById('insightsList');
+      if (!container) return;
+      const ranked = [...items].sort((a, b) => {
+        const scoreA = (a.ratingMedio || 0) * 20 + Math.min(a.totalAvaliacoes || 0, 500) / 10 + (a.destacado ? 8 : 0);
+        const scoreB = (b.ratingMedio || 0) * 20 + Math.min(b.totalAvaliacoes || 0, 500) / 10 + (b.destacado ? 8 : 0);
+        return scoreB - scoreA;
+      });
+
+      if (!ranked.length) {
+        container.innerHTML = '<div class="empty-state">Ainda não há pratos suficientes para gerar inteligência.</div>';
+        return;
+      }
+
+      container.innerHTML = ranked.slice(0, 6).map((item, index) => {
+        const sentiment = dishSentiment(item);
+        const signal = item.totalAvaliacoes
+          ? `${(item.ratingMedio || 0).toFixed(1)} rating · ${item.totalAvaliacoes} avaliações · ${formatEur(item.preco || 0)}`
+          : `Novo no menu · ${formatEur(item.preco || 0)}`;
+        return `
+          <article class="insight-row">
+            <div class="insight-rank">#${index + 1}</div>
+            <div>
+              <h4>${item.nome}</h4>
+              <p>${signal}${item.destacado ? ' · Em destaque' : ''}</p>
+            </div>
+            <span class="sentiment-badge ${sentiment.cls}">${sentiment.label}</span>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function getVisibleMenuItems(items) {
+      const query = (menuSearch?.value || '').trim().toLowerCase();
+      const sort = menuSort?.value || 'signal';
+      const visible = items.filter(item => {
+        if (!query) return true;
+        return [item.nome, item.categoria, item.descricao]
+          .filter(Boolean)
+          .some(value => String(value).toLowerCase().includes(query));
+      });
+
+      visible.sort((a, b) => {
+        if (sort === 'rating') return (b.ratingMedio || 0) - (a.ratingMedio || 0);
+        if (sort === 'reviews') return (b.totalAvaliacoes || 0) - (a.totalAvaliacoes || 0);
+        if (sort === 'priceAsc') return (a.preco || 0) - (b.preco || 0);
+        if (sort === 'priceDesc') return (b.preco || 0) - (a.preco || 0);
+        const scoreA = (a.destacado ? 12 : 0) + (a.ratingMedio || 0) * 20 + Math.min(a.totalAvaliacoes || 0, 500) / 10;
+        const scoreB = (b.destacado ? 12 : 0) + (b.ratingMedio || 0) * 20 + Math.min(b.totalAvaliacoes || 0, 500) / 10;
+        return scoreB - scoreA;
+      });
+      return visible;
+    }
+
+    function setMenuView(mode) {
+      const menuList = document.getElementById('menuList');
+      const listMode = mode === 'list';
+      menuList.classList.toggle('list-view', listMode);
+      viewGrid.classList.toggle('active', !listMode);
+      viewList.classList.toggle('active', listMode);
+      localStorage.setItem('bfMenuView', mode);
+    }
+
+    viewGrid.onclick = () => setMenuView('grid');
+    viewList.onclick = () => setMenuView('list');
+    setMenuView(localStorage.getItem('bfMenuView') || 'grid');
+
     // =====================================================================
     // REFRESH MENU
     // =====================================================================
@@ -1119,6 +1451,7 @@
       }
 
       const items = Array.isArray(res.items) ? res.items : [];
+      const visibleItems = getVisibleMenuItems(items);
 
       // Cache API-loaded pratos so mock operations (toggle, edit, delete) work
       if (items.length) {
@@ -1126,14 +1459,20 @@
       }
 
       renderStats(items);
+      renderInsights(items);
 
       if (!items.length) {
         menuList.innerHTML = '<div class="empty-state"><p style="margin:0 0 8px;color:var(--text-soft)">' + IC.utensils + '</p>O seu cardápio está vazio.<br>Adicione o primeiro prato ao lado.</div>';
         return;
       }
 
+      if (!visibleItems.length) {
+        menuList.innerHTML = '<div class="empty-state">Nenhum prato corresponde aos filtros atuais.</div>';
+        return;
+      }
+
       menuList.innerHTML = '';
-      items.forEach(item => {
+      visibleItems.forEach(item => {
         const card = document.createElement('article');
         card.className = 'dish-card' + (item.destacado ? ' is-destaque' : '');
         const precoEur = formatEur(item.preco || 0);
@@ -1291,6 +1630,12 @@
     // Image preview listeners
     document.getElementById('addImageUrl').addEventListener('input', () => updateImagePreview('addImageUrl', 'addImagePreview'));
     document.getElementById('editImageUrl').addEventListener('input', () => updateImagePreview('editImageUrl', 'editImagePreview'));
+    menuSearch.addEventListener('input', () => refreshMenu());
+    menuSort.addEventListener('change', () => refreshMenu());
+    document.getElementById('refreshInsights').onclick = () => {
+      renderInsights(MOCK.pratos[state.restauranteId] || []);
+      showToast('Intelligence atualizada.');
+    };
 
     // =====================================================================
     // LOGIN / REGISTER
