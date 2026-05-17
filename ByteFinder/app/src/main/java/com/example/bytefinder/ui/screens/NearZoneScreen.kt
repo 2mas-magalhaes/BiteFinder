@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Slider
@@ -50,11 +51,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.example.bytefinder.BuildConfig
 import com.example.bytefinder.data.LocationService
 import com.example.bytefinder.data.PratoDto
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.ClayCard
 import com.example.bytefinder.ui.components.SkeletonRow
 import com.example.bytefinder.ui.components.claySceneBackground
@@ -68,7 +69,6 @@ import com.example.bytefinder.ui.theme.ClayWhite
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -77,6 +77,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 import java.util.Locale
+import kotlin.math.ln
 
 @Composable
 fun NearZoneScreen(
@@ -296,9 +297,6 @@ private fun NearMapCard(
     pratos: List<PratoDto>,
     onPratoClick: (Int) -> Unit
 ) {
-    val hasMapsKey = BuildConfig.MAPS_API_KEY.isNotBlank() &&
-        BuildConfig.MAPS_API_KEY != "YOUR_GOOGLE_MAPS_ANDROID_KEY"
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -307,23 +305,27 @@ private fun NearMapCard(
             .clip(RoundedCornerShape(18.dp))
             .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
     ) {
-        if (!hasMapsKey) {
-            LocationMessage(
-                title = "Google Maps por configurar",
-                message = "Define MAPS_API_KEY no local.properties e ativa Maps SDK for Android."
-            )
-            return@Box
+        val targetZoom = zoomForRadius(radiusKm)
+        val cameraPositionState = rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(userLocation, targetZoom)
         }
 
-        val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(userLocation, 12f)
+        LaunchedEffect(userLocation, targetZoom) {
+            cameraPositionState.position = CameraPosition.fromLatLngZoom(userLocation, targetZoom)
         }
 
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties = MapProperties(isMyLocationEnabled = false),
-            uiSettings = MapUiSettings(zoomControlsEnabled = false, compassEnabled = false)
+            uiSettings = MapUiSettings(
+                zoomControlsEnabled = true,
+                zoomGesturesEnabled = true,
+                scrollGesturesEnabled = true,
+                rotationGesturesEnabled = true,
+                tiltGesturesEnabled = true,
+                compassEnabled = true
+            )
         ) {
             MarkerComposable(
                 state = MarkerState(position = userLocation),
@@ -337,14 +339,6 @@ private fun NearMapCard(
                         .border(2.dp, Color.White, CircleShape)
                 )
             }
-
-            Circle(
-                center = userLocation,
-                radius = radiusKm * 1000,
-                fillColor = ClayOrangeBolt.copy(alpha = 0.15f),
-                strokeColor = ClayOrangeBolt,
-                strokeWidth = 2f
-            )
 
             pratos
                 .filter { it.restauranteLatitude != null && it.restauranteLongitude != null }
@@ -379,24 +373,43 @@ private fun MapDishMarker(prato: PratoDto) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(64.dp)
                 .clip(CircleShape)
                 .background(Color.White)
-                .border(2.dp, ClayOrangeBolt, CircleShape),
+                .border(3.dp, ClayOrangeBolt, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(prato.imagemUrl)
+                    .data(prato.displayImageUrl())
+                    .allowHardware(false)
                     .crossfade(true)
                     .build(),
                 contentDescription = prato.nome,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(CircleShape)
+                    .padding(4.dp)
+                    .clip(CircleShape),
+                loading = { MapMarkerImageFallback(prato.nome) },
+                error = { MapMarkerImageFallback(prato.nome) }
             )
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .clip(RoundedCornerShape(999.dp))
+                    .background(Color(0xFFFFC107))
+                    .padding(horizontal = 5.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = String.format(Locale.US, "%.1f", prato.ratingMedio),
+                    color = ClayTextDark,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.ExtraBold
+                )
+            }
         }
+        Spacer(Modifier.height(3.dp))
         Text(
             text = prato.restauranteNome,
             fontSize = 11.sp,
@@ -404,8 +417,27 @@ private fun MapDishMarker(prato: PratoDto) {
             color = ClayTextDark,
             maxLines = 1,
             modifier = Modifier
-                .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(5.dp))
-                .padding(horizontal = 5.dp, vertical = 2.dp)
+                .clip(RoundedCornerShape(999.dp))
+                .background(Color.White.copy(alpha = 0.96f))
+                .border(1.dp, ClayBluePale, RoundedCornerShape(999.dp))
+                .padding(horizontal = 8.dp, vertical = 3.dp)
+        )
+    }
+}
+
+@Composable
+private fun MapMarkerImageFallback(label: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ClayBluePale.copy(alpha = 0.75f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label.take(1).uppercase(Locale.ROOT),
+            color = ClayTextDark,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.ExtraBold
         )
     }
 }
@@ -479,9 +511,9 @@ private fun NearDishCard(
         elevation = 6.dp
     ) {
         Column {
-            AsyncImage(
+            SubcomposeAsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(prato.imagemUrl)
+                    .data(prato.displayImageUrl())
                     .crossfade(true)
                     .build(),
                 contentDescription = prato.nome,
@@ -489,7 +521,9 @@ private fun NearDishCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(126.dp)
-                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
+                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)),
+                loading = { NearDishImageFallback(prato.nome) },
+                error = { NearDishImageFallback(prato.nome) }
             )
             Column(modifier = Modifier.padding(12.dp)) {
                 Text(
@@ -526,7 +560,57 @@ private fun NearDishCard(
                         color = ClayTextDark
                     )
                 }
+                Spacer(Modifier.height(6.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("★", color = Color(0xFFFFC107), fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.width(3.dp))
+                    Text(
+                        text = String.format(Locale.US, "%.1f", prato.ratingMedio),
+                        color = ClayTextDark,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "${prato.totalAvaliacoes} aval.",
+                        color = ClayTextMedium,
+                        fontSize = 11.sp
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun NearDishImageFallback(label: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ClayBluePale.copy(alpha = 0.65f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Filled.Restaurant,
+                contentDescription = null,
+                tint = ClayOrangeBolt,
+                modifier = Modifier.size(30.dp)
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = label.take(18),
+                color = ClayTextMedium,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+private fun zoomForRadius(radiusKm: Double): Float {
+    val clampedRadius = radiusKm.coerceIn(1.0, 20.0)
+    return (15.4 - ln(clampedRadius) / ln(2.0)).toFloat().coerceIn(11.0f, 15.5f)
 }

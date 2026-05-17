@@ -4,6 +4,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
+import java.text.Normalizer
+import java.util.Locale
 
 // -------------------- LOGIN --------------------
 
@@ -63,6 +65,63 @@ data class PratoDto(
     val distanciaKm: Double? = null,
     val destacado: Boolean = false
 )
+
+fun PratoDto.displayImageUrl(): String? {
+    return resolveDisplayImageUrl(nome = nome, categoria = categoria, imagemUrl = imagemUrl)
+}
+
+fun PratoDetailDto.displayImageUrl(): String? {
+    return resolveDisplayImageUrl(nome = nome, categoria = categoria, imagemUrl = imagemUrl)
+}
+
+private fun resolveDisplayImageUrl(nome: String, categoria: String?, imagemUrl: String?): String? {
+    val original = imagemUrl?.takeIf { it.isNotBlank() }
+    val normalizedName = normalizeImageKey(nome)
+    val fallback = reliableDishFallbackImages.firstNotNullOfOrNull { (needle, url) ->
+        url.takeIf { normalizedName.contains(needle) }
+    } ?: categoria?.let { categoryFallbackImage(it) }
+
+    return when {
+        original == null -> fallback
+        original.contains("Arroz_de_pato_no_forno", ignoreCase = true) -> fallback
+        original.contains("A%C3%A7orda_alentejana", ignoreCase = true) -> fallback
+        original.contains("Feijoada_%C3%A0_transmontana", ignoreCase = true) -> fallback
+        else -> original
+    }
+}
+
+private val dishFallbackImages = listOf(
+    "Arroz de Pato" to "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=700",
+    "Açorda" to "https://commons.wikimedia.org/wiki/Special:Redirect/file/A%C3%A7orda%20%C3%A0%20Alentejana.jpg",
+    "Feijoada" to "https://commons.wikimedia.org/wiki/Special:Redirect/file/Feijoada%20%C3%A0%20transmontada.jpg",
+    "Cozido" to "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cozido%20a%20portuguesa%201.JPG",
+    "Rojões" to "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&q=80&w=700",
+    "Tripas" to "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=700",
+    "Cabidela" to "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=700"
+)
+
+private val reliableDishFallbackImages = listOf(
+    "arroz de pato" to "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=700",
+    "acorda" to "https://commons.wikimedia.org/wiki/Special:FilePath/A%C3%A7orda%20%C3%A0%20Alentejana.jpg",
+    "feijoada" to "https://commons.wikimedia.org/wiki/Special:FilePath/Feijoada%20%C3%A0%20transmontada.jpg",
+    "cozido" to "https://commons.wikimedia.org/wiki/Special:FilePath/Cozido%20a%20portuguesa%201.JPG",
+    "rojoes" to "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&q=80&w=700",
+    "tripas" to "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&q=80&w=700",
+    "cabidela" to "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=700"
+)
+
+private fun categoryFallbackImage(category: String): String {
+    val normalizedCategory = normalizeImageKey(category)
+    return MockDataProvider.categoryImages.entries
+        .firstOrNull { normalizeImageKey(it.key) == normalizedCategory }
+        ?.value
+        ?: MockDataProvider.getCategoryImageUrl(category)
+}
+
+private fun normalizeImageKey(value: String): String =
+    Normalizer.normalize(value, Normalizer.Form.NFD)
+        .replace("\\p{Mn}+".toRegex(), "")
+        .lowercase(Locale.ROOT)
 
 data class PratosListResponse(
     val ok: Boolean,
