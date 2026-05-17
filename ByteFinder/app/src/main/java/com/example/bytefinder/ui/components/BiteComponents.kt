@@ -54,7 +54,7 @@ fun BiteButton(
 fun BiteCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    backgroundColor: Color = ClayWhite,
+    backgroundColor: Color = ClayBlueLight,
     radius: Dp = 24.dp,
     elevation: Dp = 8.dp,
     content: @Composable () -> Unit

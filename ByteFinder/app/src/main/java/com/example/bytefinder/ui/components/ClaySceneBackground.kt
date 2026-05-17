@@ -17,9 +17,9 @@ fun Modifier.claySceneBackground(): Modifier = this
     .drawWithCache {
         val bg = Brush.linearGradient(
             colors = listOf(
-                Color(0xFF061121),
-                Color(0xFF0A1628),
-                Color(0xFF102844)
+                Color(0xFFDCEEFF),
+                Color(0xFFD2E7FF),
+                Color(0xFFC6DFFF)
             ),
             start = Offset(0f, 0f),
             end = Offset(size.width, size.height)

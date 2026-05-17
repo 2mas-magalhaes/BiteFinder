@@ -1004,9 +1004,9 @@ private fun FeaturedDishCard(
 ) {
     ClayCard(
         modifier = modifier.clickable(onClick = onClick),
-        backgroundColor = ClayDarkNavy.copy(alpha = 0.9f),
+        backgroundColor = ClayWhite,
         cornerRadius = 20.dp,
-        elevation = 8.dp
+        elevation = 10.dp
     ) {
         Column {
             Box {

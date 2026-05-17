@@ -12,10 +12,10 @@ val ClayBluePale    = Color(0xFFD6E8F8)
 val ClayBlueLight   = Color(0xFFEBF3FF)
 
 // Neutros frios premium
-val ClaySurface     = Color(0xFFF4F7FB)
+val ClaySurface     = Color(0xFFD7EAFF)
 val ClayWhite       = Color(0xFFFFFFFF)
-val ClayOffWhite    = Color(0xFFF8FAFF)
-val ClayBeigeSoft   = Color(0xFFF5F8FC)
+val ClayOffWhite    = Color(0xFFEAF4FF)
+val ClayBeigeSoft   = Color(0xFFDCEEFF)
 
 // Compatibilidade (aliases para codigo existente)
 val ClayCream       = ClaySurface
@@ -26,8 +26,8 @@ val ClayOrangeDeep  = ClayBlueDeep
 val ClayPeach       = ClayBluePale
 
 // Texto
-val ClayTextDark    = Color(0xFF12213D)
-val ClayTextMedium  = Color(0xFF445069)
+val ClayTextDark    = Color(0xFF14233E)
+val ClayTextMedium  = Color(0xFF5D6E87)
 val ClayTextLight   = Color(0xFF8FA3BF)
 
 // Acentos
@@ -40,8 +40,8 @@ val ClayYellowDeep  = Color(0xFFE6A800)
 
 // Sombras suaves e neutras para evitar halos/artefactos no emulador
 val ClayShadowLight = Color(0xCCFFFFFF)
-val ClayShadowDark  = Color(0x160E223F)
-val ClayShadowOuter = Color(0x120E223F)
+val ClayShadowDark  = Color(0x180E223F)
+val ClayShadowOuter = Color(0x160E223F)
 
 // Acentos matte para categorias e estados
 val ClayOrangeBolt  = ClayBlueSoft
@@ -66,6 +66,8 @@ val ClayCategory = mapOf(
 fun getCategoryColor(category: String): Color =
     ClayCategory[category] ?: ClayBluePale
 
-val ClayDarkNavy     = Color(0xFF0A1628)
-val ClayOnDark       = Color.White
-val ClayOnDarkSecond = Color(0x99FFFFFF)
+// Compatibilidade: nomes antigos "dark" agora apontam para a linguagem clara.
+// Isto permite migrar ecras existentes sem voltar ao navy como superficie base.
+val ClayDarkNavy     = ClayWhite
+val ClayOnDark       = ClayTextDark
+val ClayOnDarkSecond = ClayTextMedium

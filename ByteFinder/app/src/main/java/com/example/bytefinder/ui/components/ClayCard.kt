@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.ui.theme.*
 import java.util.Locale
@@ -58,7 +59,7 @@ import java.util.Locale
 fun ClayCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    backgroundColor: Color = ClayWhite,
+    backgroundColor: Color = ClayBlueLight,
     cornerRadius: Dp = 24.dp,
     elevation: Dp = 8.dp,
     content: @Composable () -> Unit
@@ -118,7 +119,7 @@ fun ClayDishCard(
     ClayCard(
         modifier = modifier,
         onClick = onClick,
-        backgroundColor = ClayWhite,
+        backgroundColor = ClayBlueLight,
         cornerRadius = 24.dp,
         elevation = 8.dp
     ) {
@@ -130,28 +131,18 @@ fun ClayDishCard(
                     .height(140.dp)
             ) {
                 if (!prato.imagemUrl.isNullOrBlank()) {
-                    AsyncImage(
+                    SubcomposeAsyncImage(
                         model = prato.imagemUrl,
                         contentDescription = prato.nome,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxSize()
-                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
+                        loading = { DishImageFallback(prato.nome) },
+                        error = { DishImageFallback(prato.nome) }
                     )
                 } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(ClayBlueLight),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Restaurant,
-                            contentDescription = null,
-                            tint = ClayTextLight,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
+                    DishImageFallback(prato.nome)
                 }
 
                 // Badge de rating
@@ -216,6 +207,33 @@ fun ClayDishCard(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DishImageFallback(label: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ClayBluePale.copy(alpha = 0.65f)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Filled.Restaurant,
+                contentDescription = null,
+                tint = ClayBlue,
+                modifier = Modifier.padding(8.dp)
+            )
+            Text(
+                text = label.take(18),
+                color = ClayTextMedium,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 11.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

@@ -27,7 +27,7 @@ object MockDataProvider {
         "Pasta" to "https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Espaguetis_carbonara.jpg/330px-Espaguetis_carbonara.jpg",
         "Sobremesas" to "https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Pastel_de_nata_%2818616473070%29.jpg/330px-Pastel_de_nata_%2818616473070%29.jpg",
         "Bifana" to "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Bifana_on_a_plate.jpg/330px-Bifana_on_a_plate.jpg",
-        "Pratos Tradicionais" to "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Cozido_%C3%A0_portuguesa.jpg/330px-Cozido_%C3%A0_portuguesa.jpg",
+        "Pratos Tradicionais" to "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cozido%20a%20portuguesa%201.JPG",
         "Bacalhau" to "https://upload.wikimedia.org/wikipedia/commons/thumb/3/39/Bacalhau_a_Bras.jpg/330px-Bacalhau_a_Bras.jpg"
     )
 
@@ -299,13 +299,13 @@ object MockDataProvider {
         // ─── Pratos Tradicionais ─────────────────────────────────────────
 
         // Solar dos Presuntos (Lisboa)
-        PratoDto(89, "Cozido à Portuguesa", "Pratos Tradicionais", "Cozido tradicional com enchidos, carnes, couves e legumes frescos da época", 22.50, "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Cozido_%C3%A0_portuguesa.jpg/500px-Cozido_%C3%A0_portuguesa.jpg", 27, "Solar dos Presuntos", 4.9, 412),
+        PratoDto(89, "Cozido à Portuguesa", "Pratos Tradicionais", "Cozido tradicional com enchidos, carnes, couves e legumes frescos da época", 22.50, "https://commons.wikimedia.org/wiki/Special:Redirect/file/Cozido%20a%20portuguesa%201.JPG", 27, "Solar dos Presuntos", 4.9, 412),
         PratoDto(90, "Arroz de Pato", "Pratos Tradicionais", "Arroz de pato no forno com chouriço, presunto e hortelã", 18.50, "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Arroz_de_pato_no_forno.jpg/500px-Arroz_de_pato_no_forno.jpg", 27, "Solar dos Presuntos", 4.8, 345),
         // Tasca do Chico (Lisboa)
-        PratoDto(91, "Açorda Alentejana", "Pratos Tradicionais", "Açorda de coentros com ovo escalfado, azeite e alho", 14.00, "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/A%C3%A7orda_alentejana.jpg/500px-A%C3%A7orda_alentejana.jpg", 20, "Tasca do Chico", 4.6, 198),
+        PratoDto(91, "Açorda Alentejana", "Pratos Tradicionais", "Açorda de coentros com ovo escalfado, azeite e alho", 14.00, "https://commons.wikimedia.org/wiki/Special:Redirect/file/A%C3%A7orda%20%C3%A0%20Alentejana.jpg", 20, "Tasca do Chico", 4.6, 198),
         PratoDto(92, "Secretos de Porco Preto", "Pratos Tradicionais", "Secretos de porco preto ibérico com batata-doce assada e grelos salteados", 17.50, "https://images.unsplash.com/photo-1432139555190-58524dae6a55?auto=format&fit=crop&q=80&w=400", 20, "Tasca do Chico", 4.7, 267),
         // A Cozinha do Manel (Lisboa)
-        PratoDto(93, "Feijoada à Transmontana", "Pratos Tradicionais", "Feijoada de feijão branco com enchidos, carnes fumadas e couve", 16.50, "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Feijoada_%C3%A0_transmontana.jpg/500px-Feijoada_%C3%A0_transmontana.jpg", 14, "A Cozinha do Manel", 4.7, 234),
+        PratoDto(93, "Feijoada à Transmontana", "Pratos Tradicionais", "Feijoada de feijão branco com enchidos, carnes fumadas e couve", 16.50, "https://commons.wikimedia.org/wiki/Special:Redirect/file/Feijoada%20%C3%A0%20transmontada.jpg", 14, "A Cozinha do Manel", 4.7, 234),
         // Paparico (Porto)
         PratoDto(94, "Rojões à Minhota", "Pratos Tradicionais", "Rojões de porco bísaro com castanhas, batata frita e arroz de sarrabulho", 16.00, "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Roj%C3%B5es.jpg/500px-Roj%C3%B5es.jpg", 35, "Paparico", 4.8, 289),
         PratoDto(95, "Tripas à Moda do Porto", "Pratos Tradicionais", "Tripas com feijão branco, enchidos e especiarias — o prato emblemático do Porto", 15.50, "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Tripas_%C3%A0_moda_do_Porto.jpg/500px-Tripas_%C3%A0_moda_do_Porto.jpg", 35, "Paparico", 4.6, 178),
