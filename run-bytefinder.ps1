@@ -3,6 +3,8 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+. (Join-Path $repoRoot "run-bytefinder.helpers.ps1")
 
 function Write-Step {
     param([string]$Message)
@@ -118,6 +120,81 @@ function Ensure-LocalProperties {
     }
 }
 
+function Get-GradleJavaHomeSetting {
+    param([string]$GradlePropertiesPath)
+
+    if (-not (Test-Path $GradlePropertiesPath)) {
+        return $null
+    }
+
+    $line = Get-Content $GradlePropertiesPath |
+        Where-Object { $_ -like "org.gradle.java.home=*" } |
+        Select-Object -First 1
+
+    if (-not $line) {
+        return $null
+    }
+
+    return $line.Substring("org.gradle.java.home=".Length).Replace("\\", "\")
+}
+
+function Ensure-GradleJavaHome {
+    param([string]$GradlePropertiesPath)
+
+    $configuredJavaHome = Get-GradleJavaHomeSetting -GradlePropertiesPath $GradlePropertiesPath
+    $candidatePaths = @(
+        $env:JAVA_HOME,
+        "C:\Program Files\Android\Android Studio\jbr",
+        "C:\Program Files\Android\Android Studio\jre"
+    )
+
+    $candidatePaths += @(Get-ChildItem "C:\Program Files\Eclipse Adoptium" -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+    $candidatePaths += @(Get-ChildItem "C:\Program Files\Java" -Directory -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName)
+
+    $javaHome = Resolve-GradleJavaHome -ConfiguredPath $configuredJavaHome -CandidatePaths $candidatePaths
+    $javaHomeEscaped = $javaHome.Replace("\", "\\")
+
+    $lines = if (Test-Path $GradlePropertiesPath) {
+        @(Get-Content $GradlePropertiesPath -ErrorAction Stop)
+    }
+    else {
+        @()
+    }
+
+    $updated = @()
+    $found = $false
+    foreach ($line in $lines) {
+        if ($line -like "org.gradle.java.home=*") {
+            $updated += "org.gradle.java.home=$javaHomeEscaped"
+            $found = $true
+        }
+        else {
+            $updated += $line
+        }
+    }
+
+    if (-not $found) {
+        $updated += "org.gradle.java.home=$javaHomeEscaped"
+    }
+
+    if ((@($lines) -join "`n") -ne (@($updated) -join "`n")) {
+        Set-Content -Path $GradlePropertiesPath -Value $updated -Encoding ASCII
+    }
+
+    $env:JAVA_HOME = $javaHome
+    return $javaHome
+}
+
+function Get-AvailableAvdDeviceIds {
+    param([string]$AvdManagerPath)
+
+    $output = & $AvdManagerPath list device 2>&1
+    $exitCode = $LASTEXITCODE
+    Assert-NativeCommandSucceeded -CommandName "avdmanager list device" -ExitCode $exitCode
+
+    return Parse-AvdDeviceIds -OutputLines $output
+}
+
 function Get-SystemImagePackage {
     param([string]$SdkDir)
 
@@ -140,19 +217,34 @@ function Get-SystemImagePackage {
 function Ensure-Avd {
     param(
         [string]$SdkDir,
-        [string]$AvdName
+        [string]$AvdName,
+        [string[]]$LegacyAvdNames = @()
     )
 
-    $avdDir = Join-Path $env:USERPROFILE ".android\avd\$AvdName.avd"
+    $resolvedAvdName = Resolve-AvdName `
+        -PreferredName $AvdName `
+        -LegacyNames $LegacyAvdNames `
+        -ExistingAvdNames (Get-ExistingAvdNames)
+
+    $avdDir = Join-Path $env:USERPROFILE ".android\avd\$resolvedAvdName.avd"
     if (Test-Path $avdDir) {
-        return
+        if ($resolvedAvdName -ne $AvdName) {
+            Write-Host "A reutilizar o AVD existente $resolvedAvdName." -ForegroundColor Yellow
+        }
+        return $resolvedAvdName
     }
 
     $imagePackage = Get-SystemImagePackage -SdkDir $SdkDir
     $avdManager = Join-Path $SdkDir "cmdline-tools\latest\bin\avdmanager.bat"
+    $deviceId = Select-AvdDeviceId `
+        -PreferredDeviceIds @("pixel_8", "pixel_7", "pixel_6", "medium_phone") `
+        -AvailableDeviceIds (Get-AvailableAvdDeviceIds -AvdManagerPath $avdManager)
 
-    Write-Step "A criar o AVD $AvdName"
-    "no" | & $avdManager create avd -n $AvdName -k $imagePackage -d pixel_8 --force | Out-Host
+    Write-Step "A criar o AVD $resolvedAvdName"
+    "no" | & $avdManager create avd -n $resolvedAvdName -k $imagePackage -d $deviceId --force 2>&1 | Out-Host
+    Assert-NativeCommandSucceeded -CommandName "avdmanager create avd" -ExitCode $LASTEXITCODE
+
+    return $resolvedAvdName
 }
 
 function Ensure-AvdConfig {
@@ -281,6 +373,7 @@ function Build-And-InstallApp {
     Push-Location $ProjectDir
     try {
         & ".\gradlew.bat" installDebug
+        Assert-NativeCommandSucceeded -CommandName "gradlew installDebug" -ExitCode $LASTEXITCODE
     }
     finally {
         Pop-Location
@@ -305,10 +398,11 @@ function Launch-App {
     }
 }
 
-$repoRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectDir = Join-Path $repoRoot "ByteFinder"
 $localPropertiesPath = Join-Path $projectDir "local.properties"
-$avdName = "BiteFinder_API35"
+$gradlePropertiesPath = Join-Path $projectDir "gradle.properties"
+$preferredAvdName = "BiteFinder_API35"
+$legacyAvdNames = @("ByteFinder_API35")
 
 Write-Step "A resolver ferramentas instaladas"
 $phpExe = Get-PhpExe
@@ -318,6 +412,10 @@ $adbExe = Join-Path $sdkDir "platform-tools\adb.exe"
 Write-Step "A garantir local.properties"
 Ensure-LocalProperties -Path $localPropertiesPath -SdkDir $sdkDir
 
+Write-Step "A alinhar o Java do Gradle"
+$gradleJavaHome = Ensure-GradleJavaHome -GradlePropertiesPath $gradlePropertiesPath
+Write-Host "Gradle Java home: $gradleJavaHome" -ForegroundColor DarkCyan
+
 Write-Step "A verificar o backend PHP"
 $phpModules = & $phpExe -m
 if ($phpModules -notcontains "pdo_sqlsrv") {
@@ -325,7 +423,7 @@ if ($phpModules -notcontains "pdo_sqlsrv") {
 }
 
 Start-PhpServer -PhpExe $phpExe -RepoRoot $repoRoot
-Ensure-Avd -SdkDir $sdkDir -AvdName $avdName
+$avdName = Ensure-Avd -SdkDir $sdkDir -AvdName $preferredAvdName -LegacyAvdNames $legacyAvdNames
 Ensure-AvdConfig -AvdName $avdName
 $serial = Start-Or-ReuseEmulator -SdkDir $sdkDir -AvdName $avdName -Restart:$RestartEmulator
 Build-And-InstallApp -ProjectDir $projectDir

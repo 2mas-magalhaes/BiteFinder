@@ -38,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bytefinder.ui.theme.ClayBlue
-import com.example.bytefinder.ui.theme.ClayDarkNavy
+import com.example.bytefinder.ui.theme.ClayBlueLight
 import com.example.bytefinder.ui.theme.ClayOnDark
 import com.example.bytefinder.ui.theme.ClayOnDarkSecond
 
@@ -68,7 +68,7 @@ fun ClayBottomNav(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(ClayDarkNavy.copy(alpha = 0.96f))
+            .background(ClayBlueLight.copy(alpha = 0.96f))
             .navigationBarsPadding()
             .padding(horizontal = 8.dp, vertical = 10.dp)
     ) {

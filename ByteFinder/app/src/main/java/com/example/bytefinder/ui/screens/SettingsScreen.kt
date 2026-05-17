@@ -10,6 +10,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -122,7 +123,7 @@ fun ClaySettingsScreen(
                     }
                 )
 
-                HorizontalDivider(color = Color.White.copy(alpha = 0.07f))
+                HorizontalDivider(color = ClayBluePale.copy(alpha = 0.8f))
 
                 PermissionRow(
                     title = "Notificações",
@@ -134,7 +135,7 @@ fun ClaySettingsScreen(
                     }
                 )
 
-                HorizontalDivider(color = Color.White.copy(alpha = 0.07f))
+                HorizontalDivider(color = ClayBluePale.copy(alpha = 0.8f))
 
                 // Open app settings
                 Row(
@@ -380,7 +381,7 @@ private fun PermissionRow(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Top
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -396,11 +397,21 @@ private fun PermissionRow(
             )
         }
         Spacer(Modifier.width(12.dp))
-        ClayButton(
-            text = "Pedir",
-            onClick = onRequest,
-            modifier = Modifier.height(36.dp)
-        )
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(999.dp))
+                .background(ClayBlue)
+                .clickable(onClick = onRequest)
+                .padding(horizontal = 18.dp, vertical = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Pedir",
+                color = ClayWhite,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp
+            )
+        }
     }
 }
 
