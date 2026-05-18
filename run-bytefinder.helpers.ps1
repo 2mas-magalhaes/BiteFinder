@@ -2,8 +2,17 @@ Set-StrictMode -Version Latest
 
 function Get-ExistingAvdNames {
     param(
-        [string]$AvdRoot = (Join-Path $env:USERPROFILE ".android\avd")
+        [string]$AvdRoot
     )
+
+    if (-not $AvdRoot) {
+        $AvdRoot = if ($env:ANDROID_AVD_HOME) {
+            $env:ANDROID_AVD_HOME
+        }
+        else {
+            Join-Path $env:USERPROFILE ".android\avd"
+        }
+    }
 
     if (-not (Test-Path $AvdRoot)) {
         return @()

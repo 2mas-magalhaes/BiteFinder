@@ -3,6 +3,7 @@ package com.example.bytefinder.ui.screens
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -45,14 +47,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import coil.compose.SubcomposeAsyncImage
+import coil.imageLoader
 import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.example.bytefinder.data.LocationService
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.data.displayImageUrl
@@ -88,23 +95,23 @@ fun NearZoneScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val locationService = remember { LocationService(context) }
-    var locationRequested by remember { mutableStateOf(false) }
+    var hasLocationPermission by remember { mutableStateOf(locationService.hasLocationPermission()) }
 
-    fun loadLocation() {
+    fun applyLocation(loc: com.example.bytefinder.data.UserLocation) {
+        val matched = locationService.matchCity(loc.city)
+        viewModel.onLocationDetected(
+            matchedCity = matched,
+            displayCity = "${loc.city}, Portugal",
+            displayStreet = loc.street,
+            lat = loc.latitude,
+            lng = loc.longitude
+        )
+    }
+
+    fun refreshLocationOnce() {
         scope.launch {
-            val loc = locationService.getCurrentLocation()
-            if (loc != null) {
-                val matched = locationService.matchCity(loc.city)
-                viewModel.onLocationDetected(
-                    matchedCity = matched,
-                    displayCity = "${loc.city}, Portugal",
-                    displayStreet = loc.street,
-                    lat = loc.latitude,
-                    lng = loc.longitude
-                )
-            } else {
-                viewModel.onLocationDetected("Todas", "Portugal", "Localizacao indisponivel")
-            }
+            locationService.getCurrentLocation()?.let(::applyLocation)
+                ?: viewModel.onLocationDetected("Todas", "Portugal", "Localizacao indisponivel")
         }
     }
 
@@ -114,25 +121,24 @@ fun NearZoneScreen(
         val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
             permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         if (granted) {
-            loadLocation()
+            hasLocationPermission = true
+            refreshLocationOnce()
         } else {
             viewModel.onLocationDetected("Todas", "Portugal", "Permissao de localizacao negada")
         }
     }
 
-    LaunchedEffect(Unit) {
-        if (!locationRequested) {
-            locationRequested = true
-            if (locationService.hasLocationPermission()) {
-                loadLocation()
-            } else {
-                permissionLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
+    LaunchedEffect(hasLocationPermission) {
+        if (hasLocationPermission) {
+            refreshLocationOnce()
+            locationService.locationUpdates().collect(::applyLocation)
+        } else {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 )
-            }
+            )
         }
     }
 
@@ -149,7 +155,8 @@ fun NearZoneScreen(
                 street = state.detectedStreet,
                 onRefreshLocation = {
                     if (locationService.hasLocationPermission()) {
-                        loadLocation()
+                        hasLocationPermission = true
+                        refreshLocationOnce()
                     } else {
                         permissionLauncher.launch(
                             arrayOf(
@@ -352,16 +359,13 @@ private fun NearMapCard(
                     val restLat = topPrato.restauranteLatitude
                     val restLng = topPrato.restauranteLongitude
                     if (restLat != null && restLng != null) {
-                        MarkerComposable(
-                            keys = arrayOf(restId, topPrato.id),
-                            state = MarkerState(position = LatLng(restLat, restLng)),
-                            onClick = {
-                                onPratoClick(topPrato.id)
-                                true
-                            }
-                        ) {
-                            MapDishMarker(topPrato)
-                        }
+                        DishMapMarker(
+                            restId = restId,
+                            prato = topPrato,
+                            radiusKm = radiusKm,
+                            position = LatLng(restLat, restLng),
+                            onPratoClick = onPratoClick
+                        )
                     }
                 }
         }
@@ -369,44 +373,105 @@ private fun NearMapCard(
 }
 
 @Composable
-private fun MapDishMarker(prato: PratoDto) {
+private fun DishMapMarker(
+    restId: Int,
+    prato: PratoDto,
+    radiusKm: Double,
+    position: LatLng,
+    onPratoClick: (Int) -> Unit
+) {
+    val imageUrl = mapMarkerImageUrl(prato)
+    val context = LocalContext.current
+    var imageBitmap by remember(imageUrl) { mutableStateOf<ImageBitmap?>(null) }
+
+    LaunchedEffect(imageUrl) {
+        imageBitmap = null
+        if (imageUrl != null) {
+            val result = context.imageLoader.execute(
+                ImageRequest.Builder(context)
+                    .data(imageUrl)
+                    .allowHardware(false)
+                    .build()
+            )
+            imageBitmap = (result as? SuccessResult)
+                ?.drawable
+                ?.toBitmap()
+                ?.asImageBitmap()
+        }
+    }
+
+    MarkerComposable(
+        keys = arrayOf<Any>(restId, prato.id, radiusKm, imageUrl.orEmpty(), imageBitmap != null),
+        state = MarkerState(position = position),
+        onClick = {
+            onPratoClick(prato.id)
+            true
+        }
+    ) {
+        MapDishMarker(prato, radiusKm, imageBitmap)
+    }
+}
+
+@Composable
+private fun MapDishMarker(
+    prato: PratoDto,
+    radiusKm: Double,
+    imageBitmap: ImageBitmap?
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        val markerSize = mapMarkerSizeForRadius(radiusKm)
+        val ratingFontSize = mapMarkerRatingSizeForRadius(radiusKm)
+        val ratingText = String.format(Locale.US, "%.1f", prato.ratingMedio)
+
         Box(
             modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .border(3.dp, ClayOrangeBolt, CircleShape),
+                .size(markerSize),
             contentAlignment = Alignment.Center
         ) {
-            SubcomposeAsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(prato.displayImageUrl())
-                    .allowHardware(false)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = prato.nome,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(4.dp)
-                    .clip(CircleShape),
-                loading = { MapMarkerImageFallback(prato.nome) },
-                error = { MapMarkerImageFallback(prato.nome) }
-            )
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .clip(RoundedCornerShape(999.dp))
-                    .background(Color(0xFFFFC107))
-                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .border(2.dp, ClayOrangeBolt, CircleShape)
+                    .padding(3.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = String.format(Locale.US, "%.1f", prato.ratingMedio),
-                    color = ClayTextDark,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.ExtraBold
-                )
+                if (imageBitmap != null) {
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = prato.nome,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(ClayBluePale.copy(alpha = 0.75f))
+                    )
+                }
+            }
+            if (prato.ratingMedio > 0.0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = 8.dp, y = 6.dp)
+                        .background(ClayOrangeBolt, RoundedCornerShape(999.dp))
+                        .border(1.dp, Color.White, RoundedCornerShape(999.dp))
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "\u2605 $ratingText",
+                        color = Color.White,
+                        fontSize = ratingFontSize,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                }
             }
         }
         Spacer(Modifier.height(3.dp))
@@ -613,4 +678,27 @@ private fun NearDishImageFallback(label: String) {
 private fun zoomForRadius(radiusKm: Double): Float {
     val clampedRadius = radiusKm.coerceIn(1.0, 20.0)
     return (15.4 - ln(clampedRadius) / ln(2.0)).toFloat().coerceIn(11.0f, 15.5f)
+}
+
+private fun mapMarkerSizeForRadius(radiusKm: Double) =
+    (64.0 - radiusKm.coerceIn(1.0, 20.0) * 7.0).coerceIn(26.0, 58.0).dp
+
+private fun mapMarkerRatingSizeForRadius(radiusKm: Double) =
+    (10.5 - radiusKm.coerceIn(1.0, 20.0) * 0.45).coerceIn(7.0, 10.0).sp
+
+private fun mapMarkerImageUrl(prato: PratoDto): String? {
+    val imageUrl = prato.displayImageUrl()
+    if (imageUrl != null && !imageUrl.contains("wikimedia", ignoreCase = true)) {
+        return imageUrl
+    }
+
+    return when (prato.categoria?.lowercase().orEmpty()) {
+        "sushi" -> "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&q=80&w=240"
+        "pizza" -> "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=240"
+        "marisco" -> "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&q=80&w=240"
+        "bacalhau" -> "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=240"
+        "pratos tradicionais" -> "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=240"
+        "francesinha" -> "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&q=80&w=240"
+        else -> imageUrl ?: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=240"
+    }
 }

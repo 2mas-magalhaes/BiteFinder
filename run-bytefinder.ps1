@@ -55,6 +55,68 @@ function Get-SdkDir {
     throw "Nao encontrei o Android SDK."
 }
 
+function Get-FreeBytesForPath {
+    param([string]$Path)
+
+    $root = [System.IO.Path]::GetPathRoot($Path)
+    if (-not $root) {
+        return 0
+    }
+
+    $driveName = $root.TrimEnd("\").TrimEnd(":")
+    $drive = Get-PSDrive -Name $driveName -PSProvider FileSystem -ErrorAction SilentlyContinue
+    if (-not $drive) {
+        return 0
+    }
+
+    return $drive.Free
+}
+
+function Resolve-AvdHome {
+    param(
+        [string]$RepoRoot,
+        [long]$MinimumFreeBytes = 8GB
+    )
+
+    if ($env:ANDROID_AVD_HOME) {
+        return $env:ANDROID_AVD_HOME
+    }
+
+    $defaultAvdHome = Join-Path $env:USERPROFILE ".android\avd"
+    if ((Get-FreeBytesForPath -Path $defaultAvdHome) -ge $MinimumFreeBytes) {
+        return $defaultAvdHome
+    }
+
+    $repoDrive = [System.IO.Path]::GetPathRoot($RepoRoot)
+    $candidates = @()
+    if ($repoDrive) {
+        $candidates += (Join-Path $repoDrive "Android\avd")
+    }
+
+    $candidates += Get-PSDrive -PSProvider FileSystem |
+        Sort-Object Free -Descending |
+        ForEach-Object { Join-Path $_.Root "Android\avd" }
+
+    foreach ($candidate in ($candidates | Select-Object -Unique)) {
+        if ((Get-FreeBytesForPath -Path $candidate) -ge $MinimumFreeBytes) {
+            return $candidate
+        }
+    }
+
+    return $defaultAvdHome
+}
+
+function Ensure-AvdHome {
+    param([string]$AvdHome)
+
+    if (-not (Test-Path $AvdHome)) {
+        New-Item -ItemType Directory -Path $AvdHome -Force | Out-Null
+    }
+
+    $env:ANDROID_AVD_HOME = $AvdHome
+    Write-Host "Android AVD home: $AvdHome" -ForegroundColor DarkCyan
+}
+
 function Ensure-LocalProperties {
     param(
         [string]$Path,
@@ -218,15 +280,16 @@ function Ensure-Avd {
     param(
         [string]$SdkDir,
         [string]$AvdName,
-        [string[]]$LegacyAvdNames = @()
+        [string[]]$LegacyAvdNames = @(),
+        [string]$AvdRoot = $env:ANDROID_AVD_HOME
     )
 
     $resolvedAvdName = Resolve-AvdName `
         -PreferredName $AvdName `
         -LegacyNames $LegacyAvdNames `
-        -ExistingAvdNames (Get-ExistingAvdNames)
+        -ExistingAvdNames (Get-ExistingAvdNames -AvdRoot $AvdRoot)
 
-    $avdDir = Join-Path $env:USERPROFILE ".android\avd\$resolvedAvdName.avd"
+    $avdDir = Join-Path $AvdRoot "$resolvedAvdName.avd"
     if (Test-Path $avdDir) {
         if ($resolvedAvdName -ne $AvdName) {
             Write-Host "A reutilizar o AVD existente $resolvedAvdName." -ForegroundColor Yellow
@@ -241,16 +304,27 @@ function Ensure-Avd {
         -AvailableDeviceIds (Get-AvailableAvdDeviceIds -AvdManagerPath $avdManager)
 
     Write-Step "A criar o AVD $resolvedAvdName"
-    "no" | & $avdManager create avd -n $resolvedAvdName -k $imagePackage -d $deviceId --force 2>&1 | Out-Host
-    Assert-NativeCommandSucceeded -CommandName "avdmanager create avd" -ExitCode $LASTEXITCODE
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        "no" | & $avdManager create avd -n $resolvedAvdName -k $imagePackage -d $deviceId --force 2>&1 | Out-Host
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        $ErrorActionPreference = $previousErrorActionPreference
+    }
+    Assert-NativeCommandSucceeded -CommandName "avdmanager create avd" -ExitCode $exitCode
 
     return $resolvedAvdName
 }
 
 function Ensure-AvdConfig {
-    param([string]$AvdName)
+    param(
+        [string]$AvdName,
+        [string]$AvdRoot = $env:ANDROID_AVD_HOME
+    )
 
-    $configPath = Join-Path $env:USERPROFILE ".android\avd\$AvdName.avd\config.ini"
+    $configPath = Join-Path $AvdRoot "$AvdName.avd\config.ini"
     if (-not (Test-Path $configPath)) {
         return
     }
@@ -408,6 +482,8 @@ Write-Step "A resolver ferramentas instaladas"
 $phpExe = Get-PhpExe
 $sdkDir = Get-SdkDir -LocalPropertiesPath $localPropertiesPath
 $adbExe = Join-Path $sdkDir "platform-tools\adb.exe"
+$avdHome = Resolve-AvdHome -RepoRoot $repoRoot
+Ensure-AvdHome -AvdHome $avdHome
 
 Write-Step "A garantir local.properties"
 Ensure-LocalProperties -Path $localPropertiesPath -SdkDir $sdkDir
@@ -423,8 +499,8 @@ if ($phpModules -notcontains "pdo_sqlsrv") {
 }
 
 Start-PhpServer -PhpExe $phpExe -RepoRoot $repoRoot
-$avdName = Ensure-Avd -SdkDir $sdkDir -AvdName $preferredAvdName -LegacyAvdNames $legacyAvdNames
-Ensure-AvdConfig -AvdName $avdName
+$avdName = Ensure-Avd -SdkDir $sdkDir -AvdName $preferredAvdName -LegacyAvdNames $legacyAvdNames -AvdRoot $avdHome
+Ensure-AvdConfig -AvdName $avdName -AvdRoot $avdHome
 $serial = Start-Or-ReuseEmulator -SdkDir $sdkDir -AvdName $avdName -Restart:$RestartEmulator
 Build-And-InstallApp -ProjectDir $projectDir
 Launch-App -AdbExe $adbExe -Serial $serial

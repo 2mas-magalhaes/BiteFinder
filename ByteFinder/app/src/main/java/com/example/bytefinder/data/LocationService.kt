@@ -7,9 +7,17 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Build
 import androidx.core.content.ContextCompat
+import com.google.android.gms.location.Granularity
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
 import kotlin.coroutines.resume
@@ -37,21 +45,18 @@ class LocationService(private val context: Context) {
     suspend fun getCurrentLocation(): UserLocation? {
         if (!hasLocationPermission()) return null
 
-        val location = getLastOrCurrentLocation() ?: return null
-        val geocoded = reverseGeocode(location.first, location.second)
+        val location = getCurrentFusedLocation() ?: return null
 
-        return UserLocation(
-            latitude = location.first,
-            longitude = location.second,
-            city = geocoded.first,
-            street = geocoded.second
-        )
+        return location.toUserLocation()
     }
 
     @Suppress("MissingPermission")
-    private suspend fun getLastOrCurrentLocation(): Pair<Double, Double>? {
-        val lastLocation = suspendCancellableCoroutine<Location?> { cont ->
-            fusedClient.lastLocation
+    private suspend fun getCurrentFusedLocation(): Location? {
+        return suspendCancellableCoroutine { cont ->
+            val cts = CancellationTokenSource()
+            cont.invokeOnCancellation { cts.cancel() }
+
+            fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token)
                 .addOnSuccessListener { loc ->
                     cont.resume(loc)
                 }
@@ -59,33 +64,48 @@ class LocationService(private val context: Context) {
                     cont.resume(null)
                 }
         }
-        if (lastLocation?.isFreshEnough() == true) {
-            return Pair(lastLocation.latitude, lastLocation.longitude)
-        }
+    }
 
-        return suspendCancellableCoroutine { cont ->
-            val cts = CancellationTokenSource()
-            cont.invokeOnCancellation { cts.cancel() }
+    @Suppress("MissingPermission")
+    fun locationUpdates(): Flow<UserLocation> {
+        return callbackFlow {
+            if (!hasLocationPermission()) {
+                close()
+                return@callbackFlow
+            }
 
-            fusedClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, cts.token)
-                .addOnSuccessListener { loc ->
-                    if (loc != null) {
-                        cont.resume(Pair(loc.latitude, loc.longitude))
-                    } else {
-                        cont.resume(null)
-                    }
+            val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1_000L)
+                .setMinUpdateIntervalMillis(500L)
+                .setMaxUpdateDelayMillis(0L)
+                .setGranularity(Granularity.GRANULARITY_PERMISSION_LEVEL)
+                .setWaitForAccurateLocation(false)
+                .build()
+
+            val callback = object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    result.lastLocation?.let { trySend(it) }
                 }
-                .addOnFailureListener {
-                    cont.resume(null)
-                }
+            }
+
+            fusedClient.requestLocationUpdates(request, callback, context.mainLooper)
+                .addOnFailureListener { close(it) }
+
+            awaitClose {
+                fusedClient.removeLocationUpdates(callback)
+            }
+        }.map { location ->
+            location.toUserLocation()
         }
     }
 
-    private fun Location.isFreshEnough(): Boolean {
-        val maxAgeMs = 10 * 60 * 1000L
-        val isRecent = System.currentTimeMillis() - time <= maxAgeMs
-        val isAccurate = !hasAccuracy() || accuracy <= 1000f
-        return isRecent && isAccurate
+    private fun Location.toUserLocation(): UserLocation {
+        val geocoded = reverseGeocode(latitude, longitude)
+        return UserLocation(
+            latitude = latitude,
+            longitude = longitude,
+            city = geocoded.first,
+            street = geocoded.second
+        )
     }
 
     private fun reverseGeocode(lat: Double, lng: Double): Pair<String, String> {

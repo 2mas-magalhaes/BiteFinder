@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -127,6 +128,29 @@ private class RemoveWhiteTransformation : Transformation {
     }
 }
 
+private fun mapMarkerSizeForRadius(radiusKm: Double) =
+    (64.0 - radiusKm.coerceIn(1.0, 20.0) * 7.0).coerceIn(26.0, 58.0).dp
+
+private fun mapMarkerRatingSizeForRadius(radiusKm: Double) =
+    (10.5 - radiusKm.coerceIn(1.0, 20.0) * 0.45).coerceIn(7.0, 10.0).sp
+
+private fun mapMarkerImageUrl(prato: com.example.bytefinder.data.PratoDto): String? {
+    val imageUrl = prato.displayImageUrl()
+    if (imageUrl != null && !imageUrl.contains("wikimedia", ignoreCase = true)) {
+        return imageUrl
+    }
+
+    return when (prato.categoria?.lowercase().orEmpty()) {
+        "sushi" -> "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?auto=format&fit=crop&q=80&w=240"
+        "pizza" -> "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&q=80&w=240"
+        "marisco" -> "https://images.unsplash.com/photo-1559737558-2f5a35f4523b?auto=format&fit=crop&q=80&w=240"
+        "bacalhau" -> "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&q=80&w=240"
+        "pratos tradicionais" -> "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&q=80&w=240"
+        "francesinha" -> "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&q=80&w=240"
+        else -> imageUrl ?: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=240"
+    }
+}
+
 /**
  * HomeScreen — Ecrã principal da app com layout Bolt Food + Claymorphism.
  *
@@ -175,6 +199,7 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
+        if (false) {
         val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val hasCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!hasFine && !hasCoarse) {
@@ -196,12 +221,32 @@ fun HomeScreen(
                 }
             }
         }
+        }
     }
 
     val scope = rememberCoroutineScope()
     val locationService = remember { LocationService(context) }
+    var liveLocationPermission by remember { mutableStateOf(locationService.hasLocationPermission()) }
 
     var locationRequested by remember { mutableStateOf(false) }
+
+    fun applyLiveLocation(loc: com.example.bytefinder.data.UserLocation) {
+        val matched = locationService.matchCity(loc.city)
+        viewModel.onLocationDetected(
+            matchedCity = matched,
+            displayCity = "${loc.city}, Portugal",
+            displayStreet = loc.street,
+            lat = loc.latitude,
+            lng = loc.longitude
+        )
+    }
+
+    LaunchedEffect(liveLocationPermission) {
+        if (liveLocationPermission) {
+            locationService.getCurrentLocation()?.let(::applyLiveLocation)
+            locationService.locationUpdates().collect(::applyLiveLocation)
+        }
+    }
 
     // City/street displayed in the top bar (from GPS or manual)
     val displayCity = if (state.locationLoaded) state.detectedCity else "A detectar..."
@@ -214,6 +259,7 @@ fun HomeScreen(
         val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
                 permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         if (granted) {
+            liveLocationPermission = true
             scope.launch {
                 val loc = locationService.getCurrentLocation()
                 if (loc != null) {
@@ -293,6 +339,7 @@ fun HomeScreen(
             IconButton(
                 onClick = {
                     if (locationService.hasLocationPermission()) {
+                        liveLocationPermission = true
                         scope.launch {
                             val loc = locationService.getCurrentLocation()
                             if (loc != null) {
@@ -635,7 +682,7 @@ fun HomeScreen(
                                 val restLng = topPrato.restauranteLongitude
                                 if (restLat != null && restLng != null) {
                                     MarkerComposable(
-                                        keys = arrayOf(restId, topPrato.id),
+                                        keys = arrayOf<Any>(restId, topPrato.id, state.radiusKm),
                                         state = MarkerState(position = LatLng(restLat, restLng)),
                                         onClick = { 
                                             onPratoClick(topPrato.id)
@@ -646,37 +693,58 @@ fun HomeScreen(
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             modifier = Modifier.padding(4.dp)
                                         ) {
+                                            val markerSize = mapMarkerSizeForRadius(state.radiusKm)
+                                            val ratingFontSize = mapMarkerRatingSizeForRadius(state.radiusKm)
+                                            val ratingText = String.format(
+                                                java.util.Locale.US,
+                                                "%.1f",
+                                                topPrato.ratingMedio
+                                            )
+
                                             Box(
                                                 modifier = Modifier
-                                                    .size(60.dp)
-                                                    .clip(CircleShape)
-                                                    .background(Color.White)
-                                                    .border(2.dp, ClayOrangeBolt, CircleShape),
+                                                    .size(markerSize),
                                                 contentAlignment = Alignment.Center
                                             ) {
-                                                AsyncImage(
-                                                    model = ImageRequest.Builder(LocalContext.current)
-                                                        .data(topPrato.displayImageUrl())
-                                                        .allowHardware(false)
-                                                        .crossfade(true)
-                                                        .build(),
-                                                    contentDescription = topPrato.nome,
-                                                    contentScale = ContentScale.Crop,
-                                                    modifier = Modifier.fillMaxSize().clip(CircleShape)
-                                                )
                                                 Box(
                                                     modifier = Modifier
-                                                        .align(Alignment.BottomEnd)
+                                                        .fillMaxSize()
                                                         .clip(CircleShape)
-                                                        .background(ClayOrangeBolt)
-                                                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                                                        .background(Color.White)
+                                                        .border(2.dp, ClayOrangeBolt, CircleShape)
+                                                        .padding(3.dp),
+                                                    contentAlignment = Alignment.Center
                                                 ) {
-                                                    Text(
-                                                        text = "★ ${topPrato.ratingMedio}",
-                                                        color = Color.White,
-                                                        fontSize = 10.sp,
-                                                        fontWeight = FontWeight.Bold
+                                                    AsyncImage(
+                                                        model = ImageRequest.Builder(LocalContext.current)
+                                                            .data(mapMarkerImageUrl(topPrato))
+                                                            .allowHardware(false)
+                                                            .crossfade(true)
+                                                            .build(),
+                                                        contentDescription = topPrato.nome,
+                                                        contentScale = ContentScale.Crop,
+                                                        modifier = Modifier
+                                                            .fillMaxSize()
+                                                            .clip(CircleShape)
                                                     )
+                                                }
+                                                if (topPrato.ratingMedio > 0.0) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .align(Alignment.BottomEnd)
+                                                            .offset(x = 8.dp, y = 6.dp)
+                                                            .background(ClayOrangeBolt, RoundedCornerShape(999.dp))
+                                                            .border(1.dp, Color.White, RoundedCornerShape(999.dp))
+                                                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                                                    ) {
+                                                        Text(
+                                                            text = "\u2605 $ratingText",
+                                                            color = Color.White,
+                                                            fontSize = ratingFontSize,
+                                                            fontWeight = FontWeight.Bold,
+                                                            maxLines = 1
+                                                        )
+                                                    }
                                                 }
                                             }
                                             Spacer(modifier = Modifier.height(2.dp))

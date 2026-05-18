@@ -155,3 +155,447 @@
 [Sun May 17 23:07:49 2026] 127.0.0.1:61166 Accepted
 [Sun May 17 23:07:49 2026] 127.0.0.1:61166 [200]: GET /api/pratos/list.php?limit=100&offset=0
 [Sun May 17 23:07:49 2026] 127.0.0.1:61166 Closing
+[Sun May 17 23:12:40 2026] 127.0.0.1:61484 Accepted
+[Sun May 17 23:12:41 2026] 127.0.0.1:61484 [200]: GET /api/categorias/list.php
+[Sun May 17 23:12:41 2026] 127.0.0.1:61484 Closing
+[Sun May 17 23:12:44 2026] 127.0.0.1:61489 Accepted
+[Sun May 17 23:12:44 2026] 127.0.0.1:61489 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:12:44 2026] 127.0.0.1:61489 Closing
+[Sun May 17 23:14:48 2026] 127.0.0.1:61640 Accepted
+[Sun May 17 23:14:48 2026] 127.0.0.1:61640 [200]: GET /api/categorias/list.php
+[Sun May 17 23:14:48 2026] 127.0.0.1:61640 Closing
+[Sun May 17 23:14:51 2026] 127.0.0.1:61645 Accepted
+[Sun May 17 23:14:51 2026] 127.0.0.1:61645 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:14:51 2026] 127.0.0.1:61645 Closing
+[Sun May 17 23:15:05 2026] 127.0.0.1:61661 Accepted
+[Sun May 17 23:15:05 2026] 127.0.0.1:61661 [200]: POST /api/auth/login_jwt.php
+[Sun May 17 23:15:05 2026] 127.0.0.1:61661 Closing
+[Sun May 17 23:15:07 2026] 127.0.0.1:61664 Accepted
+[Sun May 17 23:15:07 2026] 127.0.0.1:61665 Accepted
+[Sun May 17 23:15:07 2026] 127.0.0.1:61664 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:07 2026] 127.0.0.1:61664 Closing
+[Sun May 17 23:15:07 2026] 127.0.0.1:61665 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:07 2026] 127.0.0.1:61665 Closing
+[Sun May 17 23:15:15 2026] 127.0.0.1:61674 Accepted
+[Sun May 17 23:15:15 2026] 127.0.0.1:61674 [200]: GET /api/categorias/list.php
+[Sun May 17 23:15:15 2026] 127.0.0.1:61674 Closing
+[Sun May 17 23:15:15 2026] 127.0.0.1:61676 Accepted
+[Sun May 17 23:15:15 2026] 127.0.0.1:61676 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:15:16 2026] 127.0.0.1:61676 Closing
+[Sun May 17 23:15:18 2026] 127.0.0.1:61678 Accepted
+[Sun May 17 23:15:18 2026] 127.0.0.1:61678 [200]: GET /api/categorias/list.php
+[Sun May 17 23:15:18 2026] 127.0.0.1:61678 Closing
+[Sun May 17 23:15:18 2026] 127.0.0.1:61679 Accepted
+[Sun May 17 23:15:18 2026] 127.0.0.1:61679 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:15:19 2026] 127.0.0.1:61679 Closing
+[Sun May 17 23:15:21 2026] 127.0.0.1:61682 Accepted
+[Sun May 17 23:15:21 2026] 127.0.0.1:61682 [200]: GET /api/categorias/list.php
+[Sun May 17 23:15:21 2026] 127.0.0.1:61682 Closing
+[Sun May 17 23:15:21 2026] 127.0.0.1:61683 Accepted
+[Sun May 17 23:15:21 2026] 127.0.0.1:61683 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:15:21 2026] 127.0.0.1:61683 Closing
+[Sun May 17 23:15:23 2026] 127.0.0.1:61685 Accepted
+[Sun May 17 23:15:23 2026] 127.0.0.1:61685 [200]: GET /api/categorias/list.php
+[Sun May 17 23:15:23 2026] 127.0.0.1:61685 Closing
+[Sun May 17 23:15:23 2026] 127.0.0.1:61686 Accepted
+[Sun May 17 23:15:23 2026] 127.0.0.1:61686 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:15:23 2026] 127.0.0.1:61686 Closing
+[Sun May 17 23:15:27 2026] 127.0.0.1:61689 Accepted
+[Sun May 17 23:15:27 2026] 127.0.0.1:61689 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:27 2026] 127.0.0.1:61689 Closing
+[Sun May 17 23:15:51 2026] 127.0.0.1:61706 Accepted
+[Sun May 17 23:15:51 2026] 127.0.0.1:61707 Accepted
+[Sun May 17 23:15:51 2026] 127.0.0.1:61706 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:51 2026] 127.0.0.1:61706 Closing
+[Sun May 17 23:15:51 2026] 127.0.0.1:61707 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:51 2026] 127.0.0.1:61707 Closing
+[Sun May 17 23:15:56 2026] 127.0.0.1:61713 Accepted
+[Sun May 17 23:15:56 2026] 127.0.0.1:61713 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:56 2026] 127.0.0.1:61713 Closing
+[Sun May 17 23:15:56 2026] 127.0.0.1:61714 Accepted
+[Sun May 17 23:15:56 2026] 127.0.0.1:61714 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:15:56 2026] 127.0.0.1:61714 Closing
+[Sun May 17 23:16:23 2026] 127.0.0.1:61742 Accepted
+[Sun May 17 23:16:23 2026] 127.0.0.1:61743 Accepted
+[Sun May 17 23:16:23 2026] 127.0.0.1:61742 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:16:23 2026] 127.0.0.1:61742 Closing
+[Sun May 17 23:16:23 2026] 127.0.0.1:61743 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:16:23 2026] 127.0.0.1:61743 Closing
+[Sun May 17 23:16:27 2026] 127.0.0.1:61748 Accepted
+[Sun May 17 23:16:27 2026] 127.0.0.1:61748 [200]: GET /api/categorias/list.php
+[Sun May 17 23:16:27 2026] 127.0.0.1:61748 Closing
+[Sun May 17 23:16:27 2026] 127.0.0.1:61749 Accepted
+[Sun May 17 23:16:27 2026] 127.0.0.1:61749 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:16:27 2026] 127.0.0.1:61749 Closing
+[Sun May 17 23:16:29 2026] 127.0.0.1:61753 Accepted
+[Sun May 17 23:16:29 2026] 127.0.0.1:61753 [200]: GET /api/categorias/list.php
+[Sun May 17 23:16:29 2026] 127.0.0.1:61753 Closing
+[Sun May 17 23:16:29 2026] 127.0.0.1:61754 Accepted
+[Sun May 17 23:16:29 2026] 127.0.0.1:61754 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:16:29 2026] 127.0.0.1:61754 Closing
+[Sun May 17 23:19:36 2026] 127.0.0.1:61968 Accepted
+[Sun May 17 23:19:36 2026] 127.0.0.1:61968 [200]: GET /api/categorias/list.php
+[Sun May 17 23:19:36 2026] 127.0.0.1:61968 Closing
+[Sun May 17 23:19:39 2026] 127.0.0.1:61972 Accepted
+[Sun May 17 23:19:39 2026] 127.0.0.1:61972 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:19:39 2026] 127.0.0.1:61972 Closing
+[Sun May 17 23:19:41 2026] 127.0.0.1:61975 Accepted
+[Sun May 17 23:19:42 2026] 127.0.0.1:61975 [200]: POST /api/auth/login_jwt.php
+[Sun May 17 23:19:42 2026] 127.0.0.1:61975 Closing
+[Sun May 17 23:19:43 2026] 127.0.0.1:61981 Accepted
+[Sun May 17 23:19:43 2026] 127.0.0.1:61982 Accepted
+[Sun May 17 23:19:43 2026] 127.0.0.1:61981 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:19:43 2026] 127.0.0.1:61981 Closing
+[Sun May 17 23:19:43 2026] 127.0.0.1:61982 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:19:44 2026] 127.0.0.1:61982 Closing
+[Sun May 17 23:19:49 2026] 127.0.0.1:61989 Accepted
+[Sun May 17 23:19:49 2026] 127.0.0.1:61989 [200]: GET /api/categorias/list.php
+[Sun May 17 23:19:49 2026] 127.0.0.1:61989 Closing
+[Sun May 17 23:19:50 2026] 127.0.0.1:61993 Accepted
+[Sun May 17 23:19:50 2026] 127.0.0.1:61993 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:19:50 2026] 127.0.0.1:61993 Closing
+[Sun May 17 23:19:52 2026] 127.0.0.1:61996 Accepted
+[Sun May 17 23:19:52 2026] 127.0.0.1:61996 [200]: GET /api/categorias/list.php
+[Sun May 17 23:19:52 2026] 127.0.0.1:61996 Closing
+[Sun May 17 23:19:52 2026] 127.0.0.1:61998 Accepted
+[Sun May 17 23:19:53 2026] 127.0.0.1:61998 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:19:53 2026] 127.0.0.1:61998 Closing
+[Sun May 17 23:20:18 2026] 127.0.0.1:62019 Accepted
+[Sun May 17 23:20:18 2026] 127.0.0.1:62019 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:20:18 2026] 127.0.0.1:62019 Closing
+[Sun May 17 23:20:18 2026] 127.0.0.1:62020 Accepted
+[Sun May 17 23:20:19 2026] 127.0.0.1:62020 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Sun May 17 23:20:19 2026] 127.0.0.1:62020 Closing
+[Sun May 17 23:20:20 2026] 127.0.0.1:62022 Accepted
+[Sun May 17 23:20:20 2026] 127.0.0.1:62022 [200]: GET /api/categorias/list.php
+[Sun May 17 23:20:20 2026] 127.0.0.1:62022 Closing
+[Sun May 17 23:20:20 2026] 127.0.0.1:62023 Accepted
+[Sun May 17 23:20:20 2026] 127.0.0.1:62023 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:20:20 2026] 127.0.0.1:62023 Closing
+[Sun May 17 23:23:06 2026] 127.0.0.1:62313 Accepted
+[Sun May 17 23:23:06 2026] 127.0.0.1:62314 Accepted
+[Sun May 17 23:23:06 2026] 127.0.0.1:62313 [500]: GET /api/categorias/list.php
+[Sun May 17 23:23:06 2026] 127.0.0.1:62313 Closing
+[Sun May 17 23:23:06 2026] 127.0.0.1:62314 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:23:06 2026] 127.0.0.1:62314 Closing
+[Sun May 17 23:23:11 2026] 127.0.0.1:62319 Accepted
+[Sun May 17 23:23:11 2026] 127.0.0.1:62319 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:23:11 2026] 127.0.0.1:62319 Closing
+[Sun May 17 23:25:33 2026] 127.0.0.1:62501 Accepted
+[Sun May 17 23:25:33 2026] 127.0.0.1:62502 Accepted
+[Sun May 17 23:25:33 2026] 127.0.0.1:62502 [500]: GET /api/categorias/list.php
+[Sun May 17 23:25:33 2026] 127.0.0.1:62502 Closing
+[Sun May 17 23:25:33 2026] 127.0.0.1:62501 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:25:33 2026] 127.0.0.1:62501 Closing
+[Sun May 17 23:25:38 2026] 127.0.0.1:62507 Accepted
+[Sun May 17 23:25:38 2026] 127.0.0.1:62507 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:25:38 2026] 127.0.0.1:62507 Closing
+[Sun May 17 23:28:20 2026] 127.0.0.1:62692 Accepted
+[Sun May 17 23:28:20 2026] 127.0.0.1:62693 Accepted
+[Sun May 17 23:28:20 2026] 127.0.0.1:62692 [500]: GET /api/categorias/list.php
+[Sun May 17 23:28:20 2026] 127.0.0.1:62692 Closing
+[Sun May 17 23:28:20 2026] 127.0.0.1:62693 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:28:20 2026] 127.0.0.1:62693 Closing
+[Sun May 17 23:28:26 2026] 127.0.0.1:62700 Accepted
+[Sun May 17 23:28:27 2026] 127.0.0.1:62700 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:28:27 2026] 127.0.0.1:62700 Closing
+[Sun May 17 23:35:01 2026] 127.0.0.1:63108 Accepted
+[Sun May 17 23:35:01 2026] 127.0.0.1:63109 Accepted
+[Sun May 17 23:35:01 2026] 127.0.0.1:63108 [500]: GET /api/categorias/list.php
+[Sun May 17 23:35:01 2026] 127.0.0.1:63108 Closing
+[Sun May 17 23:35:01 2026] 127.0.0.1:63109 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:35:01 2026] 127.0.0.1:63109 Closing
+[Sun May 17 23:35:07 2026] 127.0.0.1:63116 Accepted
+[Sun May 17 23:35:07 2026] 127.0.0.1:63116 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:35:07 2026] 127.0.0.1:63116 Closing
+[Sun May 17 23:35:33 2026] 127.0.0.1:63174 Accepted
+[Sun May 17 23:35:33 2026] 127.0.0.1:63175 Accepted
+[Sun May 17 23:35:33 2026] 127.0.0.1:63175 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:35:33 2026] 127.0.0.1:63175 Closing
+[Sun May 17 23:35:33 2026] 127.0.0.1:63174 [500]: GET /api/categorias/list.php
+[Sun May 17 23:35:33 2026] 127.0.0.1:63174 Closing
+[Sun May 17 23:35:59 2026] 127.0.0.1:63203 Accepted
+[Sun May 17 23:36:00 2026] 127.0.0.1:63203 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:36:00 2026] 127.0.0.1:63203 Closing
+[Sun May 17 23:39:55 2026] 127.0.0.1:63477 Accepted
+[Sun May 17 23:39:55 2026] 127.0.0.1:63478 Accepted
+[Sun May 17 23:39:55 2026] 127.0.0.1:63477 [500]: GET /api/categorias/list.php
+[Sun May 17 23:39:55 2026] 127.0.0.1:63477 Closing
+[Sun May 17 23:39:55 2026] 127.0.0.1:63478 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:39:55 2026] 127.0.0.1:63478 Closing
+[Sun May 17 23:40:14 2026] 127.0.0.1:63513 Accepted
+[Sun May 17 23:40:14 2026] 127.0.0.1:63513 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:40:14 2026] 127.0.0.1:63513 Closing
+[Sun May 17 23:41:24 2026] 127.0.0.1:63623 Accepted
+[Sun May 17 23:41:24 2026] 127.0.0.1:63624 Accepted
+[Sun May 17 23:41:24 2026] 127.0.0.1:63623 [500]: GET /api/categorias/list.php
+[Sun May 17 23:41:24 2026] 127.0.0.1:63623 Closing
+[Sun May 17 23:41:24 2026] 127.0.0.1:63624 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:41:24 2026] 127.0.0.1:63624 Closing
+[Sun May 17 23:42:08 2026] 127.0.0.1:63699 Accepted
+[Sun May 17 23:42:08 2026] 127.0.0.1:63699 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:42:08 2026] 127.0.0.1:63699 Closing
+[Sun May 17 23:52:56 2026] 127.0.0.1:64317 Accepted
+[Sun May 17 23:52:56 2026] 127.0.0.1:64318 Accepted
+[Sun May 17 23:52:56 2026] 127.0.0.1:64318 [500]: GET /api/categorias/list.php
+[Sun May 17 23:52:56 2026] 127.0.0.1:64318 Closing
+[Sun May 17 23:52:56 2026] 127.0.0.1:64317 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:52:56 2026] 127.0.0.1:64317 Closing
+[Sun May 17 23:53:07 2026] 127.0.0.1:64334 Accepted
+[Sun May 17 23:53:07 2026] 127.0.0.1:64334 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:53:07 2026] 127.0.0.1:64334 Closing
+[Sun May 17 23:59:46 2026] 127.0.0.1:64735 Accepted
+[Sun May 17 23:59:46 2026] 127.0.0.1:64736 Accepted
+[Sun May 17 23:59:46 2026] 127.0.0.1:64735 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Sun May 17 23:59:46 2026] 127.0.0.1:64735 Closing
+[Sun May 17 23:59:46 2026] 127.0.0.1:64736 [500]: GET /api/categorias/list.php
+[Sun May 17 23:59:46 2026] 127.0.0.1:64736 Closing
+[Sun May 17 23:59:53 2026] 127.0.0.1:64748 Accepted
+[Sun May 17 23:59:53 2026] 127.0.0.1:64748 [500]: POST /api/auth/login_jwt.php
+[Sun May 17 23:59:53 2026] 127.0.0.1:64748 Closing
+[Mon May 18 00:28:58 2026] 127.0.0.1:1794 Accepted
+[Mon May 18 00:29:14 2026] 127.0.0.1:1794 [500]: GET /api/categorias/list.php
+[Mon May 18 00:29:14 2026] 127.0.0.1:1794 Closing
+[Mon May 18 00:35:22 2026] 127.0.0.1:2150 Accepted
+[Mon May 18 00:35:22 2026] 127.0.0.1:2150 [200]: GET /api/categorias/list.php
+[Mon May 18 00:35:23 2026] 127.0.0.1:2150 Closing
+[Mon May 18 00:35:25 2026] 127.0.0.1:2155 Accepted
+[Mon May 18 00:35:25 2026] 127.0.0.1:2155 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:35:26 2026] 127.0.0.1:2155 Closing
+[Mon May 18 00:35:26 2026] 127.0.0.1:2157 Accepted
+[Mon May 18 00:35:27 2026] 127.0.0.1:2157 [200]: POST /api/auth/login_jwt.php
+[Mon May 18 00:35:27 2026] 127.0.0.1:2157 Closing
+[Mon May 18 00:35:29 2026] 127.0.0.1:2163 Accepted
+[Mon May 18 00:35:29 2026] 127.0.0.1:2164 Accepted
+[Mon May 18 00:35:29 2026] 127.0.0.1:2163 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 00:35:29 2026] 127.0.0.1:2163 Closing
+[Mon May 18 00:35:29 2026] 127.0.0.1:2164 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 00:35:30 2026] 127.0.0.1:2164 Closing
+[Mon May 18 00:35:35 2026] 127.0.0.1:2172 Accepted
+[Mon May 18 00:35:35 2026] 127.0.0.1:2172 [200]: GET /api/categorias/list.php
+[Mon May 18 00:35:35 2026] 127.0.0.1:2172 Closing
+[Mon May 18 00:35:35 2026] 127.0.0.1:2174 Accepted
+[Mon May 18 00:35:36 2026] 127.0.0.1:2174 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:35:36 2026] 127.0.0.1:2174 Closing
+[Mon May 18 00:36:43 2026] 127.0.0.1:2275 Accepted
+[Mon May 18 00:36:43 2026] 127.0.0.1:2275 [200]: GET /api/categorias/list.php
+[Mon May 18 00:36:43 2026] 127.0.0.1:2275 Closing
+[Mon May 18 00:36:47 2026] 127.0.0.1:2281 Accepted
+[Mon May 18 00:36:47 2026] 127.0.0.1:2281 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:36:47 2026] 127.0.0.1:2281 Closing
+[Mon May 18 00:37:14 2026] 127.0.0.1:2309 Accepted
+[Mon May 18 00:37:14 2026] 127.0.0.1:2309 [200]: POST /api/auth/login_jwt.php
+[Mon May 18 00:37:14 2026] 127.0.0.1:2309 Closing
+[Mon May 18 00:37:16 2026] 127.0.0.1:2314 Accepted
+[Mon May 18 00:37:16 2026] 127.0.0.1:2314 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 00:37:16 2026] 127.0.0.1:2314 Closing
+[Mon May 18 00:37:16 2026] 127.0.0.1:2315 Accepted
+[Mon May 18 00:37:16 2026] 127.0.0.1:2315 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 00:37:16 2026] 127.0.0.1:2315 Closing
+[Mon May 18 00:37:20 2026] 127.0.0.1:2320 Accepted
+[Mon May 18 00:37:20 2026] 127.0.0.1:2320 [200]: GET /api/categorias/list.php
+[Mon May 18 00:37:21 2026] 127.0.0.1:2320 Closing
+[Mon May 18 00:37:21 2026] 127.0.0.1:2321 Accepted
+[Mon May 18 00:37:21 2026] 127.0.0.1:2321 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:37:21 2026] 127.0.0.1:2321 Closing
+[Mon May 18 00:37:24 2026] 127.0.0.1:2327 Accepted
+[Mon May 18 00:37:24 2026] 127.0.0.1:2327 [200]: GET /api/categorias/list.php
+[Mon May 18 00:37:24 2026] 127.0.0.1:2327 Closing
+[Mon May 18 00:37:24 2026] 127.0.0.1:2328 Accepted
+[Mon May 18 00:37:24 2026] 127.0.0.1:2328 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:37:24 2026] 127.0.0.1:2328 Closing
+[Mon May 18 00:37:26 2026] 127.0.0.1:2333 Accepted
+[Mon May 18 00:37:26 2026] 127.0.0.1:2333 [200]: GET /api/categorias/list.php
+[Mon May 18 00:37:26 2026] 127.0.0.1:2333 Closing
+[Mon May 18 00:37:26 2026] 127.0.0.1:2334 Accepted
+[Mon May 18 00:37:26 2026] 127.0.0.1:2334 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:37:27 2026] 127.0.0.1:2334 Closing
+[Mon May 18 00:39:16 2026] 127.0.0.1:2488 Accepted
+[Mon May 18 00:39:16 2026] 127.0.0.1:2488 [200]: GET /api/categorias/list.php
+[Mon May 18 00:39:16 2026] 127.0.0.1:2488 Closing
+[Mon May 18 00:39:19 2026] 127.0.0.1:2491 Accepted
+[Mon May 18 00:39:19 2026] 127.0.0.1:2491 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:39:19 2026] 127.0.0.1:2491 Closing
+[Mon May 18 00:39:43 2026] 127.0.0.1:2511 Accepted
+[Mon May 18 00:39:44 2026] 127.0.0.1:2511 [200]: POST /api/auth/login_jwt.php
+[Mon May 18 00:39:44 2026] 127.0.0.1:2511 Closing
+[Mon May 18 00:39:46 2026] 127.0.0.1:2516 Accepted
+[Mon May 18 00:39:46 2026] 127.0.0.1:2516 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 00:39:46 2026] 127.0.0.1:2516 Closing
+[Mon May 18 00:39:46 2026] 127.0.0.1:2517 Accepted
+[Mon May 18 00:39:46 2026] 127.0.0.1:2517 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 00:39:46 2026] 127.0.0.1:2517 Closing
+[Mon May 18 00:41:38 2026] 127.0.0.1:2650 Accepted
+[Mon May 18 00:41:38 2026] 127.0.0.1:2650 [200]: GET /api/categorias/list.php
+[Mon May 18 00:41:38 2026] 127.0.0.1:2650 Closing
+[Mon May 18 00:41:41 2026] 127.0.0.1:2655 Accepted
+[Mon May 18 00:41:41 2026] 127.0.0.1:2655 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 00:41:41 2026] 127.0.0.1:2655 Closing
+[Mon May 18 00:41:52 2026] 127.0.0.1:2667 Accepted
+[Mon May 18 00:41:52 2026] 127.0.0.1:2667 [401]: POST /api/auth/login_jwt.php
+[Mon May 18 00:41:52 2026] 127.0.0.1:2667 Closing
+[Mon May 18 00:44:21 2026] 127.0.0.1:2820 Accepted
+[Mon May 18 00:44:21 2026] 127.0.0.1:2821 Accepted
+[Mon May 18 00:44:21 2026] 127.0.0.1:2820 [200]: GET /
+[Mon May 18 00:44:21 2026] 127.0.0.1:2820 Closing
+[Mon May 18 00:44:21 2026] 127.0.0.1:2821 [200]: GET /tokens.css
+[Mon May 18 00:44:21 2026] 127.0.0.1:2821 Closing
+[Mon May 18 00:44:21 2026] 127.0.0.1:2823 Accepted
+[Mon May 18 00:44:21 2026] 127.0.0.1:2823 [404]: GET /favicon.ico - No such file or directory
+[Mon May 18 00:44:21 2026] 127.0.0.1:2823 Closing
+[Mon May 18 00:59:48 2026] 127.0.0.1:3580 Accepted
+[Mon May 18 01:00:03 2026] 127.0.0.1:3580 [500]: GET /api/categorias/list.php
+[Mon May 18 01:00:03 2026] 127.0.0.1:3580 Closing
+[Mon May 18 01:03:59 2026] 127.0.0.1:3887 Accepted
+[Mon May 18 01:04:00 2026] 127.0.0.1:3887 [200]: GET /api/categorias/list.php
+[Mon May 18 01:04:00 2026] 127.0.0.1:3887 Closing
+[Mon May 18 01:04:03 2026] 127.0.0.1:3896 Accepted
+[Mon May 18 01:04:03 2026] 127.0.0.1:3896 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:04:03 2026] 127.0.0.1:3896 Closing
+[Mon May 18 01:04:07 2026] 127.0.0.1:3907 Accepted
+[Mon May 18 01:04:07 2026] 127.0.0.1:3907 [200]: GET /api/categorias/list.php
+[Mon May 18 01:04:07 2026] 127.0.0.1:3907 Closing
+[Mon May 18 01:04:08 2026] 127.0.0.1:3910 Accepted
+[Mon May 18 01:04:08 2026] 127.0.0.1:3910 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:04:08 2026] 127.0.0.1:3910 Closing
+[Mon May 18 01:04:19 2026] 127.0.0.1:3930 Accepted
+[Mon May 18 01:04:20 2026] 127.0.0.1:3930 [200]: POST /api/auth/login_jwt.php
+[Mon May 18 01:04:20 2026] 127.0.0.1:3930 Closing
+[Mon May 18 01:04:30 2026] 127.0.0.1:3950 Accepted
+[Mon May 18 01:04:30 2026] 127.0.0.1:3950 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 01:04:30 2026] 127.0.0.1:3950 Closing
+[Mon May 18 01:04:37 2026] 127.0.0.1:3958 Accepted
+[Mon May 18 01:04:37 2026] 127.0.0.1:3958 [200]: GET /api/pratos/nearby.php?lat=38.7222517&lng=-9.139335&radius=5.0&limit=30
+[Mon May 18 01:04:37 2026] 127.0.0.1:3958 Closing
+[Mon May 18 01:04:45 2026] 127.0.0.1:3965 Accepted
+[Mon May 18 01:04:45 2026] 127.0.0.1:3965 [200]: GET /api/categorias/list.php
+[Mon May 18 01:04:45 2026] 127.0.0.1:3965 Closing
+[Mon May 18 01:04:48 2026] 127.0.0.1:3970 Accepted
+[Mon May 18 01:04:49 2026] 127.0.0.1:3970 [200]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:04:49 2026] 127.0.0.1:3970 Closing
+[Mon May 18 01:06:33 2026] 127.0.0.1:4156 Accepted
+[Mon May 18 01:06:33 2026] 127.0.0.1:4157 Accepted
+[Mon May 18 01:06:33 2026] 127.0.0.1:4157 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:06:33 2026] 127.0.0.1:4157 Closing
+[Mon May 18 01:06:33 2026] 127.0.0.1:4156 [500]: GET /api/categorias/list.php
+[Mon May 18 01:06:33 2026] 127.0.0.1:4156 Closing
+[Mon May 18 01:06:38 2026] 127.0.0.1:4160 Accepted
+[Mon May 18 01:06:38 2026] 127.0.0.1:4160 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:06:38 2026] 127.0.0.1:4160 Closing
+[Mon May 18 01:12:45 2026] 127.0.0.1:4678 Accepted
+[Mon May 18 01:12:45 2026] 127.0.0.1:4679 Accepted
+[Mon May 18 01:12:45 2026] 127.0.0.1:4679 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:12:45 2026] 127.0.0.1:4679 Closing
+[Mon May 18 01:12:45 2026] 127.0.0.1:4678 [500]: GET /api/categorias/list.php
+[Mon May 18 01:12:45 2026] 127.0.0.1:4678 Closing
+[Mon May 18 01:13:04 2026] 127.0.0.1:4721 Accepted
+[Mon May 18 01:13:04 2026] 127.0.0.1:4721 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:13:04 2026] 127.0.0.1:4721 Closing
+[Mon May 18 01:15:56 2026] 127.0.0.1:4934 Accepted
+[Mon May 18 01:15:56 2026] 127.0.0.1:4935 Accepted
+[Mon May 18 01:15:56 2026] 127.0.0.1:4935 [500]: GET /api/categorias/list.php
+[Mon May 18 01:15:56 2026] 127.0.0.1:4935 Closing
+[Mon May 18 01:15:56 2026] 127.0.0.1:4934 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:15:57 2026] 127.0.0.1:4934 Closing
+[Mon May 18 01:16:25 2026] 127.0.0.1:4980 Accepted
+[Mon May 18 01:16:25 2026] 127.0.0.1:4980 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:16:25 2026] 127.0.0.1:4980 Closing
+[Mon May 18 01:18:35 2026] 127.0.0.1:5145 Accepted
+[Mon May 18 01:18:35 2026] 127.0.0.1:5146 Accepted
+[Mon May 18 01:18:35 2026] 127.0.0.1:5145 [500]: GET /api/categorias/list.php
+[Mon May 18 01:18:35 2026] 127.0.0.1:5145 Closing
+[Mon May 18 01:18:35 2026] 127.0.0.1:5146 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:18:35 2026] 127.0.0.1:5146 Closing
+[Mon May 18 01:19:27 2026] 127.0.0.1:5203 Accepted
+[Mon May 18 01:19:27 2026] 127.0.0.1:5203 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:19:27 2026] 127.0.0.1:5203 Closing
+[Mon May 18 01:21:11 2026] 127.0.0.1:5323 Accepted
+[Mon May 18 01:21:11 2026] 127.0.0.1:5324 Accepted
+[Mon May 18 01:21:11 2026] 127.0.0.1:5323 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:21:11 2026] 127.0.0.1:5323 Closing
+[Mon May 18 01:21:11 2026] 127.0.0.1:5324 [500]: GET /api/categorias/list.php
+[Mon May 18 01:21:11 2026] 127.0.0.1:5324 Closing
+[Mon May 18 01:21:42 2026] 127.0.0.1:5365 Accepted
+[Mon May 18 01:21:42 2026] 127.0.0.1:5365 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:21:42 2026] 127.0.0.1:5365 Closing
+[Mon May 18 01:25:42 2026] 127.0.0.1:5630 Accepted
+[Mon May 18 01:25:42 2026] 127.0.0.1:5631 Accepted
+[Mon May 18 01:25:42 2026] 127.0.0.1:5630 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:25:42 2026] 127.0.0.1:5630 Closing
+[Mon May 18 01:25:42 2026] 127.0.0.1:5631 [500]: GET /api/categorias/list.php
+[Mon May 18 01:25:42 2026] 127.0.0.1:5631 Closing
+[Mon May 18 01:25:59 2026] 127.0.0.1:5651 Accepted
+[Mon May 18 01:25:59 2026] 127.0.0.1:5651 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:25:59 2026] 127.0.0.1:5651 Closing
+[Mon May 18 01:30:58 2026] 127.0.0.1:5971 Accepted
+[Mon May 18 01:30:58 2026] 127.0.0.1:5972 Accepted
+[Mon May 18 01:30:58 2026] 127.0.0.1:5971 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:30:58 2026] 127.0.0.1:5971 Closing
+[Mon May 18 01:30:58 2026] 127.0.0.1:5972 [500]: GET /api/categorias/list.php
+[Mon May 18 01:30:58 2026] 127.0.0.1:5972 Closing
+[Mon May 18 01:31:07 2026] 127.0.0.1:5987 Accepted
+[Mon May 18 01:31:07 2026] 127.0.0.1:5987 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:31:07 2026] 127.0.0.1:5987 Closing
+[Mon May 18 01:34:13 2026] 127.0.0.1:6190 Accepted
+[Mon May 18 01:34:13 2026] 127.0.0.1:6191 Accepted
+[Mon May 18 01:34:13 2026] 127.0.0.1:6191 [500]: GET /api/categorias/list.php
+[Mon May 18 01:34:13 2026] 127.0.0.1:6191 Closing
+[Mon May 18 01:34:13 2026] 127.0.0.1:6190 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:34:13 2026] 127.0.0.1:6190 Closing
+[Mon May 18 01:34:30 2026] 127.0.0.1:6210 Accepted
+[Mon May 18 01:34:30 2026] 127.0.0.1:6210 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:34:30 2026] 127.0.0.1:6210 Closing
+[Mon May 18 01:46:26 2026] 127.0.0.1:7836 Accepted
+[Mon May 18 01:46:26 2026] 127.0.0.1:7837 Accepted
+[Mon May 18 01:46:26 2026] 127.0.0.1:7836 [500]: GET /api/categorias/list.php
+[Mon May 18 01:46:26 2026] 127.0.0.1:7836 Closing
+[Mon May 18 01:46:26 2026] 127.0.0.1:7837 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:46:26 2026] 127.0.0.1:7837 Closing
+[Mon May 18 01:50:03 2026] 127.0.0.1:8080 Accepted
+[Mon May 18 01:50:03 2026] 127.0.0.1:8080 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:50:03 2026] 127.0.0.1:8080 Closing
+[Mon May 18 01:50:53 2026] 127.0.0.1:8148 Accepted
+[Mon May 18 01:50:53 2026] 127.0.0.1:8149 Accepted
+[Mon May 18 01:50:53 2026] 127.0.0.1:8148 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:50:53 2026] 127.0.0.1:8148 Closing
+[Mon May 18 01:50:53 2026] 127.0.0.1:8149 [500]: GET /api/categorias/list.php
+[Mon May 18 01:50:53 2026] 127.0.0.1:8149 Closing
+[Mon May 18 01:50:57 2026] 127.0.0.1:8153 Accepted
+[Mon May 18 01:50:57 2026] 127.0.0.1:8153 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:50:57 2026] 127.0.0.1:8153 Closing
+[Mon May 18 01:51:40 2026] 127.0.0.1:8186 Accepted
+[Mon May 18 01:51:40 2026] 127.0.0.1:8187 Accepted
+[Mon May 18 01:51:40 2026] 127.0.0.1:8187 [500]: GET /api/categorias/list.php
+[Mon May 18 01:51:40 2026] 127.0.0.1:8187 Closing
+[Mon May 18 01:51:40 2026] 127.0.0.1:8186 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:51:40 2026] 127.0.0.1:8186 Closing
+[Mon May 18 01:51:44 2026] 127.0.0.1:8190 Accepted
+[Mon May 18 01:51:45 2026] 127.0.0.1:8190 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:51:45 2026] 127.0.0.1:8190 Closing
+[Mon May 18 01:52:51 2026] 127.0.0.1:8258 Accepted
+[Mon May 18 01:52:51 2026] 127.0.0.1:8259 Accepted
+[Mon May 18 01:52:51 2026] 127.0.0.1:8259 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:52:51 2026] 127.0.0.1:8259 Closing
+[Mon May 18 01:52:51 2026] 127.0.0.1:8258 [500]: GET /api/categorias/list.php
+[Mon May 18 01:52:51 2026] 127.0.0.1:8258 Closing
+[Mon May 18 01:52:55 2026] 127.0.0.1:8263 Accepted
+[Mon May 18 01:52:55 2026] 127.0.0.1:8263 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:52:55 2026] 127.0.0.1:8263 Closing
+[Mon May 18 01:53:41 2026] 127.0.0.1:8300 Accepted
+[Mon May 18 01:53:41 2026] 127.0.0.1:8301 Accepted
+[Mon May 18 01:53:41 2026] 127.0.0.1:8301 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 01:53:41 2026] 127.0.0.1:8301 Closing
+[Mon May 18 01:53:41 2026] 127.0.0.1:8300 [500]: GET /api/categorias/list.php
+[Mon May 18 01:53:41 2026] 127.0.0.1:8300 Closing
+[Mon May 18 01:53:46 2026] 127.0.0.1:8308 Accepted
+[Mon May 18 01:53:47 2026] 127.0.0.1:8308 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 01:53:47 2026] 127.0.0.1:8308 Closing
+[Mon May 18 02:00:57 2026] 127.0.0.1:8741 Accepted
+[Mon May 18 02:00:57 2026] 127.0.0.1:8742 Accepted
+[Mon May 18 02:00:57 2026] 127.0.0.1:8741 [500]: GET /api/categorias/list.php
+[Mon May 18 02:00:57 2026] 127.0.0.1:8741 Closing
+[Mon May 18 02:00:57 2026] 127.0.0.1:8742 [500]: GET /api/pratos/list.php?limit=100&offset=0
+[Mon May 18 02:00:57 2026] 127.0.0.1:8742 Closing
+[Mon May 18 02:01:14 2026] 127.0.0.1:8762 Accepted
+[Mon May 18 02:01:14 2026] 127.0.0.1:8762 [500]: POST /api/auth/login_jwt.php
+[Mon May 18 02:01:14 2026] 127.0.0.1:8762 Closing
