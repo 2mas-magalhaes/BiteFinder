@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -515,10 +516,12 @@ private fun NearbyContent(
     pratos: List<PratoDto>,
     onPratoClick: (Int) -> Unit
 ) {
+    val isPratosEmpty by remember(pratos) { derivedStateOf { pratos.isEmpty() } }
+
     when {
         isLoading -> Column(Modifier.padding(horizontal = 24.dp)) { SkeletonRow() }
         error != null -> LocationMessage("Erro", error)
-        pratos.isEmpty() -> LocationMessage("Sem resultados", emptyText)
+        isPratosEmpty -> LocationMessage("Sem resultados", emptyText)
         else -> LazyRow(
             contentPadding = PaddingValues(horizontal = 24.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
