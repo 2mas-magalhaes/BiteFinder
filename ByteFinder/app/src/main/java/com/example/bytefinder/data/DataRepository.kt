@@ -2,6 +2,7 @@ package com.example.bytefinder.data
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * DataRepository — Camada de abstração entre a UI e a fonte de dados.
@@ -16,6 +17,13 @@ class DataRepository(private val api: ApiService) {
 
     // ─── Flag: se a API já falhou, usa mock diretamente ─────────────────
     private var useOnlyMock = false
+
+    private suspend fun <T> fastRead(timeoutMs: Long = 4_500, block: suspend () -> T): T? =
+        try {
+            withTimeoutOrNull(timeoutMs) { block() }
+        } catch (_: Exception) {
+            null
+        }
 
     // ─── Login ──────────────────────────────────────────────────────────
 
@@ -36,8 +44,8 @@ class DataRepository(private val api: ApiService) {
         withContext(Dispatchers.IO) {
             if (useOnlyMock) return@withContext MockDataProvider.categorias
             try {
-                val res = api.listCategorias()
-                if (res.ok && res.items.isNotEmpty()) res.items else MockDataProvider.categorias
+                val res = fastRead { api.listCategorias() }
+                if (res?.ok == true && res.items.isNotEmpty()) res.items else MockDataProvider.categorias
             } catch (_: Exception) {
                 useOnlyMock = true
                 MockDataProvider.categorias
@@ -50,8 +58,12 @@ class DataRepository(private val api: ApiService) {
         withContext(Dispatchers.IO) {
             if (useOnlyMock) return@withContext MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
             try {
-                val res = api.getNearbyPratos(lat, lng, radius, categoria)
-                if (res.ok && res.items.isNotEmpty()) res.items else MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
+                val res = fastRead { api.getNearbyPratos(lat, lng, radius, categoria) }
+                if (res?.ok == true && res.items.isNotEmpty()) {
+                    res.items.map { MockDataProvider.enrichWithRestaurantLocation(it, lat, lng) }
+                } else {
+                    MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
+                }
             } catch (_: Exception) {
                 MockDataProvider.getNearbyPratos(lat, lng, radius, categoria)
             }
@@ -76,15 +88,14 @@ class DataRepository(private val api: ApiService) {
             }.drop(offset).take(limit)
         }
         try {
-            val res = api.listPratos(search, categoria, restauranteId, limit, offset)
-            if (res.ok && res.items.isNotEmpty()) res.items
+            val res = fastRead { api.listPratos(search, categoria, restauranteId, limit, offset) }
+            if (res?.ok == true && res.items.isNotEmpty()) res.items
             else MockDataProvider.filterPratos(categoria = categoria, searchQuery = search)
                 .let { list ->
                     if (restauranteId != null) list.filter { it.restauranteId == restauranteId }
                     else list
                 }.drop(offset).take(limit)
         } catch (_: Exception) {
-            useOnlyMock = true
             MockDataProvider.filterPratos(categoria = categoria, searchQuery = search)
                 .let { list ->
                     if (restauranteId != null) list.filter { it.restauranteId == restauranteId }

@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.bytefinder.data.PratoDto
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.claySceneBackground
 import com.example.bytefinder.ui.theme.*
 import com.example.bytefinder.ui.viewmodel.HomeViewModel
@@ -491,9 +492,10 @@ private fun SearchResultRow(prato: PratoDto, onClick: () -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         // Miniatura do prato
-        if (!prato.imagemUrl.isNullOrBlank()) {
+        val imageUrl = prato.displayImageUrl()
+        if (!imageUrl.isNullOrBlank()) {
             AsyncImage(
-                model = prato.imagemUrl,
+                model = imageUrl,
                 contentDescription = prato.nome,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier

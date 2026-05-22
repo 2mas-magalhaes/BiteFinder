@@ -1,6 +1,13 @@
 package com.example.bytefinder.ui.screens
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -22,10 +29,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.RateReview
+import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.Storefront
@@ -50,6 +60,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -63,9 +74,14 @@ import com.example.bytefinder.data.DeletePratoRequest
 import com.example.bytefinder.data.MockDataProvider
 import com.example.bytefinder.data.PratoDto
 import com.example.bytefinder.data.UpdatePratoRequest
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.theme.*
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
 import java.util.Locale
 
 /**
@@ -466,7 +482,7 @@ private fun PratoManagementCard(
         Row(modifier = Modifier.padding(12.dp)) {
             // Image
             AsyncImage(
-                model = prato.imagemUrl,
+                model = prato.displayImageUrl(),
                 contentDescription = prato.nome,
                 modifier = Modifier
                     .size(90.dp)
@@ -777,28 +793,21 @@ private fun CreatePratoDialog(
     var descricao by remember { mutableStateOf("") }
     var categoria by remember { mutableStateOf("") }
     var preco by remember { mutableStateOf("") }
-    var imagemUrl by remember { mutableStateOf("") }
+    var imagemUri by remember { mutableStateOf("") }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ClayWhite,
-        title = { Text("Novo Prato", fontWeight = FontWeight.Bold, color = ClayTextDark) },
+        title = {
+            Column {
+                Text("Novo prato", fontWeight = FontWeight.ExtraBold, color = ClayTextDark, fontSize = 22.sp)
+                Text("Fotografia, detalhes e preco num fluxo simples.", color = ClayTextMedium, fontSize = 13.sp)
+            }
+        },
         text = {
             Column {
-                // Image preview
-                if (imagemUrl.isNotBlank()) {
-                    AsyncImage(
-                        model = imagemUrl,
-                        contentDescription = "Preview",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(16f / 9f)
-                            .clip(RoundedCornerShape(14.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(Modifier.height(12.dp))
-                }
-
+                DishPhotoPicker(imageUri = imagemUri, onImageSelected = { imagemUri = it })
+                Spacer(Modifier.height(12.dp))
                 OutlinedTextField(value = nome, onValueChange = { nome = it },
                     label = { Text("Nome *") }, singleLine = true,
                     shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
@@ -815,9 +824,7 @@ private fun CreatePratoDialog(
                     label = { Text("Descrição") }, maxLines = 3,
                     shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(8.dp))
-                OutlinedTextField(value = imagemUrl, onValueChange = { imagemUrl = it },
-                    label = { Text("URL da imagem") }, singleLine = true,
-                    shape = RoundedCornerShape(14.dp), modifier = Modifier.fillMaxWidth())
+                Text("A imagem e escolhida pela galeria ou camara.", color = ClayTextMedium, fontSize = 12.sp)
             }
         },
         confirmButton = {
@@ -830,7 +837,7 @@ private fun CreatePratoDialog(
                         descricao.trim().ifBlank { null },
                         categoria.trim().ifBlank { null },
                         preco.replace(",", ".").toDoubleOrNull(),
-                        imagemUrl.trim().ifBlank { null }
+                        imagemUri.ifBlank { null }
                     )
                 }
             )
@@ -901,4 +908,99 @@ private fun EditPratoDialog(prato: PratoDto, onDismiss: () -> Unit, onSave: (Pra
         },
         dismissButton = { ClayButton(text = "Cancelar", isSecondary = true, onClick = onDismiss) }
     )
+}
+
+@Composable
+private fun DishPhotoPicker(
+    imageUri: String,
+    onImageSelected: (String) -> Unit
+) {
+    val context = LocalContext.current
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        if (uri != null) onImageSelected(uri.toString())
+    }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+        if (bitmap != null) onImageSelected(saveDishBitmap(context, bitmap))
+    }
+    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) cameraLauncher.launch(null)
+    }
+
+    ClayCard(backgroundColor = ClayWhite, cornerRadius = 22.dp, elevation = 8.dp) {
+        Column(Modifier.padding(12.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(ClayBlueLight)
+                    .border(1.dp, ClayBluePale, RoundedCornerShape(18.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (imageUri.isNotBlank()) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = "Fotografia do prato",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(Icons.Filled.RestaurantMenu, contentDescription = null, tint = ClayBlue, modifier = Modifier.size(34.dp))
+                        Spacer(Modifier.height(6.dp))
+                        Text("Adiciona uma foto apetecivel", color = ClayTextDark, fontWeight = FontWeight.Bold)
+                        Text("Galeria ou camara do telemovel", color = ClayTextMedium, fontSize = 12.sp)
+                    }
+                }
+            }
+            Spacer(Modifier.height(10.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                MediaActionChip(
+                    text = "Galeria",
+                    icon = Icons.Filled.PhotoLibrary,
+                    modifier = Modifier.weight(1f),
+                    onClick = { galleryLauncher.launch("image/*") }
+                )
+                MediaActionChip(
+                    text = "Camara",
+                    icon = Icons.Filled.AddAPhoto,
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                        if (granted) cameraLauncher.launch(null) else permissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MediaActionChip(
+    text: String,
+    icon: ImageVector,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(ClayBlue.copy(alpha = 0.12f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(icon, contentDescription = null, tint = ClayBlue, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(text, color = ClayBlue, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+    }
+}
+
+private fun saveDishBitmap(context: Context, bitmap: Bitmap): String {
+    val file = File(context.cacheDir, "bitefinder-dish-${System.currentTimeMillis()}.jpg")
+    FileOutputStream(file).use { output ->
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 92, output)
+    }
+    return file.toUri().toString()
 }

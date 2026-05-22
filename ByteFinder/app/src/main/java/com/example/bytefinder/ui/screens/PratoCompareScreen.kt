@@ -45,6 +45,7 @@ import coil.compose.AsyncImage
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.data.MockDataProvider
 import com.example.bytefinder.data.PratoDto
+import com.example.bytefinder.data.displayImageUrl
 import com.example.bytefinder.ui.components.*
 import com.example.bytefinder.ui.theme.*
 import java.util.Locale
@@ -146,9 +147,10 @@ fun ClayPratoCompareScreen(
             ) {
                 Column {
                     // Imagem
-                    if (!bestPrato.imagemUrl.isNullOrBlank()) {
+                    val imageUrl = bestPrato.displayImageUrl()
+                    if (!imageUrl.isNullOrBlank()) {
                         AsyncImage(
-                            model = bestPrato.imagemUrl,
+                            model = imageUrl,
                             contentDescription = tipo,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -318,9 +320,9 @@ private fun RestaurantCompareCard(
     ClayCard(
         modifier = Modifier.fillMaxWidth(),
         onClick = onClick,
-        backgroundColor = if (isFirst) ClayDarkNavy.copy(alpha = 0.9f) else ClayWhite,
+        backgroundColor = if (isFirst) ClayWhite else ClayBlueLight,
         cornerRadius = 20.dp,
-        elevation = if (isFirst) 8.dp else 5.dp
+        elevation = if (isFirst) 10.dp else 4.dp
     ) {
         Column(Modifier.padding(16.dp)) {
             if (isFirst) {
@@ -331,8 +333,8 @@ private fun RestaurantCompareCard(
                         .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
                     Text(
-                        "Melhor escolha BiteFinder",
-                        color = ClayBlueSoft,
+                        "TOP",
+                        color = ClayBlue,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp
                     )

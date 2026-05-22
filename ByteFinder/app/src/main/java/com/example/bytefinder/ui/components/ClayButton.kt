@@ -53,7 +53,7 @@ fun ClayButton(
     }
     val txtColor = when {
         !enabled    -> contentColor.copy(alpha = 0.4f)
-        isSecondary -> Color.White
+        isSecondary -> ClayTextDark
         else        -> contentColor
     }
     val shape = RoundedCornerShape(cornerRadius)
