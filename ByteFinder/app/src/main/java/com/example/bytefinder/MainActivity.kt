@@ -111,6 +111,7 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
     }
 
     fun signOut() {
+        ApiClient.setAuthToken(null)
         token = null
         userName = null
         currentUserId = null
@@ -139,6 +140,7 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
             repository = repository,
             authViewModel = authViewModel,
             onLoggedIn = { t, userId, nome, role, restaurantes ->
+                ApiClient.setAuthToken(t)
                 token = t
                 currentUserId = userId
                 userName = nome

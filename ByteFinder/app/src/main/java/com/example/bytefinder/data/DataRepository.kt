@@ -88,19 +88,22 @@ class DataRepository(private val api: ApiService) {
             }.drop(offset).take(limit)
         }
         try {
-            val res = fastRead { api.listPratos(search, categoria, restauranteId, limit, offset) }
-            if (res?.ok == true && res.items.isNotEmpty()) res.items
-            else MockDataProvider.filterPratos(categoria = categoria, searchQuery = search)
-                .let { list ->
-                    if (restauranteId != null) list.filter { it.restauranteId == restauranteId }
-                    else list
-                }.drop(offset).take(limit)
-        } catch (_: Exception) {
+            val res = api.listPratos(search, categoria, restauranteId, limit, offset)
+            if (res.ok) return@withContext res.items
+
+            if (restauranteId != null) {
+                throw IllegalStateException(res.error ?: res.message ?: "Erro ao carregar pratos do restaurante")
+            }
+
             MockDataProvider.filterPratos(categoria = categoria, searchQuery = search)
-                .let { list ->
-                    if (restauranteId != null) list.filter { it.restauranteId == restauranteId }
-                    else list
-                }.drop(offset).take(limit)
+                .drop(offset)
+                .take(limit)
+        } catch (e: Exception) {
+            if (restauranteId != null) throw e
+
+            MockDataProvider.filterPratos(categoria = categoria, searchQuery = search)
+                .drop(offset)
+                .take(limit)
         }
     }
 
@@ -136,10 +139,10 @@ class DataRepository(private val api: ApiService) {
             if (useOnlyMock) return@withContext MockDataProvider.getPratoDetail(id)
             try {
                 val res = api.getPratoDetail(id)
-                if (res.ok) res.item else MockDataProvider.getPratoDetail(id)
-            } catch (_: Exception) {
-                useOnlyMock = true
-                MockDataProvider.getPratoDetail(id)
+                if (res.ok) res.item else null
+            } catch (e: retrofit2.HttpException) {
+                if (e.code() == 404) return@withContext null
+                throw e
             }
         }
 
@@ -216,8 +219,8 @@ class DataRepository(private val api: ApiService) {
             if (useOnlyMock) return@withContext BasicOkResponse(ok = true, message = "Prato atualizado (modo offline)")
             try {
                 api.updatePrato(req)
-            } catch (_: Exception) {
-                BasicOkResponse(ok = true, message = "Prato atualizado (modo offline)")
+            } catch (e: Exception) {
+                BasicOkResponse(ok = false, error = e.message ?: "Erro ao atualizar prato")
             }
         }
 
@@ -231,9 +234,8 @@ class DataRepository(private val api: ApiService) {
             }
             try {
                 api.createPrato(req)
-            } catch (_: Exception) {
-                MockDataProvider.createPrato(req.restauranteId, req.nome, req.descricao, req.categoria, req.preco, req.imagemUrl)
-                BasicOkResponse(ok = true, message = "Prato criado (modo offline)")
+            } catch (e: Exception) {
+                BasicOkResponse(ok = false, error = e.message ?: "Erro ao criar prato")
             }
         }
 
@@ -247,9 +249,8 @@ class DataRepository(private val api: ApiService) {
             }
             try {
                 api.deletePrato(req)
-            } catch (_: Exception) {
-                MockDataProvider.deletePrato(req.idPrato)
-                BasicOkResponse(ok = true, message = "Prato eliminado (modo offline)")
+            } catch (e: Exception) {
+                BasicOkResponse(ok = false, error = e.message ?: "Erro ao eliminar prato")
             }
         }
 

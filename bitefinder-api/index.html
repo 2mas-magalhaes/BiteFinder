@@ -832,7 +832,7 @@
     <div class="auth-content">
       <div id="authCard" class="auth-card">
         <div class="auth-header">
-          <img src="https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png" alt="BiteFinder" />
+          <img src="assets/logo-bf.png" alt="BiteFinder" />
           <h2>Portal do Parceiro</h2>
           <p>Gerencie o seu restaurante com facilidade</p>
         </div>
@@ -910,7 +910,7 @@
   <div id="dashboardLayout" class="dashboard-layout hidden">
     <nav class="dash-nav">
       <div class="dash-brand">
-        <img src="https://bitefinderstorage.blob.core.windows.net/icons/logo-bf.png" alt="BiteFinder" />
+        <img src="assets/logo-bf.png" alt="BiteFinder" />
         <span id="navRestaurantName">BiteFinder</span>
 
       </div>
@@ -1443,10 +1443,11 @@
       } else {
         res = await apiRequest(`api/pratos/list.php?restauranteId=${state.restauranteId}`, 'GET');
         if (!res.ok) {
-          // Fallback to mock
-          state.isDemo = true;
-
-          res = mockListPratos(state.restauranteId);
+          renderStats([]);
+          renderInsights([]);
+          menuList.innerHTML = `<div class="empty-state">${res.error || 'Não foi possível carregar o cardápio.'}</div>`;
+          showToast(res.error || 'Não foi possível carregar o cardápio.', true);
+          return;
         }
       }
 
@@ -1531,7 +1532,6 @@
               userId: state.user?.id || 0,
               restauranteId: state.restauranteId
             });
-            if (!result.ok) result = mockDeletePrato(state.restauranteId, item.id);
           }
 
           if (result.ok) { showToast('Prato eliminado!'); await refreshMenu(); }
@@ -1590,7 +1590,6 @@
         result = mockUpdatePrato(state.restauranteId, payload.idPrato, payload);
       } else {
         result = await apiRequest('api/pratos/update.php', 'POST', payload);
-        if (!result.ok) result = mockUpdatePrato(state.restauranteId, payload.idPrato, payload);
       }
 
       if (result.ok) {
@@ -1615,7 +1614,6 @@
         result = await apiRequest('api/pratos/delete.php', 'POST', {
           idPrato, userId: state.user?.id || 0, restauranteId: state.restauranteId
         });
-        if (!result.ok) result = mockDeletePrato(state.restauranteId, idPrato);
       }
 
       if (result.ok) {
@@ -1742,7 +1740,6 @@
         res = mockCreatePrato(state.restauranteId, payload);
       } else {
         res = await apiRequest('api/pratos/create.php', 'POST', payload);
-        if (!res.ok) res = mockCreatePrato(state.restauranteId, payload);
       }
 
       if (res.ok) {

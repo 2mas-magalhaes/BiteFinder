@@ -96,7 +96,7 @@ fun ClayLoginScreen(
                 authState.user!!.id,
                 authState.user!!.nome,
                 authState.user!!.role,
-                emptyList() // social login typically doesnt return restaurants out of the box in this mock
+                authState.user!!.restaurantes
             )
         }
     }
