@@ -44,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
@@ -350,10 +351,10 @@ fun ClayLoginScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SocialIconButton("google") { authViewModel.socialLogin("google", "dummy_token_google") }
-                            SocialIconButton("apple") { authViewModel.socialLogin("apple", "dummy_token_apple") }
-                            SocialIconButton("facebook") { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
-                            SocialIconButton("microsoft") { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
+                            SocialIconButton("google", enabled = !isLoading) { authViewModel.socialLogin("google", "dummy_token_google") }
+                            SocialIconButton("apple", enabled = !isLoading) { authViewModel.socialLogin("apple", "dummy_token_apple") }
+                            SocialIconButton("facebook", enabled = !isLoading) { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
+                            SocialIconButton("microsoft", enabled = !isLoading) { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
                         }
 
                         Spacer(Modifier.height(16.dp))
@@ -627,7 +628,7 @@ fun ClayLoginScreen(
 }
 
 @Composable
-private fun SocialIconButton(provider: String, onClick: () -> Unit) {
+private fun SocialIconButton(provider: String, enabled: Boolean = true, onClick: () -> Unit) {
     val iconRes = when (provider) {
         "google" -> R.drawable.ic_social_google
         "apple" -> R.drawable.ic_social_apple
@@ -649,7 +650,8 @@ private fun SocialIconButton(provider: String, onClick: () -> Unit) {
             .clip(RoundedCornerShape(16.dp))
             .background(ClayWhite)
             .border(1.dp, ClayBluePale, RoundedCornerShape(16.dp))
-            .clickable { onClick() },
+            .alpha(if (enabled) 1f else 0.5f)
+            .clickable(enabled = enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Image(
