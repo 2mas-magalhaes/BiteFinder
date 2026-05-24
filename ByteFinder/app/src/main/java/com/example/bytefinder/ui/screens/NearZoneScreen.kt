@@ -97,6 +97,8 @@ fun NearZoneScreen(
     val locationService = remember { LocationService(context) }
     var hasLocationPermission by remember { mutableStateOf(locationService.hasLocationPermission()) }
 
+    val pratos by remember(state.nearbyPratos) { mutableStateOf(state.nearbyPratos) }
+
     fun applyLocation(loc: com.example.bytefinder.data.UserLocation) {
         val matched = locationService.matchCity(loc.city)
         viewModel.onLocationDetected(
@@ -184,7 +186,7 @@ fun NearZoneScreen(
                 lat != null && lng != null -> NearMapCard(
                     userLocation = LatLng(lat, lng),
                     radiusKm = state.radiusKm,
-                    pratos = state.nearbyPratos,
+                    pratos = pratos,
                     onPratoClick = onPratoClick
                 )
                 state.locationLoaded -> LocationMessage(
@@ -209,7 +211,7 @@ fun NearZoneScreen(
                 isLoading = state.isNearbyLoading,
                 error = state.nearbyError,
                 emptyText = "Ainda nao encontramos pratos num raio de ${state.radiusKm.toInt()} km.",
-                pratos = state.nearbyPratos,
+                    pratos = pratos,
                 onPratoClick = onPratoClick
             )
         }

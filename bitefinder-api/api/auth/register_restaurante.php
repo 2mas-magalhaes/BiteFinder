@@ -82,7 +82,7 @@ try {
     $restColumn = null;
     $candidates = ['NIF', 'CNPJ', 'Codigo', 'RestaurantCode'];
     $placeholders = implode(',', array_fill(0, count($candidates), '?'));
-    $stmt = $pdo->prepare("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Restaurante' AND COLUMN_NAME IN ($placeholders)");
+    $stmt = $pdo->prepare("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Restaurante' AND LOWER(COLUMN_NAME) IN (LOWER(?), LOWER(?), LOWER(?), LOWER(?))");
     $stmt->execute($candidates);
     $found = $stmt->fetchAll(PDO::FETCH_COLUMN);
     $foundLower = array_map('strtolower', $found);
@@ -142,5 +142,5 @@ try {
     if (isset($pdo) && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    respond(['ok' => false, 'error' => 'Erro interno do servidor. Tente novamente mais tarde.', 'message' => $e->getMessage()], 500);
+    respond(['ok' => false, 'error' => 'Erro interno do servidor. Tente novamente mais tarde.'], 500);
 }
