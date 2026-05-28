@@ -249,8 +249,12 @@ fun HomeScreen(
     }
 
     // City/street displayed in the top bar (from GPS or manual)
-    val displayCity = if (state.locationLoaded) state.detectedCity else "A detectar..."
-    val displayStreet = if (state.locationLoaded) state.detectedStreet else ""
+    val displayCity by remember {
+        androidx.compose.runtime.derivedStateOf { if (state.locationLoaded) state.detectedCity else "A detectar..." }
+    }
+    val displayStreet by remember {
+        androidx.compose.runtime.derivedStateOf { if (state.locationLoaded) state.detectedStreet else "" }
+    }
 
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -835,8 +839,12 @@ fun HomeScreen(
                         SkeletonRow()
                     }
                 } else {
-                    val sectionTitle = if (state.selectedCategory == "Todos")
-                        "As melhores opções perto de ti" else "As melhores ${state.selectedCategory} perto de ti"
+                    val sectionTitle by remember {
+                        androidx.compose.runtime.derivedStateOf {
+                            if (state.selectedCategory == "Todos")
+                                "As melhores opções perto de ti" else "As melhores ${state.selectedCategory} perto de ti"
+                        }
+                    }
 
                     SectionHeader(
                         title = sectionTitle,
