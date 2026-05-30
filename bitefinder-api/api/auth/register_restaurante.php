@@ -56,24 +56,32 @@ try {
 
         if ($httpCode === 200 && $response) {
             $data = json_decode($response, true);
-            if (isset($data['result']) && $data['result'] === 'success') {
-                $nifInfo = $data['records'][$restaurantCode] ?? null;
-                // Se a API indicar que não existe, bloquear o registo.
-                if (!$nifInfo) {
-                     respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
-                } else {
-                    // Auto-fill nome se existir na resposta e for valido
-                    if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
-                        $title = trim($nifInfo['title']);
-                        // Ignorar os erros standard da API para free tiers
-                        if (strpos($title, 'Key necessary') === false) {
-                            $restauranteNome = $title;
+            if (isset($data['result'])) {
+                if ($data['result'] === 'success') {
+                    $nifInfo = $data['records'][$restaurantCode] ?? null;
+                    // Se a API indicar que não existe, bloquear o registo.
+                    if (!$nifInfo) {
+                        respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
+                    } else {
+                        // Auto-fill nome se existir na resposta e for valido
+                        if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
+                            $title = trim($nifInfo['title']);
+                            // Ignorar os erros standard da API para free tiers
+                            if (strpos($title, 'Key necessary') === false) {
+                                $restauranteNome = $title;
+                            }
                         }
                     }
+                } else if ($data['result'] === 'error') {
+                    // A API devolveu um erro explícito (ex: NIF não encontrado)
+                    respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
                 }
             }
+        } else if ($httpCode !== 200) {
+            // Em caso de falha de conexão/timeout com a API, assumimos o risco ou bloqueamos de acordo com a política.
+            // Para não bloquear os utilizadores caso a API caia, ignoramos e seguimos.
+            // Se fosse imperativo a validação, faríamos: respond(['ok' => false, 'error' => 'Serviço de validação NIF indisponível.'], 503);
         }
-        // Se a API falhar (timeout/500), ignoramos e seguimos com o registo para não bloquear os utilizadores.
     }
     // -------------------------
 
