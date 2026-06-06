@@ -310,7 +310,8 @@ fun ClayRestaurantDetailScreen(
                         ),
                         properties = MapProperties()
                     ) {
-                        Marker(state = MarkerState(position = position))
+                        val markerState = remember(position) { MarkerState(position = position) }
+                        Marker(state = markerState)
                     }
 
                     Spacer(Modifier.height(12.dp))

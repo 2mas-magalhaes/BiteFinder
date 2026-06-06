@@ -51,6 +51,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -199,7 +200,6 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (false) {
         val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val hasCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!hasFine && !hasCoarse) {
@@ -220,7 +220,6 @@ fun HomeScreen(
                     )
                 }
             }
-        }
         }
     }
 
@@ -646,8 +645,9 @@ fun HomeScreen(
                             uiSettings = MapUiSettings(zoomControlsEnabled = false, compassEnabled = false)
                         ) {
                             // User Location
+                            val userMarkerState = remember(userLocation) { MarkerState(position = userLocation) }
                             MarkerComposable(
-                                state = MarkerState(position = userLocation),
+                                state = userMarkerState,
                                 title = "A tua localização"
                             ) {
                                 Box(
@@ -681,9 +681,11 @@ fun HomeScreen(
                                 val restLat = topPrato.restauranteLatitude
                                 val restLng = topPrato.restauranteLongitude
                                 if (restLat != null && restLng != null) {
+                                    val position = remember(restLat, restLng) { LatLng(restLat, restLng) }
+                                    val markerState = remember(position) { MarkerState(position = position) }
                                     MarkerComposable(
                                         keys = arrayOf<Any>(restId, topPrato.id, state.radiusKm),
-                                        state = MarkerState(position = LatLng(restLat, restLng)),
+                                        state = markerState,
                                         onClick = { 
                                             onPratoClick(topPrato.id)
                                             true
@@ -806,7 +808,18 @@ fun HomeScreen(
                     Spacer(Modifier.height(28.dp))
 
                     // --- Pratos Tradicionais Section ---
-                    if (state.tradicionaisPratos.isNotEmpty()) {
+                    val tradicionais by remember(state.tradicionaisPratos) { derivedStateOf { state.tradicionaisPratos } }
+                    if (state.isNearbyLoading) {
+                        SectionHeader(
+                            title = "Pratos Tradicionais na Zona",
+                            onViewAll = { }
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        Column(Modifier.padding(horizontal = 24.dp)) {
+                            SkeletonRow()
+                        }
+                        Spacer(Modifier.height(32.dp))
+                    } else if (tradicionais.isNotEmpty()) {
                         SectionHeader(
                             title = "Pratos Tradicionais na Zona",
                             onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
@@ -817,7 +830,7 @@ fun HomeScreen(
                             contentPadding = PaddingValues(horizontal = 24.dp),
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            items(state.tradicionaisPratos) { prato ->
+                            items(tradicionais) { prato ->
                                 ClayDishCard(
                                     prato = prato,
                                     modifier = Modifier.width(200.dp),
@@ -900,7 +913,7 @@ fun HomeScreen(
     }
 }
 
-// ─── AdMob Banner Dummy ──────────────────────────────────────────────────────
+// ─── AdMob Banner ────────────────────────────────────────────────────────────
 
 @Composable
 fun AdMobBanner() {
