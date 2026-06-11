@@ -50,6 +50,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -506,8 +507,12 @@ fun HomeScreen(
                 }
             } else {
                 // ─── CATEGORIAS (Carrossel horizontal) ──────────────────
-                val displayCats = listOf("Todos") + state.categorias.ifEmpty {
-                    listOf("Pizza", "Marisco", "Francesinha", "Hambúrguer", "Sushi", "Pasta", "Sobremesas")
+                val displayCats by remember {
+                    derivedStateOf {
+                        listOf("Todos") + state.categorias.ifEmpty {
+                            listOf("Pizza", "Marisco", "Francesinha", "Hambúrguer", "Sushi", "Pasta", "Sobremesas")
+                        }
+                    }
                 }
 
                 LazyRow(
