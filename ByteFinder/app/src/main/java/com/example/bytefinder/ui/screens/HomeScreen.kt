@@ -646,8 +646,9 @@ fun HomeScreen(
                             uiSettings = MapUiSettings(zoomControlsEnabled = false, compassEnabled = false)
                         ) {
                             // User Location
+                            val userLocationState = remember(userLocation) { MarkerState(position = userLocation) }
                             MarkerComposable(
-                                state = MarkerState(position = userLocation),
+                                state = userLocationState,
                                 title = "A tua localização"
                             ) {
                                 Box(
