@@ -2,10 +2,14 @@
 require_once __DIR__ . '/env_loader.php';
 
 function db(): PDO {
-    $DB_HOST = env('DB_HOST', 'bitefinderapp.database.windows.net');
-    $DB_NAME = env('DB_NAME', 'free-sql-db-6399592');
-    $DB_USER = env('DB_USER', 'borges');
-    $DB_PASS = env('DB_PASS', '***REMOVED***');
+    $DB_HOST = trim((string)env('DB_HOST', ''));
+    $DB_NAME = trim((string)env('DB_NAME', ''));
+    $DB_USER = trim((string)env('DB_USER', ''));
+    $DB_PASS = (string)env('DB_PASS', '');
+
+    if ($DB_HOST === '' || $DB_NAME === '' || $DB_USER === '' || $DB_PASS === '') {
+        throw new RuntimeException('Missing database configuration in environment (.env).');
+    }
 
     $dsn = "sqlsrv:Server=$DB_HOST;Database=$DB_NAME;Encrypt=yes;TrustServerCertificate=no";
 

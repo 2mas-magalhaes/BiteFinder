@@ -8,8 +8,12 @@ require_once __DIR__ . '/config/env_loader.php';
  * Expiry: Configurable, defaults to 1 hour (3600 seconds)
  */
 
-$JWT_SECRET = env('JWT_SECRET', '***REMOVED***');
+$JWT_SECRET = trim((string)env('JWT_SECRET', ''));
 $JWT_EXPIRY = (int)env('JWT_EXPIRY', 3600);
+
+if ($JWT_SECRET === '') {
+    throw new RuntimeException('Missing JWT_SECRET in environment (.env).');
+}
 
 // Validate JWT_SECRET length (min 32 chars for security)
 if (strlen($JWT_SECRET) < 32) {
