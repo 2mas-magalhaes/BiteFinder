@@ -34,6 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -41,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.bytefinder.data.ApiService
 import com.example.bytefinder.data.LoginRequest
+import com.example.bytefinder.data.SocialLoginRequest
 import kotlinx.coroutines.launch
 
 /**
@@ -210,6 +215,59 @@ fun LoginScreen(
                                 color = MaterialTheme.colorScheme.error,
                                 fontSize = 13.sp
                             )
+                        }
+                    }
+
+                    Spacer(Modifier.height(26.dp))
+                    Text(
+                        text = "Ou entra com",
+                        fontSize = 13.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.height(14.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        val socialLogins = listOf("Google", "Apple", "Microsoft", "Facebook")
+                        socialLogins.forEach { provider ->
+                            OutlinedButton(
+                                onClick = {
+                                    isLoading = true
+                                    errorMsg = ""
+                                    scope.launch {
+                                        try {
+                                            val res = api.socialLogin(
+                                                SocialLoginRequest(
+                                                    provider = provider.lowercase(),
+                                                    token = "dummy_token_${provider.lowercase()}"
+                                                )
+                                            )
+                                            if (res.ok && res.token != null && res.user != null) {
+                                                onLoggedIn(
+                                                    res.token,
+                                                    res.user.id,
+                                                    res.user.nome,
+                                                    res.user.role,
+                                                    res.user.restaurantes
+                                                )
+                                            } else {
+                                                errorMsg = res.error ?: res.message ?: "Falha no login social"
+                                            }
+                                        } catch (e: Exception) {
+                                            errorMsg = e.message ?: "Erro de rede"
+                                        } finally {
+                                            isLoading = false
+                                        }
+                                    }
+                                },
+                                enabled = !isLoading,
+                                modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                            ) {
+                                Text(provider.take(1), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                            }
                         }
                     }
                 }
