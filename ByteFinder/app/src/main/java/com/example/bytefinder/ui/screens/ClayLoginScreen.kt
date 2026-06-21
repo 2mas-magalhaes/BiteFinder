@@ -36,6 +36,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -88,6 +91,19 @@ fun ClayLoginScreen(
     var errorMsg by remember { mutableStateOf("") }
 
     val authState by authViewModel.authState.collectAsState()
+
+    // Mock Launcher for Social Login Providers (Structure for real SDK integration)
+    val socialLoginLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        // In a real implementation, you would extract the token from the intent:
+        // val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        // val account = task.getResult(ApiException::class.java)
+        // authViewModel.socialLogin("google", account.idToken)
+
+        // Mock fallback:
+        authViewModel.socialLogin("google", "dummy_token_google_from_launcher")
+    }
 
     LaunchedEffect(authState.user, authState.token) {
         if (authState.token != null && authState.user != null) {
@@ -350,7 +366,11 @@ fun ClayLoginScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SocialIconButton("google") { authViewModel.socialLogin("google", "dummy_token_google") }
+                            SocialIconButton("google") {
+                                // Launch real intent if SDK was present, else simulate:
+                                val mockIntent = Intent()
+                                socialLoginLauncher.launch(mockIntent)
+                            }
                             SocialIconButton("apple") { authViewModel.socialLogin("apple", "dummy_token_apple") }
                             SocialIconButton("facebook") { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
                             SocialIconButton("microsoft") { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
