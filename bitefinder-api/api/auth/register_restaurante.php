@@ -46,34 +46,38 @@ try {
 
     // Validar apenas se a API Key estiver configurada e o NIF parecer português (9 dígitos)
     if (!empty($nifApiKey) && preg_match('/^[0-9]{9}$/', $restaurantCode)) {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, "https://www.nif.pt/?json=1&q=" . urlencode($restaurantCode) . "&key=" . urlencode($nifApiKey));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://www.nif.pt/?json=1&q=" . urlencode($restaurantCode) . "&key=" . urlencode($nifApiKey));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
 
-        if ($httpCode === 200 && $response) {
-            $data = json_decode($response, true);
-            if (isset($data['result']) && $data['result'] === 'success') {
-                $nifInfo = $data['records'][$restaurantCode] ?? null;
-                // Se a API indicar que não existe, bloquear o registo.
-                if (!$nifInfo) {
-                     respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
-                } else {
-                    // Auto-fill nome se existir na resposta e for valido
-                    if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
-                        $title = trim($nifInfo['title']);
-                        // Ignorar os erros standard da API para free tiers
-                        if (strpos($title, 'Key necessary') === false) {
-                            $restauranteNome = $title;
+            if ($curlError === '' && $httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if (isset($data['result']) && $data['result'] === 'success') {
+                    $nifInfo = $data['records'][$restaurantCode] ?? null;
+                    // Se a API indicar que não existe, bloquear o registo.
+                    if (!$nifInfo) {
+                         respond(['ok' => false, 'error' => 'O NIF fornecido não é válido segundo a base de dados do NIF.pt.'], 422);
+                    } else {
+                        // Auto-fill nome se existir na resposta e for valido
+                        if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
+                            $title = trim($nifInfo['title']);
+                            // Ignorar os erros standard da API para free tiers
+                            if (strpos($title, 'Key necessary') === false) {
+                                $restauranteNome = $title;
+                            }
                         }
                     }
                 }
             }
+        } catch (Exception $e) {
+            // Se a API falhar (timeout/500/curl exception), ignoramos e seguimos com o registo para não bloquear os utilizadores.
         }
-        // Se a API falhar (timeout/500), ignoramos e seguimos com o registo para não bloquear os utilizadores.
     }
     // -------------------------
 

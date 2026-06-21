@@ -806,7 +806,17 @@ fun HomeScreen(
                     Spacer(Modifier.height(28.dp))
 
                     // --- Pratos Tradicionais Section ---
-                    if (state.tradicionaisPratos.isNotEmpty()) {
+                    if (state.isNearbyLoading) {
+                        SectionHeader(
+                            title = "Pratos Tradicionais na Zona",
+                            onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        Column(Modifier.padding(horizontal = 24.dp)) {
+                            SkeletonRow()
+                        }
+                        Spacer(Modifier.height(32.dp))
+                    } else if (state.tradicionaisPratos.isNotEmpty()) {
                         SectionHeader(
                             title = "Pratos Tradicionais na Zona",
                             onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
@@ -916,7 +926,8 @@ fun AdMobBanner() {
                     adUnitId = "ca-app-pub-3940256099942544/6300978111"
                     loadAd(AdRequest.Builder().build())
                 }
-            }
+            },
+            update = { /* No-op, previne recomposição constante */ }
         )
     }
 }
