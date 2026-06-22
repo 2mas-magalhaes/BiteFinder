@@ -70,6 +70,9 @@ try {
                             $restauranteNome = $title;
                         }
                     }
+                    if (isset($nifInfo['address']) && !empty(trim($nifInfo['address']))) {
+                        $restauranteMorada = trim($nifInfo['address']);
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 ﻿package com.example.bytefinder
 
 import android.os.Bundle
+import com.google.android.gms.ads.MobileAds
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
@@ -63,6 +64,7 @@ private enum class AppScreen {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MobileAds.initialize(this)
 
         val api = ApiClient.retrofit.create(ApiService::class.java)
         val repository = DataRepository(api)

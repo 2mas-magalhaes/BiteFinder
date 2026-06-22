@@ -1,5 +1,9 @@
 package com.example.bytefinder.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -346,14 +350,19 @@ fun ClayLoginScreen(
 
                         Spacer(Modifier.height(16.dp))
 
+                        val googleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { authViewModel.socialLogin("google", "dummy_token_google") }
+                        val appleLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { authViewModel.socialLogin("apple", "dummy_token_apple") }
+                        val facebookLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
+                        val microsoftLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SocialIconButton("google") { authViewModel.socialLogin("google", "dummy_token_google") }
-                            SocialIconButton("apple") { authViewModel.socialLogin("apple", "dummy_token_apple") }
-                            SocialIconButton("facebook") { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
-                            SocialIconButton("microsoft") { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
+                            SocialIconButton("google") { googleLauncher.launch(Intent("com.example.bytefinder.MOCK_SOCIAL_LOGIN")) }
+                            SocialIconButton("apple") { appleLauncher.launch(Intent("com.example.bytefinder.MOCK_SOCIAL_LOGIN")) }
+                            SocialIconButton("facebook") { facebookLauncher.launch(Intent("com.example.bytefinder.MOCK_SOCIAL_LOGIN")) }
+                            SocialIconButton("microsoft") { microsoftLauncher.launch(Intent("com.example.bytefinder.MOCK_SOCIAL_LOGIN")) }
                         }
 
                         Spacer(Modifier.height(16.dp))
