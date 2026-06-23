@@ -119,6 +119,16 @@ fun ClayLoginScreen(
     var registerEmail by remember { mutableStateOf("") }
     var registerPassword by remember { mutableStateOf("") }
     var registerConfirmPassword by remember { mutableStateOf("") }
+    val isRegisterValid by remember {
+        androidx.compose.runtime.derivedStateOf {
+            registerName.isNotBlank() &&
+            registerEmail.isNotBlank() &&
+            registerPassword.length >= 6 &&
+            registerPassword == registerConfirmPassword &&
+            registerEmail.contains("@") &&
+            registerEmail.contains(".")
+        }
+    }
     val scope = rememberCoroutineScope()
 
     // Animação de entrada
@@ -448,20 +458,16 @@ fun ClayLoginScreen(
                             text = if (isLoading) "A criar conta..." else "Criar Conta",
                             onClick = {
                                 errorMsg = ""
-                                if (registerName.isBlank() || registerEmail.isBlank() || registerPassword.isBlank()) {
-                                    errorMsg = "Preenche todos os campos"
-                                    return@ClayButton
-                                }
-                                if (!registerEmail.contains("@") || !registerEmail.contains(".")) {
-                                    errorMsg = "Email inválido"
-                                    return@ClayButton
-                                }
-                                if (registerPassword.length < 6) {
-                                    errorMsg = "A palavra-passe deve ter pelo menos 6 caracteres"
-                                    return@ClayButton
-                                }
-                                if (registerPassword != registerConfirmPassword) {
-                                    errorMsg = "As palavras-passe não coincidem"
+                                if (!isRegisterValid) {
+                                    if (registerName.isBlank() || registerEmail.isBlank() || registerPassword.isBlank()) {
+                                        errorMsg = "Preenche todos os campos"
+                                    } else if (!registerEmail.contains("@") || !registerEmail.contains(".")) {
+                                        errorMsg = "Email inválido"
+                                    } else if (registerPassword.length < 6) {
+                                        errorMsg = "A palavra-passe deve ter pelo menos 6 caracteres"
+                                    } else if (registerPassword != registerConfirmPassword) {
+                                        errorMsg = "As palavras-passe não coincidem"
+                                    }
                                     return@ClayButton
                                 }
                                 isLoading = true
