@@ -916,6 +916,10 @@ fun AdMobBanner() {
                     adUnitId = "ca-app-pub-3940256099942544/6300978111"
                     loadAd(AdRequest.Builder().build())
                 }
+            },
+            update = { adView ->
+                // Avoid recomposition loop by doing nothing here
+                // We only want the ad to load once when created
             }
         )
     }
