@@ -45,8 +45,12 @@ try {
 
     // Simulação: se o token contiver algo, extraímos um email dummy (ou real caso fosse implementado)
     // Assumimos que o frontend envia o email ou obtemos da API externa.
-    $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : $provider . '_user@example.com';
-    $nome = isset($body['name']) ? trim((string)$body['name']) : 'User ' . ucfirst($provider);
+    $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : '';
+    $nome = isset($body['name']) ? trim((string)$body['name']) : '';
+
+    if ($email === '' || $nome === '') {
+        respond(['ok' => false, 'error' => 'Email e nome sao obrigatorios do provider para mock token.'], 422);
+    }
 
     $pdo = db();
 
