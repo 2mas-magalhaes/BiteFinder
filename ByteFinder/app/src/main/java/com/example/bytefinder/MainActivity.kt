@@ -189,7 +189,7 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
                             repository = repository,
                             userName = userName ?: "Utilizador",
                             isRestaurantUser = (currentUserRole == "restaurante"),
-                            nearModeActive = false,
+                            nearModeActive = true,
                             onPratoClick = { pratoId ->
                                 selectedPratoId = pratoId
                                 detailReturnScreen = AppScreen.HOME
