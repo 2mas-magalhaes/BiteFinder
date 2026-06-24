@@ -335,7 +335,7 @@ private fun NearMapCard(
             )
         ) {
             MarkerComposable(
-                state = MarkerState(position = userLocation),
+                state = androidx.compose.runtime.remember(userLocation) { MarkerState(position = userLocation) },
                 title = "A tua localizacao"
             ) {
                 Box(
@@ -402,7 +402,7 @@ private fun DishMapMarker(
 
     MarkerComposable(
         keys = arrayOf<Any>(restId, prato.id, radiusKm, imageUrl.orEmpty(), imageBitmap != null),
-        state = MarkerState(position = position),
+        state = androidx.compose.runtime.remember(position) { MarkerState(position = position) },
         onClick = {
             onPratoClick(prato.id)
             true

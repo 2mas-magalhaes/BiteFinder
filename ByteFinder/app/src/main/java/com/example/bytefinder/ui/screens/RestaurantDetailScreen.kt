@@ -310,7 +310,7 @@ fun ClayRestaurantDetailScreen(
                         ),
                         properties = MapProperties()
                     ) {
-                        Marker(state = MarkerState(position = position))
+                        Marker(state = androidx.compose.runtime.remember(position) { MarkerState(position = position) })
                     }
 
                     Spacer(Modifier.height(12.dp))
