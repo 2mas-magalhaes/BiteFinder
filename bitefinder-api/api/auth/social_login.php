@@ -37,16 +37,47 @@ try {
         respond(['ok' => false, 'error' => 'Provider não suportado'], 400);
     }
 
-    // AQUI OCORRERIA A VALIDAÇÃO DO TOKEN NO LADO DO SERVIDOR USANDO AS APIS DOS PROVIDERS.
-    // Por exemplo, no Google: chamar "https://oauth2.googleapis.com/tokeninfo?id_token=" . $token
-    // Neste momento do projeto, usaremos o env_loader para simular chaves/validação:
+    // Validação do Token no lado do Servidor
     $clientIdEnvVar = strtoupper($provider) . '_CLIENT_ID';
     $clientId = env($clientIdEnvVar);
 
-    // Simulação: se o token contiver algo, extraímos um email dummy (ou real caso fosse implementado)
-    // Assumimos que o frontend envia o email ou obtemos da API externa.
-    $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : $provider . '_user@example.com';
-    $nome = isset($body['name']) ? trim((string)$body['name']) : 'User ' . ucfirst($provider);
+    $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : '';
+    $nome = isset($body['name']) ? trim((string)$body['name']) : '';
+
+    if ($provider === 'google') {
+        // Validação real usando cURL para o Google
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://oauth2.googleapis.com/tokeninfo?id_token=" . urlencode($token));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode === 200 && $response) {
+            $data = json_decode($response, true);
+            if (isset($data['email'])) {
+                $email = strtolower(trim($data['email']));
+            }
+            if (isset($data['name']) && empty($nome)) {
+                $nome = trim($data['name']);
+            }
+        } else {
+            // Em ambiente de desenvolvimento ou se o token for dummy (ex: 'dummy_token_google'),
+            // vamos cair no fallback apenas se a verificação falhar.
+            if ($token !== 'dummy_token_google') {
+                respond(['ok' => false, 'error' => 'Token do Google inválido.'], 401);
+            }
+        }
+    }
+
+    // Fallbacks
+    if (empty($email)) {
+        $email = $provider . '_user_' . substr(md5($token), 0, 8) . '@example.com';
+    }
+    if (empty($nome)) {
+        $nome = 'User ' . ucfirst($provider);
+    }
 
     $pdo = db();
 

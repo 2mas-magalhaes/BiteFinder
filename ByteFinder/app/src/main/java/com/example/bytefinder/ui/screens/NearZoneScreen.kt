@@ -312,7 +312,7 @@ private fun NearMapCard(
             .clip(RoundedCornerShape(18.dp))
             .border(1.dp, Color.White.copy(alpha = 0.5f), RoundedCornerShape(18.dp))
     ) {
-        val targetZoom = zoomForRadius(radiusKm)
+        val targetZoom by remember(radiusKm) { androidx.compose.runtime.derivedStateOf { zoomForRadius(radiusKm) } }
         val cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(userLocation, targetZoom)
         }
@@ -335,7 +335,7 @@ private fun NearMapCard(
             )
         ) {
             MarkerComposable(
-                state = MarkerState(position = userLocation),
+                state = remember(userLocation) { MarkerState(position = userLocation) },
                 title = "A tua localizacao"
             ) {
                 Box(
@@ -402,7 +402,7 @@ private fun DishMapMarker(
 
     MarkerComposable(
         keys = arrayOf<Any>(restId, prato.id, radiusKm, imageUrl.orEmpty(), imageBitmap != null),
-        state = MarkerState(position = position),
+        state = remember(position) { MarkerState(position = position) },
         onClick = {
             onPratoClick(prato.id)
             true
