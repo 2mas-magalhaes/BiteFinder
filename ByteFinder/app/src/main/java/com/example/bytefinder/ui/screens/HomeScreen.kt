@@ -806,7 +806,16 @@ fun HomeScreen(
                     Spacer(Modifier.height(28.dp))
 
                     // --- Pratos Tradicionais Section ---
-                    if (state.tradicionaisPratos.isNotEmpty()) {
+                    if (state.isNearbyLoading) {
+                        SectionHeader(
+                            title = "Pratos Tradicionais na Zona",
+                            onViewAll = {}
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        Column(Modifier.padding(horizontal = 24.dp)) {
+                            SkeletonRow()
+                        }
+                    } else if (state.tradicionaisPratos.isNotEmpty()) {
                         SectionHeader(
                             title = "Pratos Tradicionais na Zona",
                             onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
@@ -892,7 +901,11 @@ fun HomeScreen(
                 Spacer(Modifier.height(32.dp))
 
                 // AdMob Banner No Fundo
-                AdMobBanner()
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)) {
+                    AdMobBanner()
+                }
                 Spacer(Modifier.height(16.dp))
             }
         }
