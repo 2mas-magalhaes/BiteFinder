@@ -70,6 +70,18 @@ try {
                             $restauranteNome = $title;
                         }
                     }
+                    // Auto-fill morada se existir
+                    if (isset($nifInfo['address']) && !empty(trim($nifInfo['address']))) {
+                         $address = trim($nifInfo['address']);
+                         if (strpos($address, 'Key necessary') === false) {
+                             $restauranteMorada = $address;
+                         }
+                    }
+                }
+            } elseif (isset($data['result']) && $data['result'] === 'error') {
+                // If API explicitly says it's invalid
+                if (isset($data['message']) && strpos(strtolower($data['message']), 'não é válido') !== false) {
+                    respond(['ok' => false, 'error' => 'O NIF fornecido não é válido.'], 422);
                 }
             }
         }
