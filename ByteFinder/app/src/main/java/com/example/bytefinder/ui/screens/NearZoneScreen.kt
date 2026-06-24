@@ -334,8 +334,9 @@ private fun NearMapCard(
                 compassEnabled = true
             )
         ) {
+            val userLocationMarkerState = remember(userLocation) { MarkerState(position = userLocation) }
             MarkerComposable(
-                state = MarkerState(position = userLocation),
+                state = userLocationMarkerState,
                 title = "A tua localizacao"
             ) {
                 Box(
@@ -400,9 +401,11 @@ private fun DishMapMarker(
         }
     }
 
+    val markerState = remember(position) { MarkerState(position = position) }
+
     MarkerComposable(
         keys = arrayOf<Any>(restId, prato.id, radiusKm, imageUrl.orEmpty(), imageBitmap != null),
-        state = MarkerState(position = position),
+        state = markerState,
         onClick = {
             onPratoClick(prato.id)
             true

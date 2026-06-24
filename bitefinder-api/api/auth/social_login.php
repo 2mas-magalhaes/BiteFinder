@@ -98,5 +98,5 @@ try {
     ]);
 
 } catch (Throwable $e) {
-    respond(['ok' => false, 'error' => 'Erro interno do servidor', 'message' => $e->getMessage()], 500);
+    respond(['ok' => false, 'error' => 'Erro interno do servidor'], 500);
 }

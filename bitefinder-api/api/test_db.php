@@ -31,7 +31,6 @@ try {
     http_response_code(500);
     echo json_encode([
         "ok" => false,
-        "error" => "DB connection failed",
-        "message" => $e->getMessage()
+        "error" => "DB connection failed"
     ], JSON_UNESCAPED_UNICODE);
 }
