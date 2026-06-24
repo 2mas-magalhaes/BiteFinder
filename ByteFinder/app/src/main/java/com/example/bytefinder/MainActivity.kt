@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -315,23 +316,26 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
                             }
                         )
 
-                        AppScreen.PRATO_COMPARE -> ClayPratoCompareScreen(
-                            repository = repository,
-                            pratoId = selectedPratoId ?: 0,
-                            selectedCity = homeViewModel.state.value.selectedCity,
-                            onBack = { currentScreen = detailReturnScreen },
-                            onGoHome = { goHome() },
-                            onPratoDetailClick = { pratoId ->
-                                selectedPratoId = pratoId
-                                detailReturnScreen = AppScreen.PRATO_COMPARE
-                                currentScreen = AppScreen.DETAIL
-                            },
-                            onRestauranteClick = { restId ->
-                                selectedRestauranteId = restId
-                                detailReturnScreen = AppScreen.PRATO_COMPARE
-                                currentScreen = AppScreen.RESTAURANT_DETAIL
-                            }
-                        )
+                        AppScreen.PRATO_COMPARE -> {
+                            val state by homeViewModel.state.collectAsState()
+                            ClayPratoCompareScreen(
+                                repository = repository,
+                                pratoId = selectedPratoId ?: 0,
+                                selectedCity = state.selectedCity,
+                                onBack = { currentScreen = detailReturnScreen },
+                                onGoHome = { goHome() },
+                                onPratoDetailClick = { pratoId ->
+                                    selectedPratoId = pratoId
+                                    detailReturnScreen = AppScreen.PRATO_COMPARE
+                                    currentScreen = AppScreen.DETAIL
+                                },
+                                onRestauranteClick = { restId ->
+                                    selectedRestauranteId = restId
+                                    detailReturnScreen = AppScreen.PRATO_COMPARE
+                                    currentScreen = AppScreen.RESTAURANT_DETAIL
+                                }
+                            )
+                        }
                     }
                 }
             }

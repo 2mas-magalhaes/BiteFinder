@@ -743,8 +743,9 @@ private fun EmbeddedMap(lat: Double, lng: Double) {
         ),
         properties = MapProperties()
     ) {
+        val markerState = remember(position) { MarkerState(position = position) }
         Marker(
-            state = MarkerState(position = position)
+            state = markerState
         )
     }
 }
