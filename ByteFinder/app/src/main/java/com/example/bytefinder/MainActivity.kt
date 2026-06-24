@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bytefinder.data.ApiClient
 import com.example.bytefinder.data.ApiService
+import com.google.android.gms.ads.MobileAds
 import com.example.bytefinder.data.DataRepository
 import com.example.bytefinder.ui.components.ClayBottomNav
 import com.example.bytefinder.ui.components.NavTab
@@ -63,6 +64,8 @@ private enum class AppScreen {
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        MobileAds.initialize(this) {}
 
         val api = ApiClient.retrofit.create(ApiService::class.java)
         val repository = DataRepository(api)
