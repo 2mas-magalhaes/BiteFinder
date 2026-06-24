@@ -350,10 +350,10 @@ fun ClayLoginScreen(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            SocialIconButton("google") { authViewModel.socialLogin("google", "dummy_token_google") }
-                            SocialIconButton("apple") { authViewModel.socialLogin("apple", "dummy_token_apple") }
-                            SocialIconButton("facebook") { authViewModel.socialLogin("facebook", "dummy_token_facebook") }
-                            SocialIconButton("microsoft") { authViewModel.socialLogin("microsoft", "dummy_token_microsoft") }
+                            SocialIconButton("google") { authViewModel.socialLogin("google", "mock_google_token_123") }
+                            SocialIconButton("apple") { authViewModel.socialLogin("apple", "mock_apple_token_123") }
+                            SocialIconButton("facebook") { authViewModel.socialLogin("facebook", "mock_facebook_token_123") }
+                            SocialIconButton("microsoft") { authViewModel.socialLogin("microsoft", "mock_microsoft_token_123") }
                         }
 
                         Spacer(Modifier.height(16.dp))
