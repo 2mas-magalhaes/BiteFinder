@@ -806,7 +806,15 @@ fun HomeScreen(
                     Spacer(Modifier.height(28.dp))
 
                     // --- Pratos Tradicionais Section ---
-                    if (state.tradicionaisPratos.isNotEmpty()) {
+                    if (state.isNearbyLoading) {
+                        SectionHeader(
+                            title = "Pratos Tradicionais na Zona",
+                            onViewAll = {}
+                        )
+                        Spacer(Modifier.height(14.dp))
+                        SkeletonRow()
+                        Spacer(Modifier.height(32.dp))
+                    } else if (state.tradicionaisPratos.isNotEmpty()) {
                         SectionHeader(
                             title = "Pratos Tradicionais na Zona",
                             onViewAll = { viewModel.onViewAll("Pratos Tradicionais", "Pratos Tradicionais na Zona") }
