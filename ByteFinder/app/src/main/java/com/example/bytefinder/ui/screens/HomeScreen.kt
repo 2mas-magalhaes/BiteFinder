@@ -92,6 +92,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberMarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 /** Coil transformation that smoothly removes white/light background pixels. */
@@ -647,7 +648,7 @@ fun HomeScreen(
                         ) {
                             // User Location
                             MarkerComposable(
-                                state = MarkerState(position = userLocation),
+                                state = rememberMarkerState(position = userLocation),
                                 title = "A tua localização"
                             ) {
                                 Box(
@@ -683,7 +684,7 @@ fun HomeScreen(
                                 if (restLat != null && restLng != null) {
                                     MarkerComposable(
                                         keys = arrayOf<Any>(restId, topPrato.id, state.radiusKm),
-                                        state = MarkerState(position = LatLng(restLat, restLng)),
+                                        state = rememberMarkerState(position = LatLng(restLat, restLng)),
                                         onClick = { 
                                             onPratoClick(topPrato.id)
                                             true
@@ -916,7 +917,8 @@ fun AdMobBanner() {
                     adUnitId = "ca-app-pub-3940256099942544/6300978111"
                     loadAd(AdRequest.Builder().build())
                 }
-            }
+            },
+            update = {}
         )
     }
 }
