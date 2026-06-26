@@ -2,6 +2,8 @@
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -315,11 +317,13 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
                             }
                         )
 
-                        AppScreen.PRATO_COMPARE -> ClayPratoCompareScreen(
-                            repository = repository,
-                            pratoId = selectedPratoId ?: 0,
-                            selectedCity = homeViewModel.state.value.selectedCity,
-                            onBack = { currentScreen = detailReturnScreen },
+                        AppScreen.PRATO_COMPARE -> {
+                            val state by homeViewModel.state.collectAsState()
+                            ClayPratoCompareScreen(
+                                repository = repository,
+                                pratoId = selectedPratoId ?: 0,
+                                selectedCity = state.selectedCity,
+                                onBack = { currentScreen = detailReturnScreen },
                             onGoHome = { goHome() },
                             onPratoDetailClick = { pratoId ->
                                 selectedPratoId = pratoId
@@ -332,6 +336,7 @@ private fun AppRoot(repository: DataRepository, api: com.example.bytefinder.data
                                 currentScreen = AppScreen.RESTAURANT_DETAIL
                             }
                         )
+                        }
                     }
                 }
             }
