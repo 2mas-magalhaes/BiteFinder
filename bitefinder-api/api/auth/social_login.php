@@ -38,15 +38,35 @@ try {
     }
 
     // AQUI OCORRERIA A VALIDAÇÃO DO TOKEN NO LADO DO SERVIDOR USANDO AS APIS DOS PROVIDERS.
-    // Por exemplo, no Google: chamar "https://oauth2.googleapis.com/tokeninfo?id_token=" . $token
-    // Neste momento do projeto, usaremos o env_loader para simular chaves/validação:
     $clientIdEnvVar = strtoupper($provider) . '_CLIENT_ID';
     $clientId = env($clientIdEnvVar);
 
-    // Simulação: se o token contiver algo, extraímos um email dummy (ou real caso fosse implementado)
-    // Assumimos que o frontend envia o email ou obtemos da API externa.
     $email = isset($body['email']) ? strtolower(trim((string)$body['email'])) : $provider . '_user@example.com';
     $nome = isset($body['name']) ? trim((string)$body['name']) : 'User ' . ucfirst($provider);
+
+    if ($provider === 'google' && $token !== '') {
+        try {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, "https://oauth2.googleapis.com/tokeninfo?id_token=" . urlencode($token));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200 && $response) {
+                $data = json_decode($response, true);
+                if (isset($data['email']) && !empty($data['email'])) {
+                    $email = strtolower(trim($data['email']));
+                }
+                if (isset($data['name']) && !empty($data['name'])) {
+                    $nome = trim($data['name']);
+                }
+            }
+        } catch (Throwable $e) {
+            // Ignorar erros de rede e continuar com o fallback dummy.
+        }
+    }
 
     $pdo = db();
 
