@@ -70,7 +70,7 @@ try {
     respond([
         'ok' => false,
         'error' => 'Erro interno do servidor',
-        'message' => $e->getMessage()
+        'message' => 'Ocorreu um erro no servidor.'
     ], 500);
 }
 

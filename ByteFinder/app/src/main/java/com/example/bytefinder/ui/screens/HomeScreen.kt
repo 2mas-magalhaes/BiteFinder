@@ -92,6 +92,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberMarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 /** Coil transformation that smoothly removes white/light background pixels. */
@@ -646,8 +647,10 @@ fun HomeScreen(
                             uiSettings = MapUiSettings(zoomControlsEnabled = false, compassEnabled = false)
                         ) {
                             // User Location
+                            val userMarkerState = rememberMarkerState(position = userLocation)
+                            userMarkerState.position = userLocation
                             MarkerComposable(
-                                state = MarkerState(position = userLocation),
+                                state = userMarkerState,
                                 title = "A tua localização"
                             ) {
                                 Box(
@@ -681,9 +684,12 @@ fun HomeScreen(
                                 val restLat = topPrato.restauranteLatitude
                                 val restLng = topPrato.restauranteLongitude
                                 if (restLat != null && restLng != null) {
+                                    val restLocation = LatLng(restLat, restLng)
+                                    val restMarkerState = rememberMarkerState(position = restLocation)
+                                    restMarkerState.position = restLocation
                                     MarkerComposable(
                                         keys = arrayOf<Any>(restId, topPrato.id, state.radiusKm),
-                                        state = MarkerState(position = LatLng(restLat, restLng)),
+                                        state = restMarkerState,
                                         onClick = { 
                                             onPratoClick(topPrato.id)
                                             true
@@ -916,7 +922,8 @@ fun AdMobBanner() {
                     adUnitId = "ca-app-pub-3940256099942544/6300978111"
                     loadAd(AdRequest.Builder().build())
                 }
-            }
+            },
+            update = {}
         )
     }
 }
