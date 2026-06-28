@@ -126,6 +126,6 @@ try {
     respond([
         'ok' => false,
         'error' => 'Erro interno',
-        'message' => $e->getMessage()
+        'message' => 'Ocorreu um erro no servidor.'
     ], 500);
 }
