@@ -199,7 +199,6 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        if (false) {
         val hasFine = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
         val hasCoarse = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
         if (!hasFine && !hasCoarse) {
@@ -220,7 +219,6 @@ fun HomeScreen(
                     )
                 }
             }
-        }
         }
     }
 
@@ -506,8 +504,10 @@ fun HomeScreen(
                 }
             } else {
                 // ─── CATEGORIAS (Carrossel horizontal) ──────────────────
-                val displayCats = listOf("Todos") + state.categorias.ifEmpty {
-                    listOf("Pizza", "Marisco", "Francesinha", "Hambúrguer", "Sushi", "Pasta", "Sobremesas")
+                val displayCats = remember(state.categorias) {
+                    listOf("Todos") + state.categorias.ifEmpty {
+                        listOf("Pizza", "Marisco", "Pratos Tradicionais", "Francesinha", "Hambúrguer", "Sushi", "Pasta", "Sobremesas")
+                    }
                 }
 
                 LazyRow(
@@ -669,9 +669,11 @@ fun HomeScreen(
                             )
 
                             // Restaurantes & pratos
-                            val pratosByRestaurante = state.nearbyPratos
-                                .filter { it.restauranteLatitude != null && it.restauranteLongitude != null }
-                                .groupBy { it.restauranteId }
+                            val pratosByRestaurante = remember(state.nearbyPratos) {
+                                state.nearbyPratos
+                                    .filter { it.restauranteLatitude != null && it.restauranteLongitude != null }
+                                    .groupBy { it.restauranteId }
+                            }
                             pratosByRestaurante.forEach { (restId, pratos) ->
                                 val topPrato = pratos.minWithOrNull(
                                     compareBy<com.example.bytefinder.data.PratoDto> { it.distanciaKm ?: Double.MAX_VALUE }
@@ -916,7 +918,8 @@ fun AdMobBanner() {
                     adUnitId = "ca-app-pub-3940256099942544/6300978111"
                     loadAd(AdRequest.Builder().build())
                 }
-            }
+            },
+            update = { }
         )
     }
 }
