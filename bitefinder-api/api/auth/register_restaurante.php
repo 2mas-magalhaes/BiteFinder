@@ -66,7 +66,7 @@ try {
                     if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
                         $title = trim($nifInfo['title']);
                         // Ignorar os erros standard da API para free tiers
-                        if (strpos($title, 'Key necessary') === false) {
+                        if (strpos($title, 'Key necessary') === false && strpos($title, 'limit') === false && strpos($title, 'quota') === false) {
                             $restauranteNome = $title;
                         }
                     }
