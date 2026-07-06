@@ -82,6 +82,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.MarkerComposable
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.math.ln
@@ -334,8 +335,12 @@ private fun NearMapCard(
                 compassEnabled = true
             )
         ) {
+            val userMarkerState = rememberMarkerState(position = userLocation)
+            LaunchedEffect(userLocation) {
+                userMarkerState.position = userLocation
+            }
             MarkerComposable(
-                state = MarkerState(position = userLocation),
+                state = userMarkerState,
                 title = "A tua localizacao"
             ) {
                 Box(
@@ -400,9 +405,14 @@ private fun DishMapMarker(
         }
     }
 
+    val dishMarkerState = rememberMarkerState(position = position)
+    LaunchedEffect(position) {
+        dishMarkerState.position = position
+    }
+
     MarkerComposable(
         keys = arrayOf<Any>(restId, prato.id, radiusKm, imageUrl.orEmpty(), imageBitmap != null),
-        state = MarkerState(position = position),
+        state = dishMarkerState,
         onClick = {
             onPratoClick(prato.id)
             true
