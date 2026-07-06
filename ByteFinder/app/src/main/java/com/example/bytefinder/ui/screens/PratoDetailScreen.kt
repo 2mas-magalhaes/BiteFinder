@@ -60,6 +60,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import com.example.bytefinder.data.AvaliacaoDto
 import com.example.bytefinder.data.CreateAvaliacaoRequest
 import com.example.bytefinder.data.CreateRespostaRequest
@@ -743,8 +744,12 @@ private fun EmbeddedMap(lat: Double, lng: Double) {
         ),
         properties = MapProperties()
     ) {
+        val markerState = rememberMarkerState(position = position)
+        LaunchedEffect(position) {
+            markerState.position = position
+        }
         Marker(
-            state = MarkerState(position = position)
+            state = markerState
         )
     }
 }

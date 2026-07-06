@@ -58,6 +58,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 import java.util.Locale
 
 /**
@@ -310,7 +311,11 @@ fun ClayRestaurantDetailScreen(
                         ),
                         properties = MapProperties()
                     ) {
-                        Marker(state = MarkerState(position = position))
+                        val markerState = rememberMarkerState(position = position)
+                        LaunchedEffect(position) {
+                            markerState.position = position
+                        }
+                        Marker(state = markerState)
                     }
 
                     Spacer(Modifier.height(12.dp))
