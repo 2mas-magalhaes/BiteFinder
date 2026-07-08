@@ -65,8 +65,11 @@ try {
                     // Auto-fill nome se existir na resposta e for valido
                     if (isset($nifInfo['title']) && !empty(trim($nifInfo['title']))) {
                         $title = trim($nifInfo['title']);
+                        $titleLower = strtolower($title);
                         // Ignorar os erros standard da API para free tiers
-                        if (strpos($title, 'Key necessary') === false) {
+                        if (strpos($titleLower, 'key necessary') === false &&
+                            strpos($titleLower, 'limit') === false &&
+                            strpos($titleLower, 'quota') === false) {
                             $restauranteNome = $title;
                         }
                     }
